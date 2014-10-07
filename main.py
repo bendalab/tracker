@@ -62,12 +62,12 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
 # morph given img by erosion/dilation
 def morph_img(img):
     # erode img
-    er_kernel = np.ones((5, 5),np.uint8)
+    er_kernel = np.ones((5, 5), np.uint8)
     er_img = cv2.erode(img, er_kernel, iterations = 1)
     # dilate img
-    di_kernel = np.ones((5,5),np.uint8)
+    di_kernel = np.ones((5,5), np.uint8)
     di_img = cv2.dilate(er_img,di_kernel,iterations = 4)
-    # thresholding to easy black-white
+    # thresholding to black-white
     ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
     return  ret, morphed_img
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             break
 
         # set region of interest ROI
-        roi = frame[80:525, 15:695]
+        roi = frame[80:515, 15:695]
 
 
         # subtract background fro ROI
@@ -123,8 +123,6 @@ if __name__ == '__main__':
         mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
 
 
-
-
         # getting contours (of the morphed img)
         ret,thresh_img = cv2.threshold(mo_roi_bg_sub,127,255,cv2.THRESH_BINARY)
         contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -137,7 +135,6 @@ if __name__ == '__main__':
 
         # show all imgs
         show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
-
 
         # draw countours to ROI img and show img
         # print "contour list:" + str(contour_list)
