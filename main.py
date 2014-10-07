@@ -11,7 +11,6 @@ import cv2
 #   - extract white area of frame 1
 # 2.
 
-
 FRAME_WAITTIME = 25
 
 
@@ -42,100 +41,111 @@ cv2.moveWindow("canny", 600, 70)
 cv2.namedWindow("contours")
 cv2.moveWindow("contours", 570, 570)
 
-# create BG subtractor
-bg_sub = cv2.BackgroundSubtractorMOG2()
 
 
-while(cap.isOpened()):
-    ret, frame = cap.read()
+# morph given img by erosion/dilation
+def morph_img(img):
+    # erode img
+    er_kernel = np.ones((5, 5),np.uint8)
+    er_img = cv2.erode(img, er_kernel, iterations = 1)
+    # dilate img
+    di_kernel = np.ones((5,5),np.uint8)
+    di_img = cv2.dilate(er_img,di_kernel,iterations = 6)
+    # thresholding to easy black-white
+    ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
+    return  ret, morphed_img
 
-    if (frame == None):
-        break
-
-    # set region of interest ROI
-    roi = frame[80:525, 15:695]
+def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edges):
 
     # show original output
-    cv2.imshow('file', frame)
+    cv2.imshow('file', img)
 
     # show original ROI
     cv2.imshow('ROI', roi)
 
-    # subtract background fro ROI
-    roi_bg_sub = bg_sub.apply(roi)
-    cv2.imshow('Background subtracted', roi_bg_sub)
+    # show ROI with subtracted BG
+    cv2.imshow('Background subtracted', roi_bg_subtracted)
+
+    # show morphed subtracted BG-img
+    cv2.imshow("morphed", roi_bg_subtracted_morphed)
+
+    # show ROI img with canny edge detection
+    cv2.imshow("canny", canny_edges)
 
 
-    # erode img
-    er_kernel = np.ones((5,5),np.uint8)
-    er_roi_bg_sub = cv2.erode(roi_bg_sub, er_kernel, iterations = 1)
-    # dilate img
-    di_kernel = np.ones((5,5),np.uint8)
-    di_roi_bg_sub = cv2.dilate(er_roi_bg_sub,di_kernel,iterations = 4)
-    # thresholding to easy black-white
-    ret, mo_roi_bg_sub = cv2.threshold(di_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
+if __name__ == '__main__':
 
-    # set morphed output
-    # mo_roi_bg_sub = di_roi_bg_sub
+    # create BG subtractor
+    bg_sub = cv2.BackgroundSubtractorMOG2()
 
-    # show morphed image
-    cv2.imshow("morphed", mo_roi_bg_sub)
+    # main loop
+    while(cap.isOpened()):
+        ret, frame = cap.read()
 
-    # # dilate edges of bg-deleted img
-    dilate_kernel = np.ones((3,3),np.uint8)
-    dilated_roi_bg_sub = cv2.dilate(roi_bg_sub,dilate_kernel,iterations = 1)
-    # detect edges of bg-deleted img
-    edges = cv2.Canny(roi_bg_sub, 500, 500)
+        if (frame == None):
+            break
 
-    # detect edges of morphed img (not displayed)
-    mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
-
-    # edges = cv2.Canny(roi, 100, 200)
-    cv2.imshow("canny", edges)
+        # set region of interest ROI
+        roi = frame[80:525, 15:695]
 
 
-    #########################################################
-    # things i don't understand yet
+        # subtract background fro ROI
+        roi_bg_sub = bg_sub.apply(roi)
 
-    # getting contours (of the bg-subtracted img)
-    # ret,thresh_img = cv2.threshold(roi_bg_sub,127,255,cv2.THRESH_BINARY)
-    # contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        # morph img
+        ret, mo_roi_bg_sub = morph_img(roi_bg_sub)
 
-    # getting contours (of the morphed img)
-    ret,thresh_img = cv2.threshold(mo_roi_bg_sub,127,255,cv2.THRESH_BINARY)
-    contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        # detect edges of bg-deleted img
+        edges = cv2.Canny(roi_bg_sub, 500, 500)
 
-
-    # set a threshold for object area. everything below threshold is ignored
-    area_threshold = 700
-    if (len(contour_list) > 0 ):
-
-        counter = 0
-        while (counter < len(contour_list)):
-
-            popped = False
-
-            # print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
-            if (cv2.contourArea(contour_list[counter]) < area_threshold):
-                contour_list.pop(counter)
-                popped = True
-            if not popped:
-                # print(cv2.contourArea(contour_list[counter]))
-                counter += 1
-
-
-
-    # draw countours to ROI img and show img
-    # print "contour list:" + str(contour_list)
-    cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
-    cv2.imshow("contours", roi)
+        # detect edges of morphed img (not displayed)
+        mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
 
 
 
 
+        # getting contours (of the morphed img)
+        ret,thresh_img = cv2.threshold(mo_roi_bg_sub,127,255,cv2.THRESH_BINARY)
+        contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-    if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
-        break
 
-cap.release()
-cv2.destroyAllWindows()
+        # set a threshold for object area. everything below threshold is ignored
+        area_threshold = 700
+        if (len(contour_list) > 0 ):
+
+            counter = 0
+            while (counter < len(contour_list)):
+
+                popped = False
+
+                # print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
+                if (cv2.contourArea(contour_list[counter]) < area_threshold):
+                    contour_list.pop(counter)
+                    popped = True
+                if not popped:
+                    # print(cv2.contourArea(contour_list[counter]))
+                    counter += 1
+
+
+
+
+        show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
+
+
+
+        # draw countours to ROI img and show img
+        # print "contour list:" + str(contour_list)
+        cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
+        cv2.imshow("contours", roi)
+
+
+
+
+
+        if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
