@@ -45,6 +45,18 @@ cv2.moveWindow("contours", 570, 570)
 # create BG subtractor
 bg_sub = cv2.BackgroundSubtractorMOG2()
 
+# COPIED! check if two contours near to eachother
+dist = 5
+def find_if_close(cnt1,cnt2):
+    row1,row2 = cnt1.shape[0],cnt2.shape[0]
+    for i in xrange(row1):
+        for j in xrange(row2):
+            dist = np.linalg.norm(cnt1[i]-cnt2[j])
+            if abs(dist) < dist :
+                return True
+            elif i==row1-1 and j==row2-1:
+                return False
+
 while(cap.isOpened()):
     ret, frame = cap.read()
 
@@ -101,22 +113,53 @@ while(cap.isOpened()):
 
     if (len(contour_list) > 0 ):
 
-        counter = 0
-        while (counter < len(contour_list)):
-
-            popped = False
-
-            print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
-            if (cv2.contourArea(contour_list[counter]) < 300):
-                contour_list.pop(counter)
-                popped = True
-            if not popped:
-                counter += 1
+        # counter = 0
+        # while (counter < len(contour_list)):
         #
+        #     popped = False
         #
-        # draw countours to ROI img and show img
-        print "contour list:" + str(contour_list)
-        cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
+        #     print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
+        #     if (cv2.contourArea(contour_list[counter]) < 300):
+        #         contour_list.pop(counter)
+        #         popped = True
+        #     if not popped:
+        #         counter += 1
+
+        # COPIED! merge contours
+        LENGTH = len(contour_list)
+        status = np.zeros((LENGTH,1))
+
+        for i,cnt1 in enumerate(contour_list):
+            x = i
+            if i != LENGTH-1:
+                for j,cnt2 in enumerate(contour_list[i+1:]):
+                    x = x+1
+                    dist = find_if_close(cnt1,cnt2)
+                    if dist == True:
+                        val = min(status[i],status[x])
+                        status[x] = status[i] = val
+                    else:
+                        if status[x]==status[i]:
+                            status[x] = i+1
+
+        unified = []
+        maximum = int(status.max())+1
+        for i in xrange(maximum):
+            pos = np.where(status==i)[0]
+            if pos.size != 0:
+                cont = np.vstack(contour_list[i] for i in pos)
+                hull = cv2.convexHull(cont)
+                unified.append(hull)
+
+
+        # # draw countours to ROI img and show img
+        # print "contour list:" + str(contour_list)
+        # cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
+        # cv2.imshow("contours", roi)
+
+        # draw _unified_ countours to ROI img and show img
+        print "contour list:" + str(unified)
+        cv2.drawContours(roi, unified, -1, (0,255,0), 3)
         cv2.imshow("contours", roi)
 
 
