@@ -1,25 +1,18 @@
 import numpy as np
 import cv2
 
-# print cv2.__version__
-
-
-# TODO
-# 0. define path with given arguments
-#
-# 1. define region of interest ROI
-#   - extract white area of frame 1
-# 2.
 
 FRAME_WAITTIME = 25
 
 
 # define testvideo
+# path to directory
 dir = "examples/"
-# date = "2014-10-02_5"
-# date = "2014-10-02_27"
-date = "2014-10-01_33"
-testVid = dir + date + ".avi"
+
+# videofile_name = "2014-10-02_5"
+# videofile_name = "2014-10-02_27"
+videofile_name = "2014-10-01_33"
+testVid = dir + videofile_name + ".avi"
 
 # capture video
 cap = cv2.VideoCapture(testVid)
@@ -42,19 +35,8 @@ cv2.namedWindow("contours")
 cv2.moveWindow("contours", 570, 570)
 
 
-
-# morph given img by erosion/dilation
-def morph_img(img):
-    # erode img
-    er_kernel = np.ones((5, 5),np.uint8)
-    er_img = cv2.erode(img, er_kernel, iterations = 1)
-    # dilate img
-    di_kernel = np.ones((5,5),np.uint8)
-    di_img = cv2.dilate(er_img,di_kernel,iterations = 6)
-    # thresholding to easy black-white
-    ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
-    return  ret, morphed_img
-
+# temporary function
+# show images
 def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edges):
 
     # show original output
@@ -71,6 +53,45 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
 
     # show ROI img with canny edge detection
     cv2.imshow("canny", canny_edges)
+
+
+##########################################################################################
+##########################################################################################
+# serious stuff starts here
+
+# morph given img by erosion/dilation
+def morph_img(img):
+    # erode img
+    er_kernel = np.ones((5, 5),np.uint8)
+    er_img = cv2.erode(img, er_kernel, iterations = 1)
+    # dilate img
+    di_kernel = np.ones((5,5),np.uint8)
+    di_img = cv2.dilate(er_img,di_kernel,iterations = 4)
+    # thresholding to easy black-white
+    ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
+    return  ret, morphed_img
+
+
+
+# set a threshold for area. all contours with smaller area get deleted
+def del_small_contours(contour_list, threshold):
+    area_threshold = threshold
+    if (len(contour_list) > 0 ):
+
+        counter = 0
+        while (counter < len(contour_list)):
+
+            popped = False
+
+            # print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
+            if (cv2.contourArea(contour_list[counter]) < area_threshold):
+                contour_list.pop(counter)
+                popped = True
+            if not popped:
+                # print(cv2.contourArea(contour_list[counter]))
+                counter += 1
+    return contour_list
+
 
 
 if __name__ == '__main__':
@@ -110,27 +131,12 @@ if __name__ == '__main__':
 
 
         # set a threshold for object area. everything below threshold is ignored
-        area_threshold = 700
-        if (len(contour_list) > 0 ):
-
-            counter = 0
-            while (counter < len(contour_list)):
-
-                popped = False
-
-                # print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
-                if (cv2.contourArea(contour_list[counter]) < area_threshold):
-                    contour_list.pop(counter)
-                    popped = True
-                if not popped:
-                    # print(cv2.contourArea(contour_list[counter]))
-                    counter += 1
+        threshold = 700
+        contour_list = del_small_contours(contour_list, threshold)
 
 
-
-
+        # show all imgs
         show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
-
 
 
         # draw countours to ROI img and show img
