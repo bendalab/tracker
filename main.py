@@ -2,12 +2,15 @@ import numpy as np
 import cv2
 
 
-FRAME_WAITTIME = 25
+FRAME_WAITTIME = 10
 
 DRAW_CONTOUR = True
 
-DRAW_ELLIPSE = True
+DRAW_ELLIPSE = False
 ellipse = None
+
+DRAW_LINE = False
+line = None
 
 DRAW_TRAVEL_ROUTE = True
 
@@ -136,8 +139,17 @@ def fit_ellipse_on_contour(contour_list):
         if (len(contour_list) > 0):
             cnt = contour_list[0]
             ellipse = cv2.fitEllipse(cnt)
-            ## center of ellipse is a tuple in ellipse[0]
+            ## center: ellipse[0]
+            ## size  : ellipse[1]
+            ## angle : ellipse[2]
+            print ellipse
             return ellipse
+
+def fit_line_on_contour(contour_list):
+    if (contour_list != None and len(contour_list) > 0):
+        cnt = contour_list[0]
+        line = cv2.fitLine(cnt, cv2.DIST_LABEL_PIXEL, 0, 0.01, 0.01)
+        return line
 
 def append_to_travel_route(ellipse):
     if (ellipse != None):
@@ -145,7 +157,6 @@ def append_to_travel_route(ellipse):
         ellipse_y = int(round(ellipse[0][1]))
         point = (ellipse_x, ellipse_y)
         travel_route.append(point)
-        print travel_route
 
 if __name__ == '__main__':
 
@@ -178,7 +189,7 @@ if __name__ == '__main__':
 
         # getting contours (of the morphed img)
         ret,thresh_img = cv2.threshold(mo_roi_bg_sub,127,255,cv2.THRESH_BINARY)
-        contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
 
         # set a threshold for object area. everything below threshold is ignored
@@ -189,6 +200,8 @@ if __name__ == '__main__':
         contour_list = keep_biggest_contours(contour_list)
 
         # TODO check  if fish already started, if not, delete contours
+        # if fish not yet started, delete contours
+
 
         # TODO if two contours (of same size) in list delete which is farthest away from last point
 
@@ -201,12 +214,27 @@ if __name__ == '__main__':
             cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
 
         # fit ellipse on contour
-        if (DRAW_ELLIPSE):
-            ellipse =  fit_ellipse_on_contour(contour_list)
+        ellipse =  fit_ellipse_on_contour(contour_list)
         # draw ellipse
         if (DRAW_ELLIPSE and ellipse != None):
             cv2.ellipse(roi,ellipse,(0, 0, 255),2)
 
+        # fit line on contour
+        line = fit_line_on_contour(contour_list)
+        # draw line
+        if (DRAW_LINE and line != None):
+            vx = line[0]
+            vy = line[1]
+            # gradient = vx/vy
+
+            x1 = line[2]
+            y1 = line[3]
+            x2 = x1 + vx*200
+            y2 = y1 + vy*200
+            x3 = x1 - vx*20
+            y3 = y1 - vy*20
+
+            cv2.line(roi, (x2, y2), (x3, y3), (0, 0, 255), 2)
 
         # append ellipse center to travel route
         if (DRAW_TRAVEL_ROUTE):
