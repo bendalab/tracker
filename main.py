@@ -1,15 +1,17 @@
 import numpy as np
 import cv2
+import math
 
 
 FRAME_WAITTIME = 10
 
-DRAW_CONTOUR = True
+DRAW_CONTOUR = False
 
-DRAW_ELLIPSE = False
+DRAW_ELLIPSE = True
 ellipse = None
 
-DRAW_LINE = False
+DRAW_LINE = True
+line_length = 40
 line = None
 
 DRAW_TRAVEL_ROUTE = True
@@ -142,14 +144,37 @@ def fit_ellipse_on_contour(contour_list):
             ## center: ellipse[0]
             ## size  : ellipse[1]
             ## angle : ellipse[2]
-            print ellipse
+            # print ellipse
             return ellipse
 
-def fit_line_on_contour(contour_list):
-    if (contour_list != None and len(contour_list) > 0):
-        cnt = contour_list[0]
-        line = cv2.fitLine(cnt, cv2.DIST_LABEL_PIXEL, 0, 0.01, 0.01)
-        return line
+
+# TODO get this right, dude!
+def get_line_from_ellipse(ellipse):
+    # print ellipse
+
+    half_length = line_length/2
+
+    center_x = ellipse[0][0]
+    center_y = ellipse[0][1]
+    grade_angle = 90 - ellipse[2]
+    angle_prop = 180/grade_angle
+    angle = math.pi*angle_prop
+
+
+    print "angle: " + str(angle)
+    x_dif = math.sin(angle)
+    y_dif = math.cos(angle)
+
+    print "x: " + str(x_dif)
+    print "y: " + str(y_dif)
+
+    x1 = int(round(center_x - half_length*x_dif))
+    y1 = int(round(center_y - half_length*y_dif))
+    x2 = int(round(center_x + half_length*x_dif))
+    y2 = int(round(center_y + half_length*y_dif))
+
+    return x1, y1, x2, y2
+
 
 def append_to_travel_route(ellipse):
     if (ellipse != None):
@@ -157,6 +182,8 @@ def append_to_travel_route(ellipse):
         ellipse_y = int(round(ellipse[0][1]))
         point = (ellipse_x, ellipse_y)
         travel_route.append(point)
+
+
 
 if __name__ == '__main__':
 
@@ -219,22 +246,17 @@ if __name__ == '__main__':
         if (DRAW_ELLIPSE and ellipse != None):
             cv2.ellipse(roi,ellipse,(0, 0, 255),2)
 
-        # fit line on contour
-        line = fit_line_on_contour(contour_list)
+        # get line from ellipse
+        lx1 = 0
+        ly1 = 0
+        lx2 = 0
+        ly2 = 0
+        if (ellipse != None):
+            lx1, ly1, lx2, ly2 = get_line_from_ellipse(ellipse)
         # draw line
-        if (DRAW_LINE and line != None):
-            vx = line[0]
-            vy = line[1]
-            # gradient = vx/vy
+        if (DRAW_LINE and ellipse != None):
+            cv2.line(roi, (lx1, ly1), (lx2, ly2), (0,0,255),2)
 
-            x1 = line[2]
-            y1 = line[3]
-            x2 = x1 + vx*200
-            y2 = y1 + vy*200
-            x3 = x1 - vx*20
-            y3 = y1 - vy*20
-
-            cv2.line(roi, (x2, y2), (x3, y3), (0, 0, 255), 2)
 
         # append ellipse center to travel route
         if (DRAW_TRAVEL_ROUTE):
