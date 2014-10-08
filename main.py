@@ -4,6 +4,23 @@ import cv2
 
 FRAME_WAITTIME = 25
 
+DRAW_CONTOUR = True
+
+DRAW_ELLIPSE = True
+ellipse = None
+
+DRAW_TRAVEL_ROUTE = True
+
+travel_route = []
+
+ROI_X1 = 80
+ROI_X2 = 515
+ROI_Y1 = 15
+ROI_Y2 = 695
+
+
+fish_started = False
+
 
 # define testvideo
 # path to directory
@@ -12,6 +29,7 @@ dir = "examples/"
 # videofile_name = "2014-10-02_5"
 # videofile_name = "2014-10-02_27"
 videofile_name = "2014-10-01_33"
+# videofile_name = "2014-10-01_31"
 testVid = dir + videofile_name + ".avi"
 
 # capture video
@@ -93,6 +111,41 @@ def del_small_contours(contour_list, threshold):
     return contour_list
 
 
+# only keep biggest-area object in contour list
+def keep_biggest_contours(contour_list):
+    if (len(contour_list) == 0):
+        return
+
+    biggest = cv2.contourArea(contour_list[0])
+
+    counter = 1
+    while (counter < len(contour_list)):
+        next_size = cv2.contourArea(contour_list[counter])
+        if (next_size < biggest):
+            contour_list.pop(counter)
+        elif (next_size > biggest):
+            biggest = next_size
+            contour_list.pop(counter-1)
+        else:
+            counter += 1
+
+    return contour_list
+
+def fit_ellipse_on_contour(contour_list):
+    if (contour_list != None and len(contour_list) > 0):
+        if (len(contour_list) > 0):
+            cnt = contour_list[0]
+            ellipse = cv2.fitEllipse(cnt)
+            ## center of ellipse is a tuple in ellipse[0]
+            return ellipse
+
+def append_to_travel_route(ellipse):
+    if (ellipse != None):
+        ellipse_x = int(round(ellipse[0][0]))
+        ellipse_y = int(round(ellipse[0][1]))
+        point = (ellipse_x, ellipse_y)
+        travel_route.append(point)
+        print travel_route
 
 if __name__ == '__main__':
 
@@ -107,7 +160,7 @@ if __name__ == '__main__':
             break
 
         # set region of interest ROI
-        roi = frame[80:515, 15:695]
+        roi = frame[ROI_X1:ROI_X2, ROI_Y1:ROI_Y2]
 
 
         # subtract background fro ROI
@@ -132,17 +185,41 @@ if __name__ == '__main__':
         threshold = 700
         contour_list = del_small_contours(contour_list, threshold)
 
+        # keep only biggest contours
+        contour_list = keep_biggest_contours(contour_list)
+
+        # TODO check  if fish already started, if not, delete contours
+
+        # TODO if two contours (of same size) in list delete which is farthest away from last point
+
 
         # show all imgs
         show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
 
         # draw countours to ROI img and show img
-        # print "contour list:" + str(contour_list)
-        cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
+        if (DRAW_CONTOUR):
+            cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
+
+        # fit ellipse on contour
+        if (DRAW_ELLIPSE):
+            ellipse =  fit_ellipse_on_contour(contour_list)
+        # draw ellipse
+        if (DRAW_ELLIPSE and ellipse != None):
+            cv2.ellipse(roi,ellipse,(0, 0, 255),2)
+
+
+        # append ellipse center to travel route
+        if (DRAW_TRAVEL_ROUTE):
+            append_to_travel_route(ellipse)
+
+
+        # draw travel route
+        if (DRAW_TRAVEL_ROUTE):
+            for point in travel_route:
+                cv2.circle(roi, point, 2, (255, 0, 0))
+
+        # show output img
         cv2.imshow("contours", roi)
-
-
-
 
 
         if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
