@@ -3,7 +3,9 @@ import cv2
 import math
 
 
-FRAME_WAITTIME = 10
+FRAME_WAITTIME = 50
+
+frame_counter = 1
 
 DRAW_CONTOUR = False
 
@@ -11,7 +13,7 @@ DRAW_ELLIPSE = True
 ellipse = None
 
 DRAW_LINE = True
-line_length = 40
+line_length = 30
 line = None
 
 DRAW_TRAVEL_ROUTE = True
@@ -148,25 +150,23 @@ def fit_ellipse_on_contour(contour_list):
             return ellipse
 
 
-# TODO get this right, dude!
+# calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
+# TODO gather angles in list, adjust angles to fish
 def get_line_from_ellipse(ellipse):
-    # print ellipse
 
     half_length = line_length/2
 
     center_x = ellipse[0][0]
     center_y = ellipse[0][1]
-    grade_angle = 90 - ellipse[2]
-    angle_prop = 180/grade_angle
+    grade_angle = -1 * ellipse[2]
+    print "ellipse angle: " +  str(ellipse[2])
+    print "  grade angle: " + str(grade_angle)
+    angle_prop = grade_angle/180
     angle = math.pi*angle_prop
+    print "        angle: " + str(angle)
 
-
-    print "angle: " + str(angle)
     x_dif = math.sin(angle)
     y_dif = math.cos(angle)
-
-    print "x: " + str(x_dif)
-    print "y: " + str(y_dif)
 
     x1 = int(round(center_x - half_length*x_dif))
     y1 = int(round(center_y - half_length*y_dif))
@@ -255,7 +255,7 @@ if __name__ == '__main__':
             lx1, ly1, lx2, ly2 = get_line_from_ellipse(ellipse)
         # draw line
         if (DRAW_LINE and ellipse != None):
-            cv2.line(roi, (lx1, ly1), (lx2, ly2), (0,0,255),2)
+            cv2.line(roi, (lx1, ly1), (lx2, ly2), (0,0,255), 1)
 
 
         # append ellipse center to travel route
@@ -274,6 +274,8 @@ if __name__ == '__main__':
 
         if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
             break
+
+        frame_counter += 1
 
     cap.release()
     cv2.destroyAllWindows()
