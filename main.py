@@ -3,9 +3,9 @@ import cv2
 import math
 
 
-FRAME_WAITTIME = 50
+FRAME_WAITTIME = 25
 
-frame_counter = 1
+frame_counter = 0
 
 DRAW_CONTOUR = False
 
@@ -27,6 +27,7 @@ DRAW_TRAVEL_ROUTE = True
 
 travel_route = []
 
+# set region of interest (ROI)
 ROI_X1 = 80
 ROI_X2 = 515
 ROI_Y1 = 15
@@ -36,6 +37,12 @@ ROI_Y2 = 695
 fish_size_threshold = 700
 
 fish_started = False
+
+# init last position of fish to middle of right edge of ROI
+last_pos = (ROI_X2-ROI_X1, int((ROI_Y2-ROI_Y1)/2))
+
+
+
 
 
 # define testvideo
@@ -127,6 +134,28 @@ def del_small_contours(contour_list):
                 counter += 1
     return contour_list
 
+# def only_keep_biggest(li):
+#     if (len(li) == 0):
+#         return
+#
+#     biggest = li[0]
+#
+#     counter = 1
+#     while (counter < len(li)):
+#         next_size = cv2.contourArea(li[counter])
+#         if (next_size < biggest):
+#             li.pop(counter)
+#         elif (next_size > biggest):
+#             biggest = next_size
+#             li.pop(counter-1)
+#         else:
+#             counter += 1
+#
+#     return li
+
+
+
+
 
 # only keep biggest-area object in contour list
 def keep_biggest_contours(contour_list):
@@ -147,6 +176,41 @@ def keep_biggest_contours(contour_list):
             counter += 1
 
     return contour_list
+
+
+
+# calculates distance of two given points (tuples)
+def calculate_distance(p1, p2):
+    x_diff = p2[0] - p1[0]
+    y_diff = p2[1] - p1[1]
+    dist = math.sqrt(x_diff*x_diff + y_diff*y_diff)
+    return dist
+
+# get center of contour based on fitting ellipse
+def get_center(cnt):
+    ellipse = cv2.fitEllipse(cnt)
+    return ellipse[0]
+
+# if two or more contours (of same size) in contour_list delete which is farthest away from last point
+def keep_nearest_contour(contour_list):
+    cnt_center = get_center(ellipse[0])
+    biggest_dist = calculate_distance(cnt_center, last_pos)
+
+    counter = 1
+    while (counter < len(contour_list)):
+        next_center = get_center(ellipse[counter])
+        next_dist = calculate_distance(next_center, last_pos)
+        if (next_dist < biggest):
+            contour_list.pop(counter)
+        elif (next_dist > biggest):
+            biggest = next_dist
+            contour_list.pop(counter-1)
+        else:
+            counter += 1
+
+    return contour_list
+
+
 
 # check if fish started from the right side
 def check_if_fish_started(contour_list, roi):
@@ -258,11 +322,11 @@ if __name__ == '__main__':
         # keep only biggest contours
         contour_list = keep_biggest_contours(contour_list)
 
-        # TODO check  if fish already started, if not, delete contours
-        # if fish not yet started, delete contours
 
+        # if two or more contours (of same size) in list delete which is farthest away from last point
+        if fish_started and len(contour_list) > 1:
+            contour_list = keep_nearest_contour(contour_list)
 
-        # TODO if two contours (of same size) in list delete which is farthest away from last point
 
 
         # show all imgs
@@ -275,11 +339,11 @@ if __name__ == '__main__':
         # fit ellipse on contour
         ellipse =  fit_ellipse_on_contour(contour_list)
         # draw ellipse
-        if (DRAW_ELLIPSE and ellipse != None):
+        if (DRAW_ELLIPSE and fish_started):
             cv2.ellipse(roi,ellipse,(0, 0, 255),2)
 
         # get line from ellipse
-        if (ellipse != None):
+        if (fish_started):
             lx1, ly1, lx2, ly2 = get_line_from_ellipse(ellipse)
         # draw line
         if (DRAW_LINE and ellipse != None):
@@ -291,8 +355,7 @@ if __name__ == '__main__':
             append_to_travel_route(ellipse)
 
         # append coordinates to travel_orientation
-        # TODO change ellipse to fish_started
-        if (DRAW_TRAVEL_ORIENTATION and ellipse != None):
+        if (DRAW_TRAVEL_ORIENTATION and fish_started):
             append_to_travel_orientation(lx1, ly1, lx2, ly2)
 
 
