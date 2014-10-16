@@ -21,11 +21,10 @@ lx2 = 0
 ly2 = 0
 
 DRAW_TRAVEL_ORIENTATION = True
-travel_orientation = []
+img_travel_orientation = []
 
 DRAW_TRAVEL_ROUTE = True
-
-travel_route = []
+img_travel_route = []
 
 # set region of interest (ROI)
 ROI_X1 = 80
@@ -42,6 +41,10 @@ fish_started = False
 last_pos = None
 all_pos_roi = []
 all_pos_original = []
+
+# init last orientation and list for saving
+last_ori = None
+all_oris = []
 
 last_frame = None
 
@@ -174,11 +177,11 @@ def get_center(cnt):
     ellipse = cv2.fitEllipse(cnt)
     return ellipse[0]
 
-# if two or more contours (of same size) in contour_list delete which is farthest away from last point
+# if two or more contours (of same size) in contour_list delete which is farthest away from last pos fish was
 def keep_nearest_contour(contour_list):
 
     global last_pos
-    if last_pos == None:
+    if last_pos is None:
         last_pos = (ROI_X2-ROI_X1, int((ROI_Y2-ROI_Y1)/2))
 
     cnt_center = get_center(ellipse[0])
@@ -251,17 +254,17 @@ def get_line_from_ellipse(ellipse):
 
 def append_to_travel_orientation(lx1, ly1, lx2, ly2):
     coordinates = (lx1, ly1, lx2, ly2)
-    travel_orientation.append(coordinates)
+    img_travel_orientation.append(coordinates)
 
 def append_to_travel_route(ellipse):
     if (ellipse != None):
         ellipse_x = int(round(ellipse[0][0]))
         ellipse_y = int(round(ellipse[0][1]))
         point = (ellipse_x, ellipse_y)
-        travel_route.append(point)
+        img_travel_route.append(point)
 
 def set_last_pos(ellipse):
-    if ellipse == None:
+    if ellipse is None:
         return
     else:
         global last_pos
@@ -270,12 +273,43 @@ def set_last_pos(ellipse):
 def save_fish_positions():
     global last_pos
     all_pos_roi.append(last_pos)
-    if last_pos == None:
+    if last_pos is None:
         all_pos_original.append(last_pos)
     else:
         original_x = last_pos[0]+ROI_X1
         original_y = last_pos[1]+ROI_Y1
         all_pos_original.append((original_x,original_y))
+
+def set_last_orientation(ellipse):
+    if not fish_started:
+        return
+
+    global last_ori
+    if last_ori is None:
+        last_ori = 270
+
+    ell_ori = ellipse[2]
+    if last_ori > ell_ori:
+        ori_diff = last_ori - ell_ori
+        if ori_diff > 270:
+            last_ori = ell_ori
+        elif ori_diff < 90:
+            last_ori = ell_ori
+        else:
+            last_ori = (ell_ori + 180) % 360
+    if last_ori < ell_ori:
+        ori_diff = ell_ori - last_ori
+        if ori_diff < 90:
+            last_ori = ell_ori % 360
+        else:
+            last_ori = (ell_ori + 180) % 360
+
+def save_fish_orientations():
+    if not fish_started:
+        return
+
+    global last_ori
+    all_oris.append(last_ori)
 
 
 
@@ -290,7 +324,7 @@ def run_Tracker():
 
         ret, frame = cap.read()
 
-        if (frame == None):
+        if (frame is None):
             break
 
         # set region of interest ROI
@@ -367,6 +401,12 @@ def run_Tracker():
         # save fish positions
         save_fish_positions()
 
+        # set last orientation
+        set_last_orientation(ellipse)
+
+        # save orientations
+        save_fish_orientations()
+
         # append coordinates to travel_orientation
         if (DRAW_TRAVEL_ORIENTATION and fish_started):
             append_to_travel_orientation(lx1, ly1, lx2, ly2)
@@ -374,12 +414,12 @@ def run_Tracker():
 
         # draw travel route
         if (DRAW_TRAVEL_ORIENTATION):
-            for coordinates in travel_orientation:
+            for coordinates in img_travel_orientation:
                 cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
 
         # draw travel orientation
         if (DRAW_TRAVEL_ROUTE):
-            for point in travel_route:
+            for point in img_travel_route:
                 cv2.circle(roi, point, 2, (255, 0, 0))
 
 
@@ -408,6 +448,7 @@ if __name__ == '__main__':
 
     # print all_pos_roi
     # print all_pos_original
+    # print all_oris
 
     cv2.imshow("result", last_frame)
     cv2.waitKey(0)
