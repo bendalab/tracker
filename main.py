@@ -13,8 +13,15 @@ DRAW_ELLIPSE = True
 ellipse = None
 
 DRAW_LINE = True
-line_length = 30
+line_point_offset = 5
 line = None
+lx1 = 0
+ly1 = 0
+lx2 = 0
+ly2 = 0
+
+DRAW_TRAVEL_ORIENTATION = True
+travel_orientation = []
 
 DRAW_TRAVEL_ROUTE = True
 
@@ -25,6 +32,8 @@ ROI_X2 = 515
 ROI_Y1 = 15
 ROI_Y2 = 695
 
+
+fish_size_threshold = 700
 
 fish_started = False
 
@@ -41,6 +50,7 @@ testVid = dir + videofile_name + ".avi"
 
 # capture video
 cap = cv2.VideoCapture(testVid)
+
 
 # create and position windows
 cv2.namedWindow("file")
@@ -99,8 +109,8 @@ def morph_img(img):
 
 
 # set a threshold for area. all contours with smaller area get deleted
-def del_small_contours(contour_list, threshold):
-    area_threshold = threshold
+def del_small_contours(contour_list):
+    area_threshold = fish_size_threshold
     if (len(contour_list) > 0 ):
 
         counter = 0
@@ -138,6 +148,11 @@ def keep_biggest_contours(contour_list):
 
     return contour_list
 
+# check if fish started from the right side
+def check_if_fish_started(contour_list, roi):
+
+
+# fitting ellipse onto contour
 def fit_ellipse_on_contour(contour_list):
     if (contour_list != None and len(contour_list) > 0):
         if (len(contour_list) > 0):
@@ -151,30 +166,31 @@ def fit_ellipse_on_contour(contour_list):
 
 
 # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
-# TODO gather angles in list, adjust angles to fish
 def get_line_from_ellipse(ellipse):
-
-    half_length = line_length/2
 
     center_x = ellipse[0][0]
     center_y = ellipse[0][1]
     grade_angle = -1 * ellipse[2]
-    print "ellipse angle: " +  str(ellipse[2])
-    print "  grade angle: " + str(grade_angle)
+    # print "ellipse angle: " +  str(ellipse[2])
+    # print "  grade angle: " + str(grade_angle)
     angle_prop = grade_angle/180
     angle = math.pi*angle_prop
-    print "        angle: " + str(angle)
+    # print "        angle: " + str(angle)
 
     x_dif = math.sin(angle)
     y_dif = math.cos(angle)
 
-    x1 = int(round(center_x - half_length*x_dif))
-    y1 = int(round(center_y - half_length*y_dif))
-    x2 = int(round(center_x + half_length*x_dif))
-    y2 = int(round(center_y + half_length*y_dif))
+    x1 = int(round(center_x - line_point_offset*x_dif))
+    y1 = int(round(center_y - line_point_offset*y_dif))
+    x2 = int(round(center_x + line_point_offset*x_dif))
+    y2 = int(round(center_y + line_point_offset*y_dif))
 
     return x1, y1, x2, y2
 
+def append_to_travel_orientation(lx1, ly1, lx2, ly2):
+    coordinates = (lx1, ly1, lx2, ly2)
+    travel_orientation.append(coordinates)
+    print travel_orientation
 
 def append_to_travel_route(ellipse):
     if (ellipse != None):
@@ -219,9 +235,11 @@ if __name__ == '__main__':
         contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
 
-        # set a threshold for object area. everything below threshold is ignored
-        threshold = 700
-        contour_list = del_small_contours(contour_list, threshold)
+        # everything below fish_size_threshold is being ignored
+        contour_list = del_small_contours(contour_list)
+
+        # check if fish started
+        check_if_fish_started(contour_list, roi)
 
         # keep only biggest contours
         contour_list = keep_biggest_contours(contour_list)
@@ -247,10 +265,6 @@ if __name__ == '__main__':
             cv2.ellipse(roi,ellipse,(0, 0, 255),2)
 
         # get line from ellipse
-        lx1 = 0
-        ly1 = 0
-        lx2 = 0
-        ly2 = 0
         if (ellipse != None):
             lx1, ly1, lx2, ly2 = get_line_from_ellipse(ellipse)
         # draw line
@@ -262,11 +276,23 @@ if __name__ == '__main__':
         if (DRAW_TRAVEL_ROUTE):
             append_to_travel_route(ellipse)
 
+        # append coordinates to travel_orientation
+        # TODO change ellipse to fish_started
+        if (DRAW_TRAVEL_ORIENTATION and ellipse != None):
+            append_to_travel_orientation(lx1, ly1, lx2, ly2)
+
 
         # draw travel route
         if (DRAW_TRAVEL_ROUTE):
+            for coordinates in travel_orientation:
+                cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
+
+        # draw travel orientation
+        if (DRAW_TRAVEL_ORIENTATION):
             for point in travel_route:
                 cv2.circle(roi, point, 2, (255, 0, 0))
+
+
 
         # show output img
         cv2.imshow("contours", roi)
