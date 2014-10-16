@@ -4,7 +4,7 @@ import math
 import sys
 
 
-FRAME_WAITTIME = 50
+FRAME_WAITTIME = 1
 
 frame_counter = 0
 
@@ -80,18 +80,18 @@ def set_video_capture():
 
 
 # create and position windows
-cv2.namedWindow("file")
-cv2.moveWindow("file", 0, 0)
-cv2.namedWindow("ROI")
-cv2.moveWindow("ROI", 1300, 0)
-cv2.namedWindow("Background subtracted")
-cv2.moveWindow("Background subtracted", 0, 600)
-
-cv2.namedWindow("morphed")
-cv2.moveWindow("morphed", 1300, 600)
-
-cv2.namedWindow("canny")
-cv2.moveWindow("canny", 600, 70)
+# cv2.namedWindow("file")
+# cv2.moveWindow("file", 0, 0)
+# cv2.namedWindow("ROI")
+# cv2.moveWindow("ROI", 1300, 0)
+# cv2.namedWindow("Background subtracted")
+# cv2.moveWindow("Background subtracted", 0, 600)
+#
+# cv2.namedWindow("morphed")
+# cv2.moveWindow("morphed", 1300, 600)
+#
+# cv2.namedWindow("canny")
+# cv2.moveWindow("canny", 600, 70)
 
 cv2.namedWindow("contours")
 cv2.moveWindow("contours", 570, 570)
@@ -101,20 +101,20 @@ cv2.moveWindow("contours", 570, 570)
 # show images
 def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edges):
 
-    # show original output
-    cv2.imshow('file', img)
-
-    # show original ROI
-    cv2.imshow('ROI', roi)
-
-    # show ROI with subtracted BG
-    cv2.imshow('Background subtracted', roi_bg_subtracted)
-
-    # show morphed subtracted BG-img
-    cv2.imshow("morphed", roi_bg_subtracted_morphed)
-
-    # show ROI img with canny edge detection
-    cv2.imshow("canny", canny_edges)
+    # # show original output
+    # cv2.imshow('file', img)
+    #
+    # # show original ROI
+    # cv2.imshow('ROI', roi)
+    #
+    # # show ROI with subtracted BG
+    # cv2.imshow('Background subtracted', roi_bg_subtracted)
+    #
+    # # show morphed subtracted BG-img
+    # cv2.imshow("morphed", roi_bg_subtracted_morphed)
+    #
+    # # show ROI img with canny edge detection
+    # cv2.imshow("canny", canny_edges)
 
     return
 
@@ -127,10 +127,10 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
 def morph_img(img):
     # erode img
     er_kernel = np.ones((5, 5), np.uint8)
-    er_img = cv2.erode(img, er_kernel, iterations = 1)
+    er_img = cv2.erode(img, er_kernel, iterations=1)
     # dilate img
     di_kernel = np.ones((5,5), np.uint8)
-    di_img = cv2.dilate(er_img,di_kernel,iterations = 4)
+    di_img = cv2.dilate(er_img, di_kernel, iterations=4)
     # thresholding to black-white
     ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
     return  ret, morphed_img
@@ -140,15 +140,15 @@ def morph_img(img):
 # set a threshold for area. all contours with smaller area get deleted
 def del_small_contours(contour_list):
     area_threshold = fish_size_threshold
-    if (len(contour_list) > 0 ):
+    if len(contour_list) > 0:
 
         counter = 0
-        while (counter < len(contour_list)):
+        while counter < len(contour_list):
 
             popped = False
 
             # print "contour nr" + str(counter) + ": area  = " + str(cv2.contourArea(contour_list[counter]))
-            if (cv2.contourArea(contour_list[counter]) < area_threshold):
+            if cv2.contourArea(contour_list[counter]) < area_threshold:
                 contour_list.pop(counter)
                 popped = True
             if not popped:
@@ -160,17 +160,17 @@ def del_small_contours(contour_list):
 
 # only keep biggest-area object in contour list
 def keep_biggest_contours(contour_list):
-    if (len(contour_list) == 0):
+    if len(contour_list) == 0:
         return
 
     biggest = cv2.contourArea(contour_list[0])
 
     counter = 1
-    while (counter < len(contour_list)):
+    while counter < len(contour_list):
         next_size = cv2.contourArea(contour_list[counter])
-        if (next_size < biggest):
+        if next_size < biggest:
             contour_list.pop(counter)
-        elif (next_size > biggest):
+        elif next_size > biggest:
             biggest = next_size
             contour_list.pop(counter-1)
         else:
@@ -203,12 +203,12 @@ def keep_nearest_contour(contour_list):
     biggest_dist= calculate_distance(cnt_center, last_pos)
 
     counter = 1
-    while (counter < len(contour_list)):
+    while counter < len(contour_list):
         next_center = get_center(ellipse[counter])
         next_dist = calculate_distance(next_center, last_pos)
-        if (next_dist < biggest_dist):
+        if next_dist < biggest_dist:
             contour_list.pop(counter)
-        elif (next_dist > biggest_dist):
+        elif next_dist > biggest_dist:
             biggest_dist = next_dist
             contour_list.pop(counter-1)
         else:
@@ -221,12 +221,14 @@ def keep_nearest_contour(contour_list):
 # check if fish started from the right side
 def check_if_fish_started(contour_list, roi):
     height, width, depth = roi.shape
-    non_starting_area = int(0.8 * width)
+    non_starting_area_x = int(0.85 * width)
+    non_starting_area_y1 = int(0.30 * height)
+    non_starting_area_y2 = int(0.70 * height)
 
     for i in range(0, len(contour_list)):
         cnt = contour_list[i]
         ellipse = cv2.fitEllipse(cnt)
-        if ellipse[0][0] > non_starting_area:
+        if ellipse[0][0] > non_starting_area_x and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
             global fish_started
             fish_started = True
 
@@ -234,8 +236,8 @@ def check_if_fish_started(contour_list, roi):
 
 # fitting ellipse onto contour
 def fit_ellipse_on_contour(contour_list):
-    if (contour_list != None and len(contour_list) > 0):
-        if (len(contour_list) > 0):
+    if contour_list != None and len(contour_list) > 0:
+        if len(contour_list) > 0:
             cnt = contour_list[0]
             ellipse = cv2.fitEllipse(cnt)
             ## center: ellipse[0]
@@ -272,7 +274,7 @@ def append_to_travel_orientation(lx1, ly1, lx2, ly2):
     img_travel_orientation.append(coordinates)
 
 def append_to_travel_route(ellipse):
-    if (ellipse != None):
+    if ellipse != None:
         ellipse_x = int(round(ellipse[0][0]))
         ellipse_y = int(round(ellipse[0][1]))
         point = (ellipse_x, ellipse_y)
@@ -296,7 +298,7 @@ def save_fish_positions():
         all_pos_original.append((original_x,original_y))
 
 def set_last_orientation(ellipse):
-    if not fish_started:
+    if not fish_started or ellipse is None:
         return
 
     global last_ori
@@ -334,12 +336,12 @@ def run_Tracker():
     bg_sub = cv2.BackgroundSubtractorMOG2()
 
     # main loop
-    while(cap.isOpened()):
+    while cap.isOpened():
 
 
         ret, frame = cap.read()
 
-        if (frame is None):
+        if frame is None:
             break
 
         # set region of interest ROI
@@ -380,7 +382,7 @@ def run_Tracker():
 
 
         # if two or more contours (of same size) in list delete which is farthest away from last point
-        if fish_started and len(contour_list) > 1:
+        if fish_started and contour_list is not None and len(contour_list) > 1:
             contour_list = keep_nearest_contour(contour_list)
 
 
@@ -389,25 +391,25 @@ def run_Tracker():
         show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
 
         # draw countours to ROI img and show img
-        if (DRAW_CONTOUR):
+        if DRAW_CONTOUR:
             cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
 
         # fit ellipse on contour
         ellipse =  fit_ellipse_on_contour(contour_list)
         # draw ellipse
-        if (DRAW_ELLIPSE and fish_started):
+        if DRAW_ELLIPSE and ellipse is not None and fish_started:
             cv2.ellipse(roi,ellipse,(0, 0, 255),2)
 
         # get line from ellipse
-        if (fish_started):
+        if fish_started and ellipse is not None:
             lx1, ly1, lx2, ly2 = get_line_from_ellipse(ellipse)
         # draw line
-        if (DRAW_LINE and ellipse != None):
+        if DRAW_LINE and ellipse is not None:
             cv2.line(roi, (lx1, ly1), (lx2, ly2), (0,0,255), 1)
 
 
         # append ellipse center to travel route
-        if (DRAW_TRAVEL_ROUTE):
+        if DRAW_TRAVEL_ROUTE:
             append_to_travel_route(ellipse)
 
         # set last_pos to ellipse center
@@ -423,17 +425,17 @@ def run_Tracker():
         save_fish_orientations()
 
         # append coordinates to travel_orientation
-        if (DRAW_TRAVEL_ORIENTATION and fish_started):
+        if DRAW_TRAVEL_ORIENTATION and fish_started:
             append_to_travel_orientation(lx1, ly1, lx2, ly2)
 
 
         # draw travel route
-        if (DRAW_TRAVEL_ORIENTATION):
+        if DRAW_TRAVEL_ORIENTATION:
             for coordinates in img_travel_orientation:
                 cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
 
         # draw travel orientation
-        if (DRAW_TRAVEL_ROUTE):
+        if DRAW_TRAVEL_ROUTE:
             for point in img_travel_route:
                 cv2.circle(roi, point, 2, (255, 0, 0))
 
