@@ -150,6 +150,16 @@ def keep_biggest_contours(contour_list):
 
 # check if fish started from the right side
 def check_if_fish_started(contour_list, roi):
+    height, width, depth = roi.shape
+    non_starting_area = int(0.8 * width)
+
+    for cnt in contour_list:
+        cnt = contour_list[0]
+        ellipse = cv2.fitEllipse(cnt)
+        if ellipse[0][0] > non_starting_area:
+            global fish_started
+            fish_started = True
+
 
 
 # fitting ellipse onto contour
@@ -190,7 +200,6 @@ def get_line_from_ellipse(ellipse):
 def append_to_travel_orientation(lx1, ly1, lx2, ly2):
     coordinates = (lx1, ly1, lx2, ly2)
     travel_orientation.append(coordinates)
-    print travel_orientation
 
 def append_to_travel_route(ellipse):
     if (ellipse != None):
@@ -239,7 +248,12 @@ if __name__ == '__main__':
         contour_list = del_small_contours(contour_list)
 
         # check if fish started
-        check_if_fish_started(contour_list, roi)
+        if not fish_started:
+            check_if_fish_started(contour_list, roi)
+
+        # if fish hasn't started yet, delete all contours
+        if not fish_started:
+            contour_list = []
 
         # keep only biggest contours
         contour_list = keep_biggest_contours(contour_list)
