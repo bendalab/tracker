@@ -3,7 +3,7 @@ import cv2
 import math
 
 
-FRAME_WAITTIME = 25
+FRAME_WAITTIME = 1
 
 frame_counter = 0
 
@@ -38,10 +38,12 @@ fish_size_threshold = 700
 
 fish_started = False
 
-# init last position of fish to middle of right edge of ROI
-last_pos = (ROI_X2-ROI_X1, int((ROI_Y2-ROI_Y1)/2))
+# init last position and lists for saving
+last_pos = None
+all_pos_roi = []
+all_pos_original = []
 
-
+last_frame = None
 
 
 
@@ -96,6 +98,8 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
     # show ROI img with canny edge detection
     cv2.imshow("canny", canny_edges)
 
+    return
+
 
 ##########################################################################################
 ##########################################################################################
@@ -133,27 +137,6 @@ def del_small_contours(contour_list):
                 # print(cv2.contourArea(contour_list[counter]))
                 counter += 1
     return contour_list
-
-# def only_keep_biggest(li):
-#     if (len(li) == 0):
-#         return
-#
-#     biggest = li[0]
-#
-#     counter = 1
-#     while (counter < len(li)):
-#         next_size = cv2.contourArea(li[counter])
-#         if (next_size < biggest):
-#             li.pop(counter)
-#         elif (next_size > biggest):
-#             biggest = next_size
-#             li.pop(counter-1)
-#         else:
-#             counter += 1
-#
-#     return li
-
-
 
 
 
@@ -193,17 +176,22 @@ def get_center(cnt):
 
 # if two or more contours (of same size) in contour_list delete which is farthest away from last point
 def keep_nearest_contour(contour_list):
+
+    global last_pos
+    if last_pos == None:
+        last_pos = (ROI_X2-ROI_X1, int((ROI_Y2-ROI_Y1)/2))
+
     cnt_center = get_center(ellipse[0])
-    biggest_dist = calculate_distance(cnt_center, last_pos)
+    biggest_dist= calculate_distance(cnt_center, last_pos)
 
     counter = 1
     while (counter < len(contour_list)):
         next_center = get_center(ellipse[counter])
         next_dist = calculate_distance(next_center, last_pos)
-        if (next_dist < biggest):
+        if (next_dist < biggest_dist):
             contour_list.pop(counter)
-        elif (next_dist > biggest):
-            biggest = next_dist
+        elif (next_dist > biggest_dist):
+            biggest_dist = next_dist
             contour_list.pop(counter-1)
         else:
             counter += 1
@@ -217,8 +205,8 @@ def check_if_fish_started(contour_list, roi):
     height, width, depth = roi.shape
     non_starting_area = int(0.8 * width)
 
-    for cnt in contour_list:
-        cnt = contour_list[0]
+    for i in range(0, len(contour_list)):
+        cnt = contour_list[i]
         ellipse = cv2.fitEllipse(cnt)
         if ellipse[0][0] > non_starting_area:
             global fish_started
@@ -272,15 +260,34 @@ def append_to_travel_route(ellipse):
         point = (ellipse_x, ellipse_y)
         travel_route.append(point)
 
+def set_last_pos(ellipse):
+    if ellipse == None:
+        return
+    else:
+        global last_pos
+        last_pos = ellipse[0]
+
+def save_fish_positions():
+    global last_pos
+    all_pos_roi.append(last_pos)
+    if last_pos == None:
+        all_pos_original.append(last_pos)
+    else:
+        original_x = last_pos[0]+ROI_X1
+        original_y = last_pos[1]+ROI_Y1
+        all_pos_original.append((original_x,original_y))
 
 
-if __name__ == '__main__':
+
+def run_Tracker():
 
     # create BG subtractor
     bg_sub = cv2.BackgroundSubtractorMOG2()
 
     # main loop
     while(cap.isOpened()):
+
+
         ret, frame = cap.read()
 
         if (frame == None):
@@ -354,18 +361,24 @@ if __name__ == '__main__':
         if (DRAW_TRAVEL_ROUTE):
             append_to_travel_route(ellipse)
 
+        # set last_pos to ellipse center
+        set_last_pos(ellipse)
+
+        # save fish positions
+        save_fish_positions()
+
         # append coordinates to travel_orientation
         if (DRAW_TRAVEL_ORIENTATION and fish_started):
             append_to_travel_orientation(lx1, ly1, lx2, ly2)
 
 
         # draw travel route
-        if (DRAW_TRAVEL_ROUTE):
+        if (DRAW_TRAVEL_ORIENTATION):
             for coordinates in travel_orientation:
                 cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
 
         # draw travel orientation
-        if (DRAW_TRAVEL_ORIENTATION):
+        if (DRAW_TRAVEL_ROUTE):
             for point in travel_route:
                 cv2.circle(roi, point, 2, (255, 0, 0))
 
@@ -374,13 +387,27 @@ if __name__ == '__main__':
         # show output img
         cv2.imshow("contours", roi)
 
+        global frame_counter
+        frame_counter += 1
+
+        global last_frame
+        last_frame = roi
 
         if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
             break
 
-        frame_counter += 1
 
     cap.release()
     cv2.destroyAllWindows()
 
 
+if __name__ == '__main__':
+    run_Tracker()
+    cv2.namedWindow("result")
+    cv2.moveWindow("result", 500, 350)
+
+    # print all_pos_roi
+    # print all_pos_original
+
+    cv2.imshow("result", last_frame)
+    cv2.waitKey(0)
