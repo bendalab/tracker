@@ -1,9 +1,10 @@
 import numpy as np
 import cv2
 import math
+import sys
 
 
-FRAME_WAITTIME = 1
+FRAME_WAITTIME = 50
 
 frame_counter = 0
 
@@ -56,12 +57,26 @@ dir = "examples/"
 
 # videofile_name = "2014-10-02_5"
 # videofile_name = "2014-10-02_27"
-videofile_name = "2014-10-01_33"
-# videofile_name = "2014-10-01_31"
-testVid = dir + videofile_name + ".avi"
+# videofile_name = "2014-10-01_33"
+videofile_name = "2014-10-01_31"
+video_file = dir + videofile_name + ".avi"
 
-# capture video
-cap = cv2.VideoCapture(testVid)
+# sets video file to terminal-attribute path to video file
+def set_video_file():
+    if len(sys.argv) > 1:
+        global video_file
+        video_file = sys.argv[1]
+    else:
+        return
+
+
+# init cap
+cap = ""
+
+# captures video defined by path stored in video file
+def set_video_capture():
+    global cap
+    cap = cv2.VideoCapture(video_file)
 
 
 # create and position windows
@@ -442,6 +457,9 @@ def run_Tracker():
 
 
 if __name__ == '__main__':
+    set_video_file()
+    set_video_capture()
+
     run_Tracker()
     cv2.namedWindow("result")
     cv2.moveWindow("result", 500, 350)
