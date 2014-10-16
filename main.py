@@ -57,8 +57,8 @@ dir = "examples/"
 
 # videofile_name = "2014-10-02_5"
 # videofile_name = "2014-10-02_27"
-# videofile_name = "2014-10-01_33"
-videofile_name = "2014-10-01_31"
+videofile_name = "2014-10-01_33"
+# videofile_name = "2014-10-01_31"
 video_file = dir + videofile_name + ".avi"
 
 # sets video file to terminal-attribute path to video file
@@ -126,7 +126,7 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
 # morph given img by erosion/dilation
 def morph_img(img):
     # erode img
-    er_kernel = np.ones((5, 5), np.uint8)
+    er_kernel = np.ones((6, 6), np.uint8)
     er_img = cv2.erode(img, er_kernel, iterations=1)
     # dilate img
     di_kernel = np.ones((5,5), np.uint8)
