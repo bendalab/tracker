@@ -2,9 +2,11 @@ import numpy as np
 import cv2
 import math
 import sys
+import copy
+import argparse
 
 
-FRAME_WAITTIME = 1
+FRAME_WAITTIME = 10
 
 frame_counter = 0
 
@@ -26,12 +28,13 @@ img_travel_orientation = []
 
 DRAW_TRAVEL_ROUTE = True
 img_travel_route = []
+DRAW_ORIGINAL_OUTPUT = False
 
 # set region of interest (ROI)
-ROI_X1 = 80
-ROI_X2 = 515
-ROI_Y1 = 15
-ROI_Y2 = 695
+ROI_X1 = 15
+ROI_X2 = 695
+ROI_Y1 = 80
+ROI_Y2 = 515
 
 
 fish_size_threshold = 700
@@ -48,6 +51,7 @@ last_ori = None
 all_oris = []
 
 last_frame = None
+last_frame_OV = None
 
 
 
@@ -80,18 +84,18 @@ def set_video_capture():
 
 
 # create and position windows
-# cv2.namedWindow("file")
-# cv2.moveWindow("file", 0, 0)
-# cv2.namedWindow("ROI")
-# cv2.moveWindow("ROI", 1300, 0)
-# cv2.namedWindow("Background subtracted")
-# cv2.moveWindow("Background subtracted", 0, 600)
-#
-# cv2.namedWindow("morphed")
-# cv2.moveWindow("morphed", 1300, 600)
-#
-# cv2.namedWindow("canny")
-# cv2.moveWindow("canny", 600, 70)
+cv2.namedWindow("file")
+cv2.moveWindow("file", 0, 0)
+cv2.namedWindow("ROI")
+cv2.moveWindow("ROI", 1300, 0)
+cv2.namedWindow("Background subtracted")
+cv2.moveWindow("Background subtracted", 0, 600)
+
+cv2.namedWindow("morphed")
+cv2.moveWindow("morphed", 1300, 600)
+
+cv2.namedWindow("canny")
+cv2.moveWindow("canny", 600, 70)
 
 cv2.namedWindow("contours")
 cv2.moveWindow("contours", 570, 570)
@@ -101,20 +105,20 @@ cv2.moveWindow("contours", 570, 570)
 # show images
 def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edges):
 
-    # # show original output
-    # cv2.imshow('file', img)
-    #
-    # # show original ROI
-    # cv2.imshow('ROI', roi)
-    #
-    # # show ROI with subtracted BG
-    # cv2.imshow('Background subtracted', roi_bg_subtracted)
-    #
-    # # show morphed subtracted BG-img
-    # cv2.imshow("morphed", roi_bg_subtracted_morphed)
-    #
-    # # show ROI img with canny edge detection
-    # cv2.imshow("canny", canny_edges)
+    # show original output
+    cv2.imshow('file', img)
+
+    # show original ROI
+    cv2.imshow('ROI', roi)
+
+    # show ROI with subtracted BG
+    cv2.imshow('Background subtracted', roi_bg_subtracted)
+
+    # show morphed subtracted BG-img
+    cv2.imshow("morphed", roi_bg_subtracted_morphed)
+
+    # show ROI img with canny edge detection
+    cv2.imshow("canny", canny_edges)
 
     return
 
@@ -197,7 +201,7 @@ def keep_nearest_contour(contour_list):
 
     global last_pos
     if last_pos is None:
-        last_pos = (ROI_X2-ROI_X1, int((ROI_Y2-ROI_Y1)/2))
+        last_pos = (ROI_Y2-ROI_Y1, int((ROI_X2-ROI_X1)/2))
 
     cnt_center = get_center(ellipse[0])
     biggest_dist= calculate_distance(cnt_center, last_pos)
@@ -323,6 +327,7 @@ def set_last_orientation(ellipse):
 
 def save_fish_orientations():
     if not fish_started:
+        all_oris.append(None)
         return
 
     global last_ori
@@ -345,7 +350,7 @@ def run_Tracker():
             break
 
         # set region of interest ROI
-        roi = frame[ROI_X1:ROI_X2, ROI_Y1:ROI_Y2]
+        roi = copy.copy(frame[ROI_Y1:ROI_Y2, ROI_X1:ROI_X2])
 
 
         # subtract background fro ROI
@@ -385,10 +390,6 @@ def run_Tracker():
         if fish_started and contour_list is not None and len(contour_list) > 1:
             contour_list = keep_nearest_contour(contour_list)
 
-
-
-        # show all imgs
-        show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
 
         # draw countours to ROI img and show img
         if DRAW_CONTOUR:
@@ -439,7 +440,17 @@ def run_Tracker():
             for point in img_travel_route:
                 cv2.circle(roi, point, 2, (255, 0, 0))
 
+        if DRAW_ORIGINAL_OUTPUT:
+            for coordinates in img_travel_orientation:
+                cv2.line(frame, (coordinates[0]+ROI_X1, coordinates[1]+ROI_Y1), (coordinates[2]+ROI_X1, coordinates[3]+ROI_Y1), (150,150,0), 1)
+            for point in all_pos_original:
+                if point is not None:
+                    cv2.circle(frame, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
 
+
+
+        # show all imgs
+        show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
 
         # show output img
         cv2.imshow("contours", roi)
@@ -449,6 +460,8 @@ def run_Tracker():
 
         global last_frame
         last_frame = roi
+        global last_frame_OV
+        last_frame_OV = frame
 
         if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
             break
@@ -459,16 +472,26 @@ def run_Tracker():
 
 
 if __name__ == '__main__':
+    # parser = argparse.ArgumentParser(description='tracking fish in video file')
+    # parser.add_argument('path', type=str,
+    #                     help="absolute file path to video including file name")
+    # args = parser.parse_args()
+
     set_video_file()
     set_video_capture()
 
     run_Tracker()
     cv2.namedWindow("result")
-    cv2.moveWindow("result", 500, 350)
+    cv2.moveWindow("result", 200, 350)
+    if DRAW_ORIGINAL_OUTPUT:
+        cv2.namedWindow("result_ov")
+        cv2.moveWindow("result_ov", 900, 350)
 
-    # print all_pos_roi
-    # print all_pos_original
-    # print all_oris
+    print all_pos_roi
+    print all_pos_original
+    print all_oris
 
     cv2.imshow("result", last_frame)
+    if DRAW_ORIGINAL_OUTPUT:
+        cv2.imshow("result_ov", last_frame_OV)
     cv2.waitKey(0)
