@@ -54,6 +54,11 @@ all_oris = []
 last_frame = None
 last_frame_OV_output = None
 
+ESTIMATE_MISSING_DATA = True
+estimated_pos_roi = []
+estimated_pos_original = []
+estimated_oris = []
+
 
 
 # define testvideo
@@ -258,7 +263,8 @@ def fit_ellipse_on_contour(contour_list):
 
 
 # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
-def get_line_from_ellipse(ellipse):
+def get_line_from_ellipse():
+    global ellipse
 
     center_x = ellipse[0][0]
     center_y = ellipse[0][1]
@@ -283,15 +289,17 @@ def append_to_travel_orientation(lx1, ly1, lx2, ly2):
     coordinates = (lx1, ly1, lx2, ly2)
     img_travel_orientation.append(coordinates)
 
-def append_to_travel_route(ellipse):
+def append_to_travel_route():
+    global ellipse
     if ellipse != None:
         ellipse_x = int(round(ellipse[0][0]))
         ellipse_y = int(round(ellipse[0][1]))
         point = (ellipse_x, ellipse_y)
         img_travel_route.append(point)
 
-def set_last_pos(ellipse):
+def set_last_pos():
     global last_pos
+    global ellipse
     if ellipse is None:
         last_pos = None
         return
@@ -350,9 +358,77 @@ def save_fish_orientations():
     global last_ori
     all_oris.append(last_ori)
 
+def estimate_missing_pos():
+    global frame_counter
+    global all_pos_roi
+    global estimated_pos_roi
+    global estimated_pos_original
+
+    # init length of estimated-lists to amount of frames
+    for x in range(0, frame_counter):
+        estimated_pos_roi.append(None)
+        estimated_pos_original.append(None)
+
+    # set pointer to start of data
+    pointer =  0
+    while all_pos_roi[pointer] is None:
+        pointer += 1
+
+    while pointer < frame_counter:
+        while all_pos_roi[pointer] is not None:
+            pointer += 1
+            if pointer <= frame_counter-1:
+                return
+
+        gap_start_pointer = pointer
+        gap_end_pointer = pointer
+        while all_oris[gap_end_pointer] is None:
+            gap_end_pointer += 1
+
+        start_value_x = all_pos_roi[gap_start_pointer-1][0]
+        start_value_y = all_pos_roi[gap_start_pointer-1][1]
+        end_value_x = all_pos_roi[gap_end_pointer][0]
+        end_value_y = all_pos_roi[gap_end_pointer][1]
+
+        pointer_diff = gap_end_pointer - (gap_start_pointer-1)
+        value_diff_x = end_value_x - start_value_x
+        value_diff_y = end_value_y - start_value_y
+        value_diff_x_part = value_diff_x/pointer_diff
+        value_diff_y_part = value_diff_y/pointer_diff
+
+
+        # print "pointer diff = " + str(pointer_diff)
+        first_pos_estimated = False
+        while pointer < gap_end_pointer:
+            if not first_pos_estimated:
+                estimated_pos_roi[pointer] = ((all_pos_roi[pointer-1][0] + value_diff_x_part), (all_pos_roi[pointer-1][1] + value_diff_y_part))
+                first_pos_estimated = True
+            else:
+                estimated_pos_roi[pointer] = ((estimated_pos_roi[pointer-1][0] + value_diff_x_part), (estimated_pos_roi[pointer-1][1] + value_diff_y_part))
+            pointer += 1
+            print "x"
+        print "gap closed"
+
+
+# def estimate_missing_ori():
+#     global frame_counter
+#     global all_oris
+#     global estimated_oris
+#
+#     # init length of estimated-lists to amount of frames
+#     print frame_counter
+#     for x in range(0, frame_counter):
+#         estimated_oris.append(None)
+#
+#     pointer =  0
+#     # set pointer to start of data
+#     while all_oris[pointer] is None:
+#         pointer += 1
+
 
 
 def run_Tracker():
+    global frame_counter
 
     # create BG subtractor
     bg_sub = cv2.BackgroundSubtractorMOG2()
@@ -365,6 +441,8 @@ def run_Tracker():
 
         if frame is None:
             break
+
+        frame_counter += 1
 
         # set region of interest ROI
         roi = copy.copy(frame[ROI_Y1:ROI_Y2, ROI_X1:ROI_X2])
@@ -422,7 +500,7 @@ def run_Tracker():
 
         # get line from ellipse
         if fish_started and ellipse is not None:
-            lx1, ly1, lx2, ly2 = get_line_from_ellipse(ellipse)
+            lx1, ly1, lx2, ly2 = get_line_from_ellipse()
         # draw line
         if DRAW_LINE and ellipse is not None:
             cv2.line(roi, (lx1, ly1), (lx2, ly2), (0,0,255), 1)
@@ -430,10 +508,10 @@ def run_Tracker():
 
         # append ellipse center to travel route
         if DRAW_TRAVEL_ROUTE:
-            append_to_travel_route(ellipse)
+            append_to_travel_route()
 
         # set last_pos to ellipse center
-        set_last_pos(ellipse)
+        set_last_pos()
 
         # save fish positions
         save_fish_positions()
@@ -477,8 +555,7 @@ def run_Tracker():
         # show output img
         cv2.imshow("contours", roi)
 
-        global frame_counter
-        frame_counter += 1
+
 
         global last_frame
         last_frame = roi
@@ -512,6 +589,10 @@ if __name__ == '__main__':
     print all_pos_roi
     print all_pos_original
     print all_oris
+    if not len(all_pos_roi) == len(all_pos_original) == len(all_oris) == frame_counter:
+        print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
+
+    estimate_missing_pos()
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
