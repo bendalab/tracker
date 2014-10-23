@@ -6,7 +6,7 @@ import copy
 import argparse
 
 
-FRAME_WAITTIME = 10
+FRAME_WAITTIME = 25
 
 frame_counter = 0
 
@@ -351,6 +351,7 @@ def run_Tracker():
 
         # set region of interest ROI
         roi = copy.copy(frame[ROI_Y1:ROI_Y2, ROI_X1:ROI_X2])
+        roi_output = copy.copy(roi)
 
 
         # subtract background fro ROI
@@ -450,7 +451,7 @@ def run_Tracker():
 
 
         # show all imgs
-        show_imgs(frame, roi, roi_bg_sub, mo_roi_bg_sub, edges)
+        show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
 
         # show output img
         cv2.imshow("contours", roi)
@@ -487,9 +488,9 @@ if __name__ == '__main__':
         cv2.namedWindow("result_ov")
         cv2.moveWindow("result_ov", 900, 350)
 
-    print all_pos_roi
-    print all_pos_original
-    print all_oris
+    # print all_pos_roi
+    # print all_pos_original
+    # print all_oris
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
