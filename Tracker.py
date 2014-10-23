@@ -377,7 +377,7 @@ def estimate_missing_pos():
     while pointer < frame_counter:
         while all_pos_roi[pointer] is not None:
             pointer += 1
-            if pointer <= frame_counter-1:
+            if pointer >= frame_counter-1:
                 return
 
         gap_start_pointer = pointer
@@ -592,7 +592,12 @@ if __name__ == '__main__':
     if not len(all_pos_roi) == len(all_pos_original) == len(all_oris) == frame_counter:
         print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
 
-    estimate_missing_pos()
+    if ESTIMATE_MISSING_DATA:
+        estimate_missing_pos()
+
+        for c in estimated_pos_roi:
+            if c is not None:
+                cv2.circle(last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
