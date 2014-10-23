@@ -28,7 +28,7 @@ img_travel_orientation = []
 
 DRAW_TRAVEL_ROUTE = True
 img_travel_route = []
-DRAW_ORIGINAL_OUTPUT = False
+DRAW_ORIGINAL_OUTPUT = True
 
 # set region of interest (ROI)
 ROI_X1 = 15
@@ -51,7 +51,7 @@ last_ori = None
 all_oris = []
 
 last_frame = None
-last_frame_OV = None
+last_frame_OV_output = None
 
 
 
@@ -353,6 +353,7 @@ def run_Tracker():
         roi = copy.copy(frame[ROI_Y1:ROI_Y2, ROI_X1:ROI_X2])
         roi_output = copy.copy(roi)
 
+        frame_output = copy.copy(frame)
 
         # subtract background fro ROI
         roi_bg_sub = bg_sub.apply(roi)
@@ -443,15 +444,18 @@ def run_Tracker():
 
         if DRAW_ORIGINAL_OUTPUT:
             for coordinates in img_travel_orientation:
-                cv2.line(frame, (coordinates[0]+ROI_X1, coordinates[1]+ROI_Y1), (coordinates[2]+ROI_X1, coordinates[3]+ROI_Y1), (150,150,0), 1)
+                cv2.line(frame_output, (coordinates[0]+ROI_X1, coordinates[1]+ROI_Y1), (coordinates[2]+ROI_X1, coordinates[3]+ROI_Y1), (150,150,0), 1)
             for point in all_pos_original:
                 if point is not None:
-                    cv2.circle(frame, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
+                    cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
 
 
 
         # show all imgs
-        show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
+        if DRAW_ORIGINAL_OUTPUT:
+            show_imgs(frame_output, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
+        else:
+            show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
 
         # show output img
         cv2.imshow("contours", roi)
@@ -461,8 +465,8 @@ def run_Tracker():
 
         global last_frame
         last_frame = roi
-        global last_frame_OV
-        last_frame_OV = frame
+        global last_frame_OV_output
+        last_frame_OV_output = frame_output
 
         if cv2.waitKey(FRAME_WAITTIME) & 0xFF == 27:
             break
@@ -494,5 +498,5 @@ if __name__ == '__main__':
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
-        cv2.imshow("result_ov", last_frame_OV)
+        cv2.imshow("result_ov", last_frame_OV_output)
     cv2.waitKey(0)
