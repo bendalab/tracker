@@ -5,8 +5,9 @@ import sys
 import copy
 import argparse
 
+# check out 2014-08-27_39.avi! put in estimated position algorithm! put in estimated orientation algorithm!
 
-FRAME_WAITTIME = 25
+FRAME_WAITTIME = 1
 
 frame_counter = 0
 
@@ -57,12 +58,15 @@ last_frame_OV_output = None
 
 # define testvideo
 # path to directory
+# standard:
 dir = "examples/"
 
-# videofile_name = "2014-10-02_5"
-# videofile_name = "2014-10-02_27"
-videofile_name = "2014-10-01_33"
-# videofile_name = "2014-10-01_31"
+
+# standard:
+# videofile_name = "2014-10-01_33"
+# problem:
+videofile_name = "2014-08-27_33"
+
 video_file = dir + videofile_name + ".avi"
 
 # sets video file to terminal-attribute path to video file
@@ -240,7 +244,10 @@ def check_if_fish_started(contour_list, roi):
 
 # fitting ellipse onto contour
 def fit_ellipse_on_contour(contour_list):
-    if contour_list != None and len(contour_list) > 0:
+    global ellipse
+    if contour_list is None or len(contour_list) == 0:
+        ellipse = None
+    elif contour_list is not None and len(contour_list) > 0:
         if len(contour_list) > 0:
             cnt = contour_list[0]
             ellipse = cv2.fitEllipse(cnt)
@@ -248,7 +255,6 @@ def fit_ellipse_on_contour(contour_list):
             ## size  : ellipse[1]
             ## angle : ellipse[2]
             # print ellipse
-            return ellipse
 
 
 # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
@@ -285,10 +291,11 @@ def append_to_travel_route(ellipse):
         img_travel_route.append(point)
 
 def set_last_pos(ellipse):
+    global last_pos
     if ellipse is None:
+        last_pos = None
         return
     else:
-        global last_pos
         last_pos = ellipse[0]
 
 def save_fish_positions():
@@ -301,13 +308,18 @@ def save_fish_positions():
         original_y = last_pos[1]+ROI_Y1
         all_pos_original.append((original_x,original_y))
 
-def set_last_orientation(ellipse):
+def set_last_orientation():
+    global last_ori
+    global ellipse
     if not fish_started or ellipse is None:
         return
 
     global last_ori
     if last_ori is None:
         last_ori = 270
+
+    if ellipse is None:
+        return
 
     ell_ori = ellipse[2]
     if last_ori > ell_ori:
@@ -327,6 +339,11 @@ def set_last_orientation(ellipse):
 
 def save_fish_orientations():
     if not fish_started:
+        all_oris.append(None)
+        return
+
+    global ellipse
+    if ellipse is None:
         all_oris.append(None)
         return
 
@@ -398,7 +415,7 @@ def run_Tracker():
             cv2.drawContours(roi, contour_list, -1, (0,255,0), 3)
 
         # fit ellipse on contour
-        ellipse =  fit_ellipse_on_contour(contour_list)
+        fit_ellipse_on_contour(contour_list)
         # draw ellipse
         if DRAW_ELLIPSE and ellipse is not None and fish_started:
             cv2.ellipse(roi,ellipse,(0, 0, 255),2)
@@ -422,7 +439,7 @@ def run_Tracker():
         save_fish_positions()
 
         # set last orientation
-        set_last_orientation(ellipse)
+        set_last_orientation()
 
         # save orientations
         save_fish_orientations()
@@ -492,9 +509,9 @@ if __name__ == '__main__':
         cv2.namedWindow("result_ov")
         cv2.moveWindow("result_ov", 900, 350)
 
-    # print all_pos_roi
-    # print all_pos_original
-    # print all_oris
+    print all_pos_roi
+    print all_pos_original
+    print all_oris
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
