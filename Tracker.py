@@ -7,7 +7,7 @@ import argparse
 
 # check out 2014-08-27_39.avi! put in estimated position algorithm! put in estimated orientation algorithm!
 
-FRAME_WAITTIME = 1
+FRAME_WAITTIME = 25
 
 frame_counter = 0
 
@@ -142,10 +142,11 @@ def morph_img(img):
     er_kernel = np.ones((6, 6), np.uint8)
     er_img = cv2.erode(img, er_kernel, iterations=1)
     # dilate img
-    di_kernel = np.ones((5,5), np.uint8)
+    di_kernel = np.ones((6,6), np.uint8)
     di_img = cv2.dilate(er_img, di_kernel, iterations=4)
     # thresholding to black-white
     ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
+    # ret, morphed_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
     return  ret, morphed_img
 
 
@@ -153,7 +154,7 @@ def morph_img(img):
 # set a threshold for area. all contours with smaller area get deleted
 def del_small_contours(contour_list):
     area_threshold = fish_size_threshold
-    if len(contour_list) > 0:
+    if contour_list is not None and len(contour_list) > 0:
 
         counter = 0
         while counter < len(contour_list):
@@ -170,10 +171,67 @@ def del_small_contours(contour_list):
     return contour_list
 
 
+# calculates distance of two given points (tuples)
+def calculate_distance(p1, p2):
+    x_diff = p2[0] - p1[0]
+    y_diff = p2[1] - p1[1]
+    dist = math.sqrt(x_diff*x_diff + y_diff*y_diff)
+    return dist
+
+# get center of contour based on fitting ellipse
+def get_center(cnt):
+    ellipse = cv2.fitEllipse(cnt)
+    return ellipse[0]
+
+# merge biggest contour with nearest
+def merge_biggest_contour_with_nearest(contour_list):
+
+    if contour_list is None or len(contour_list) < 2:
+        return
+
+
+    merge_threshold = 100
+    near_cnts = []
+
+    biggest = 0
+
+    for i in range(0, len(contour_list)):
+        if cv2.contourArea(contour_list[i]) > cv2.contourArea(contour_list[biggest]):
+            biggest = i
+
+    print "biggest area before: " + str(cv2.contourArea(contour_list[biggest]))
+
+    # store all contours that are near the biggest one
+    biggest_center = get_center(contour_list[biggest])
+    counter = 0
+    for cnt in contour_list:
+        dist = calculate_distance(biggest_center, get_center(cnt))
+        if dist < merge_threshold:
+            near_cnts.append((counter, dist))
+        counter += 1
+
+    # find the nearest one
+    nearest = 0
+    near_counter = 0
+    for entry in near_cnts:
+        if entry[1] < near_cnts[near_counter][1]:
+            nearest = near_counter
+        near_counter += 1
+
+
+    # merge biggest with nearest
+    if near_cnts is not None and len(near_cnts) > 0 and biggest != near_cnts[nearest][0]:
+        # print "before" + str(contour_list)
+        contour_list.append(np.append(contour_list[biggest], contour_list[near_cnts[nearest][0]], axis=0))
+        # print "after " + str(contour_list)
+        print "biggest area after: " + str(cv2.contourArea(contour_list[len(contour_list)-1]))
+
+    return contour_list
+
 
 # only keep biggest-area object in contour list
 def keep_biggest_contours(contour_list):
-    if len(contour_list) == 0:
+    if contour_list is None or len(contour_list) == 0:
         return
 
     biggest = cv2.contourArea(contour_list[0])
@@ -193,17 +251,6 @@ def keep_biggest_contours(contour_list):
 
 
 
-# calculates distance of two given points (tuples)
-def calculate_distance(p1, p2):
-    x_diff = p2[0] - p1[0]
-    y_diff = p2[1] - p1[1]
-    dist = math.sqrt(x_diff*x_diff + y_diff*y_diff)
-    return dist
-
-# get center of contour based on fitting ellipse
-def get_center(cnt):
-    ellipse = cv2.fitEllipse(cnt)
-    return ellipse[0]
 
 # if two or more contours (of same size) in contour_list delete which is farthest away from last pos fish was
 def keep_nearest_contour(contour_list):
@@ -238,12 +285,13 @@ def check_if_fish_started(contour_list, roi):
     non_starting_area_y1 = int(0.30 * height)
     non_starting_area_y2 = int(0.70 * height)
 
-    for i in range(0, len(contour_list)):
-        cnt = contour_list[i]
-        ellipse = cv2.fitEllipse(cnt)
-        if ellipse[0][0] > non_starting_area_x and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
-            global fish_started
-            fish_started = True
+    if contour_list is not None:
+        for i in range(0, len(contour_list)):
+            cnt = contour_list[i]
+            ellipse = cv2.fitEllipse(cnt)
+            if ellipse[0][0] > non_starting_area_x and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
+                global fish_started
+                fish_started = True
 
 
 
@@ -371,7 +419,8 @@ def estimate_missing_pos():
 
     # set pointer to start of data
     pointer =  0
-    while all_pos_roi[pointer] is None:
+    print "all_pos_roi: " + str(all_pos_roi)
+    while pointer < frame_counter and all_pos_roi[pointer] is None:
         pointer += 1
 
     while pointer < frame_counter:
@@ -382,8 +431,11 @@ def estimate_missing_pos():
 
         gap_start_pointer = pointer
         gap_end_pointer = pointer
-        while all_oris[gap_end_pointer] is None:
+        while gap_end_pointer < frame_counter-1 and all_oris[gap_end_pointer] is None:
             gap_end_pointer += 1
+
+        if gap_end_pointer == frame_counter-1:
+            break
 
         start_value_x = all_pos_roi[gap_start_pointer-1][0]
         start_value_y = all_pos_roi[gap_start_pointer-1][1]
@@ -406,8 +458,6 @@ def estimate_missing_pos():
             else:
                 estimated_pos_roi[pointer] = ((estimated_pos_roi[pointer-1][0] + value_diff_x_part), (estimated_pos_roi[pointer-1][1] + value_diff_y_part))
             pointer += 1
-            print "x"
-        print "gap closed"
 
 
 # def estimate_missing_ori():
@@ -467,6 +517,9 @@ def run_Tracker():
         ret,thresh_img = cv2.threshold(mo_roi_bg_sub,127,255,cv2.THRESH_BINARY)
         contour_list, hierarchy = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
+        # TODO
+        # merge biggest contour with nearest
+        # contour_list = merge_biggest_contour_with_nearest(contour_list)
 
         # everything below fish_size_threshold is being ignored
         contour_list = del_small_contours(contour_list)
@@ -582,9 +635,6 @@ if __name__ == '__main__':
     run_Tracker()
     cv2.namedWindow("result")
     cv2.moveWindow("result", 200, 350)
-    if DRAW_ORIGINAL_OUTPUT:
-        cv2.namedWindow("result_ov")
-        cv2.moveWindow("result_ov", 900, 350)
 
     print all_pos_roi
     print all_pos_original
@@ -598,8 +648,11 @@ if __name__ == '__main__':
         for c in estimated_pos_roi:
             if c is not None:
                 cv2.circle(last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
+                cv2.circle(last_frame_OV_output, (int(round(c[0]))+ROI_X1, int(round(c[1])+ROI_Y1)), 2, (0, 0, 255))
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
+        cv2.namedWindow("result_ov")
+        cv2.moveWindow("result_ov", 900, 350)
         cv2.imshow("result_ov", last_frame_OV_output)
     cv2.waitKey(0)
