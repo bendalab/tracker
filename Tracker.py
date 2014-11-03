@@ -5,9 +5,12 @@ import sys
 import copy
 import argparse
 
-# check out 2014-08-27_39.avi! put in estimated position algorithm! put in estimated orientation algorithm!
+# for debug
+SAVE_FRAMES = False
 
-FRAME_WAITTIME = 25
+# check out 2014-08-27_39.avi! put in estimated orientation algorithm!
+
+FRAME_WAITTIME = 1
 
 frame_counter = 0
 
@@ -30,6 +33,9 @@ img_travel_orientation = []
 DRAW_TRAVEL_ROUTE = True
 img_travel_route = []
 DRAW_ORIGINAL_OUTPUT = True
+
+number_contours_per_frame = []
+number_relevant_contours_per_frame = []
 
 # set region of interest (ROI)
 ROI_X1 = 15
@@ -64,7 +70,9 @@ estimated_oris = []
 # define testvideo
 # path to directory
 # standard:
-dir = "examples/"
+# dir = "examples/2014-10-01_33/"
+# problem:
+dir = "examples/2014-08-27_33/"
 
 
 # standard:
@@ -129,6 +137,13 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
     # show ROI img with canny edge detection
     cv2.imshow("canny", canny_edges)
 
+    if SAVE_FRAMES and img is not None:
+        cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub_morph" + ".jpg", roi_bg_subtracted_morphed)
+        cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub" + ".jpg", roi_bg_subtracted)
+        cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi" + ".jpg", roi)
+        # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_img" + ".jpg", img)
+        # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_canny" + ".jpg", canny_edges)
+
     return
 
 
@@ -139,10 +154,10 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
 # morph given img by erosion/dilation
 def morph_img(img):
     # erode img
-    er_kernel = np.ones((6, 6), np.uint8)
+    er_kernel = np.ones((4, 4), np.uint8)
     er_img = cv2.erode(img, er_kernel, iterations=1)
     # dilate img
-    di_kernel = np.ones((6,6), np.uint8)
+    di_kernel = np.ones((4, 4), np.uint8)
     di_img = cv2.dilate(er_img, di_kernel, iterations=4)
     # thresholding to black-white
     ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
@@ -228,6 +243,11 @@ def merge_biggest_contour_with_nearest(contour_list):
 
     return contour_list
 
+def save_number_of_contours(contour_list, number_cnt_list):
+    if contour_list is None:
+        number_cnt_list.append(0)
+    else:
+        number_cnt_list.append(len(contour_list))
 
 # only keep biggest-area object in contour list
 def keep_biggest_contours(contour_list):
@@ -419,7 +439,6 @@ def estimate_missing_pos():
 
     # set pointer to start of data
     pointer =  0
-    print "all_pos_roi: " + str(all_pos_roi)
     while pointer < frame_counter and all_pos_roi[pointer] is None:
         pointer += 1
 
@@ -521,8 +540,16 @@ def run_Tracker():
         # merge biggest contour with nearest
         # contour_list = merge_biggest_contour_with_nearest(contour_list)
 
+        # save amount of contours
+        global number_contours_per_frame
+        save_number_of_contours(contour_list, number_contours_per_frame)
+
         # everything below fish_size_threshold is being ignored
         contour_list = del_small_contours(contour_list)
+
+        # save number of remaining contours
+        global number_relevant_contours_per_frame
+        save_number_of_contours(contour_list, number_relevant_contours_per_frame)
 
         # check if fish started
         if not fish_started:
@@ -607,6 +634,8 @@ def run_Tracker():
 
         # show output img
         cv2.imshow("contours", roi)
+        if SAVE_FRAMES:
+            cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
 
 
@@ -623,6 +652,20 @@ def run_Tracker():
     cv2.destroyAllWindows()
 
 
+def print_data():
+    print "positions region of interest: " + str(all_pos_roi)
+    print "estimated positions roi:      " + str(estimated_pos_roi)
+    print "positions original recording: " + str(all_pos_original)
+    print "estimated positions original: " + str(estimated_pos_original)
+    print "all orientations:             " + str(all_oris)
+    print "number of contours in frames: " + str(number_contours_per_frame)
+    print "number of fish-size contours: " + str(number_relevant_contours_per_frame)
+    if not len(all_pos_roi) == len(all_pos_original) == len(all_oris) == frame_counter:
+        print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
+
+    print "All lists consistent with frame count: " + str(len(all_pos_roi) == len(all_pos_original) == len(all_oris) == len(number_contours_per_frame) == frame_counter)
+
+
 if __name__ == '__main__':
     # parser = argparse.ArgumentParser(description='tracking fish in video file')
     # parser.add_argument('path', type=str,
@@ -636,11 +679,6 @@ if __name__ == '__main__':
     cv2.namedWindow("result")
     cv2.moveWindow("result", 200, 350)
 
-    print all_pos_roi
-    print all_pos_original
-    print all_oris
-    if not len(all_pos_roi) == len(all_pos_original) == len(all_oris) == frame_counter:
-        print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
 
     if ESTIMATE_MISSING_DATA:
         estimate_missing_pos()
@@ -649,6 +687,9 @@ if __name__ == '__main__':
             if c is not None:
                 cv2.circle(last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
                 cv2.circle(last_frame_OV_output, (int(round(c[0]))+ROI_X1, int(round(c[1])+ROI_Y1)), 2, (0, 0, 255))
+
+    print_data()
+
 
     cv2.imshow("result", last_frame)
     if DRAW_ORIGINAL_OUTPUT:
