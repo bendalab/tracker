@@ -5,8 +5,9 @@ import sys
 import copy
 import argparse
 
+
 # for debug
-SAVE_FRAMES = False
+SAVE_FRAMES = True
 
 # check out 2014-08-27_39.avi! put in estimated orientation algorithm!
 
@@ -71,14 +72,12 @@ estimated_oris = []
 # path to directory
 # standard:
 # dir = "examples/2014-10-01_33/"
-# problem:
-dir = "examples/2014-08-27_33/"
-
-
-# standard:
 # videofile_name = "2014-10-01_33"
 # problem:
+dir = "examples/2014-08-27_33/"
 videofile_name = "2014-08-27_33"
+
+
 
 video_file = dir + videofile_name + ".avi"
 
@@ -137,10 +136,10 @@ def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edge
     # show ROI img with canny edge detection
     cv2.imshow("canny", canny_edges)
 
-    if SAVE_FRAMES and img is not None:
-        cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub_morph" + ".jpg", roi_bg_subtracted_morphed)
-        cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub" + ".jpg", roi_bg_subtracted)
-        cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi" + ".jpg", roi)
+    # if SAVE_FRAMES and img is not None:
+        # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub_morph" + ".jpg", roi_bg_subtracted_morphed)
+        # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub" + ".jpg", roi_bg_subtracted)
+        # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi" + ".jpg", roi)
         # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_img" + ".jpg", img)
         # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_canny" + ".jpg", canny_edges)
 
@@ -409,7 +408,7 @@ def set_last_orientation():
     if last_ori < ell_ori:
         ori_diff = ell_ori - last_ori
         if ori_diff < 90:
-            last_ori = ell_ori % 360
+            last_ori = ell_ori
         else:
             last_ori = (ell_ori + 180) % 360
 
@@ -450,7 +449,7 @@ def estimate_missing_pos():
 
         gap_start_pointer = pointer
         gap_end_pointer = pointer
-        while gap_end_pointer < frame_counter-1 and all_oris[gap_end_pointer] is None:
+        while gap_end_pointer < frame_counter-1 and all_pos_roi[gap_end_pointer] is None:
             gap_end_pointer += 1
 
         if gap_end_pointer == frame_counter-1:
@@ -479,20 +478,55 @@ def estimate_missing_pos():
             pointer += 1
 
 
-# def estimate_missing_ori():
-#     global frame_counter
-#     global all_oris
-#     global estimated_oris
-#
-#     # init length of estimated-lists to amount of frames
-#     print frame_counter
-#     for x in range(0, frame_counter):
-#         estimated_oris.append(None)
-#
-#     pointer =  0
-#     # set pointer to start of data
-#     while all_oris[pointer] is None:
-#         pointer += 1
+def estimate_missing_ori():
+    global frame_counter
+    global all_oris
+    global estimated_oris
+
+    # init length of estimated-list to amount of frames
+    for x in range(0, frame_counter):
+        estimated_oris.append(None)
+
+    pointer =  0
+    # set pointer to start of data
+    while all_oris[pointer] is None:
+        pointer += 1
+
+    while pointer < frame_counter:
+        while all_oris[pointer] is not None:
+            pointer += 1
+            if pointer >= frame_counter-1:
+                return
+
+        gap_start_pointer = pointer
+        gap_end_pointer = pointer
+        while gap_end_pointer < frame_counter-1 and all_oris[gap_end_pointer] is None:
+            gap_end_pointer += 1
+
+        if gap_end_pointer == frame_counter-1:
+            break
+
+        start_value = all_oris[gap_start_pointer-1]
+        end_value = all_oris[gap_end_pointer]
+
+        pointer_diff = gap_end_pointer - (gap_start_pointer-1)
+        value_diff = end_value - start_value
+        if start_value > end_value and abs(value_diff) > 180:
+            value_diff = (end_value + 360) - start_value
+        elif start_value < end_value and abs(value_diff) > 180:
+            value_diff = (end_value - 360) - start_value
+        value_diff_part = value_diff/pointer_diff
+
+
+        # print "pointer diff = " + str(pointer_diff)
+        first_pos_estimated = False
+        while pointer < gap_end_pointer:
+            if not first_pos_estimated:
+                estimated_oris[pointer] = (all_oris[pointer-1] + value_diff_part) % 360
+                first_pos_estimated = True
+            else:
+                estimated_oris[pointer] = (estimated_oris[pointer-1] + value_diff_part) % 360
+            pointer += 1
 
 
 
@@ -526,7 +560,7 @@ def run_Tracker():
         ret, mo_roi_bg_sub = morph_img(roi_bg_sub)
 
         # detect edges of bg-deleted img
-        edges = cv2.Canny(roi_bg_sub, 500, 500)
+        edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
 
         # detect edges of morphed img (not displayed)
         mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
@@ -634,8 +668,8 @@ def run_Tracker():
 
         # show output img
         cv2.imshow("contours", roi)
-        if SAVE_FRAMES:
-            cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
+        # if SAVE_FRAMES:
+        #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
 
 
@@ -658,12 +692,13 @@ def print_data():
     print "positions original recording: " + str(all_pos_original)
     print "estimated positions original: " + str(estimated_pos_original)
     print "all orientations:             " + str(all_oris)
+    print "estimated orientations:       " + str(estimated_oris)
     print "number of contours in frames: " + str(number_contours_per_frame)
     print "number of fish-size contours: " + str(number_relevant_contours_per_frame)
     if not len(all_pos_roi) == len(all_pos_original) == len(all_oris) == frame_counter:
         print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
 
-    print "All lists consistent with frame count: " + str(len(all_pos_roi) == len(all_pos_original) == len(all_oris) == len(number_contours_per_frame) == frame_counter)
+    print "All lists consistent with frame count: " + str(len(all_pos_roi) == len(all_pos_original) == len(all_oris) == len(number_contours_per_frame) == len(number_relevant_contours_per_frame) == frame_counter)
 
 
 if __name__ == '__main__':
@@ -682,16 +717,20 @@ if __name__ == '__main__':
 
     if ESTIMATE_MISSING_DATA:
         estimate_missing_pos()
-
         for c in estimated_pos_roi:
             if c is not None:
                 cv2.circle(last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
                 cv2.circle(last_frame_OV_output, (int(round(c[0]))+ROI_X1, int(round(c[1])+ROI_Y1)), 2, (0, 0, 255))
 
+        estimate_missing_ori()
+
     print_data()
 
 
     cv2.imshow("result", last_frame)
+    # if SAVE_FRAMES:
+    #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
+
     if DRAW_ORIGINAL_OUTPUT:
         cv2.namedWindow("result_ov")
         cv2.moveWindow("result_ov", 900, 350)
