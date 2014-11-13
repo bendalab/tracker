@@ -3,6 +3,7 @@ import cv2
 import math
 import sys
 import copy
+import os
 import argparse
 
 
@@ -67,15 +68,20 @@ estimated_pos_original = []
 estimated_oris = []
 
 
+output_directory = ""
 
 # define testvideo
 # path to directory
 # standard:
-# dir = "examples/2014-10-01_33/"
+# dir = "examples/"
 # videofile_name = "2014-10-01_33"
 # problem:
-dir = "examples/2014-08-27_33/"
+dir = "examples/"
 videofile_name = "2014-08-27_33"
+
+# dir = "/home/madai/Videos/"
+# videofile_name = "2014-08-27_1"
+
 
 
 
@@ -88,6 +94,22 @@ def set_video_file():
         video_file = sys.argv[1]
     else:
         return
+
+def extract_video_file_name_and_path():
+    pointer_end = len(video_file)-1
+    while video_file[pointer_end] != ".":
+        pointer_end -= 1
+        if pointer_end == 0:
+            print "no valid file"
+            return ""
+
+    pointer_start = pointer_end
+    while video_file[pointer_start-1] != "/":
+        pointer_start -= 1
+
+    return video_file[pointer_start:pointer_end], video_file[:pointer_start]
+
+
 
 
 # init cap
@@ -472,9 +494,11 @@ def estimate_missing_pos():
         while pointer < gap_end_pointer:
             if not first_pos_estimated:
                 estimated_pos_roi[pointer] = ((all_pos_roi[pointer-1][0] + value_diff_x_part), (all_pos_roi[pointer-1][1] + value_diff_y_part))
+                estimated_pos_original[pointer] = (estimated_pos_roi[pointer][0] + ROI_X1, estimated_pos_roi[pointer][1] + ROI_Y1)
                 first_pos_estimated = True
             else:
                 estimated_pos_roi[pointer] = ((estimated_pos_roi[pointer-1][0] + value_diff_x_part), (estimated_pos_roi[pointer-1][1] + value_diff_y_part))
+                estimated_pos_original[pointer] = (estimated_pos_roi[pointer][0] + ROI_X1, estimated_pos_roi[pointer][1] + ROI_Y1)
             pointer += 1
 
 
@@ -487,10 +511,12 @@ def estimate_missing_ori():
     for x in range(0, frame_counter):
         estimated_oris.append(None)
 
-    pointer =  0
+    pointer = 0
     # set pointer to start of data
     while all_oris[pointer] is None:
         pointer += 1
+        if pointer >= frame_counter-1:
+                return
 
     while pointer < frame_counter:
         while all_oris[pointer] is not None:
@@ -700,6 +726,156 @@ def print_data():
 
     print "All lists consistent with frame count: " + str(len(all_pos_roi) == len(all_pos_original) == len(all_oris) == len(number_contours_per_frame) == len(number_relevant_contours_per_frame) == frame_counter)
 
+def fill_spaces(file, string):
+    for i in range(0, 20-len(string)):
+        file.write(" ")
+
+def print_None_to_file(file):
+    for i in range(0, 16):
+        file.write(" ")
+    file.write("None")
+
+
+
+def save_data_to_files():
+    file_name, file_directory = extract_video_file_name_and_path()
+
+    ###
+    ### save data into txt file
+    ###
+
+    global output_directory
+    # define ouput directory name as file name
+    output_directory = file_directory + file_name
+
+    #check if times file in same folder as video file
+    times_file_path = file_directory + file_name + "_times.dat"
+    times_file = None
+    if not os.path.exists(times_file_path):
+        print "times file missing - data saving abortet"
+        return
+    else:
+        times_file = open(times_file_path, 'r')
+
+    # create directory name after video file
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+    # else:
+    #     print "directory exists"
+
+    output_file_path = output_directory + "/" + file_name + ".txt"
+    output_file = open(output_file_path, 'w')
+
+    output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n\n")
+
+    lc = 0
+    spacing = 4
+    for line in times_file:
+
+        output_file.write("  ")
+        fill_spaces(output_file, line[:-1])
+        output_file.write(line[:-1])
+        output_file.write(" "*spacing)
+
+        if all_pos_roi[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_x_pos_original = str(round(all_pos_roi[lc][0], 2))
+            fill_spaces(output_file, rounded_x_pos_original)
+            output_file.write(rounded_x_pos_original)
+        output_file.write(" "*spacing)
+
+        if all_pos_roi[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_y_pos_original = str(round(all_pos_roi[lc][1], 2))
+            fill_spaces(output_file, rounded_y_pos_original)
+            output_file.write(rounded_y_pos_original)
+        output_file.write(" "*spacing)
+
+        if estimated_pos_roi[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_est_x_pos_original = str(round(estimated_pos_roi[lc][0], 2))
+            fill_spaces(output_file, rounded_est_x_pos_original)
+            output_file.write(rounded_est_x_pos_original)
+        output_file.write(" "*spacing)
+
+        if estimated_pos_roi[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_est_y_pos_original = str(round(estimated_pos_roi[lc][1], 2))
+            fill_spaces(output_file, rounded_est_y_pos_original)
+            output_file.write(rounded_est_y_pos_original)
+        output_file.write(" "*spacing)
+
+
+        if all_pos_original[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_x_pos_original = str(round(all_pos_original[lc][0], 2))
+            fill_spaces(output_file, rounded_x_pos_original)
+            output_file.write(rounded_x_pos_original)
+        output_file.write(" "*spacing)
+
+        if all_pos_original[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_y_pos_original = str(round(all_pos_original[lc][1], 2))
+            fill_spaces(output_file, rounded_y_pos_original)
+            output_file.write(rounded_y_pos_original)
+        output_file.write(" "*spacing)
+
+        if estimated_pos_original[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_est_x_pos_original = str(round(estimated_pos_original[lc][0], 2))
+            fill_spaces(output_file, rounded_est_x_pos_original)
+            output_file.write(rounded_est_x_pos_original)
+        output_file.write(" "*spacing)
+
+        if estimated_pos_original[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_est_y_pos_original = str(round(estimated_pos_original[lc][1], 2))
+            fill_spaces(output_file, rounded_est_y_pos_original)
+            output_file.write(rounded_est_y_pos_original)
+        output_file.write(" "*spacing)
+
+        if all_oris[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_ori = str(round(all_oris[lc], 2))
+            fill_spaces(output_file, rounded_ori)
+            output_file.write(rounded_ori)
+        output_file.write(" "*spacing)
+
+        if estimated_oris[lc] is None:
+            print_None_to_file(output_file)
+        else:
+            rounded_est_ori = str(round(estimated_oris[lc], 2))
+            fill_spaces(output_file, rounded_est_ori)
+            output_file.write(rounded_est_ori)
+        output_file.write(" "*spacing)
+
+        cnt_of_frame = str(number_contours_per_frame[lc])
+        fill_spaces(output_file, cnt_of_frame)
+        output_file.write(cnt_of_frame)
+        output_file.write(" "*spacing)
+
+        rel_cnt_of_frame = str(number_relevant_contours_per_frame[lc])
+        fill_spaces(output_file, rel_cnt_of_frame)
+        output_file.write(rel_cnt_of_frame)
+
+
+
+        output_file.write("\n")
+
+        lc += 1
+
+    #save last frame
+    cv2.imwrite(output_directory + "/" + file_name + "_OV_path.png", last_frame_OV_output)
+
 
 if __name__ == '__main__':
     # parser = argparse.ArgumentParser(description='tracking fish in video file')
@@ -730,6 +906,8 @@ if __name__ == '__main__':
     cv2.imshow("result", last_frame)
     # if SAVE_FRAMES:
     #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
+
+    save_data_to_files()
 
     if DRAW_ORIGINAL_OUTPUT:
         cv2.namedWindow("result_ov")
