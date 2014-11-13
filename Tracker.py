@@ -49,6 +49,9 @@ ROI_Y2 = 515
 fish_size_threshold = 700
 
 fish_started = False
+starting_area_x_factor = 0.85
+starting_area_y1_factor = 0.30
+starting_area_y2_factor = 0.70
 
 # init last position and lists for saving
 last_pos = None
@@ -57,6 +60,7 @@ all_pos_original = []
 
 # init last orientation and list for saving
 last_ori = None
+start_ori = 270
 all_oris = []
 
 last_frame = None
@@ -122,18 +126,18 @@ def set_video_capture():
 
 
 # create and position windows
-cv2.namedWindow("file")
-cv2.moveWindow("file", 0, 0)
-cv2.namedWindow("ROI")
-cv2.moveWindow("ROI", 1300, 0)
-cv2.namedWindow("Background subtracted")
-cv2.moveWindow("Background subtracted", 0, 600)
-
-cv2.namedWindow("morphed")
-cv2.moveWindow("morphed", 1300, 600)
-
-cv2.namedWindow("canny")
-cv2.moveWindow("canny", 600, 70)
+# cv2.namedWindow("file")
+# cv2.moveWindow("file", 0, 0)
+# cv2.namedWindow("ROI")
+# cv2.moveWindow("ROI", 1300, 0)
+# cv2.namedWindow("Background subtracted")
+# cv2.moveWindow("Background subtracted", 0, 600)
+#
+# cv2.namedWindow("morphed")
+# cv2.moveWindow("morphed", 1300, 600)
+#
+# cv2.namedWindow("canny")
+# cv2.moveWindow("canny", 600, 70)
 
 cv2.namedWindow("contours")
 cv2.moveWindow("contours", 570, 570)
@@ -143,20 +147,20 @@ cv2.moveWindow("contours", 570, 570)
 # show images
 def show_imgs(img, roi, roi_bg_subtracted, roi_bg_subtracted_morphed, canny_edges):
 
-    # show original output
-    cv2.imshow('file', img)
-
-    # show original ROI
-    cv2.imshow('ROI', roi)
-
-    # show ROI with subtracted BG
-    cv2.imshow('Background subtracted', roi_bg_subtracted)
-
-    # show morphed subtracted BG-img
-    cv2.imshow("morphed", roi_bg_subtracted_morphed)
-
-    # show ROI img with canny edge detection
-    cv2.imshow("canny", canny_edges)
+    # # show original output
+    # cv2.imshow('file', img)
+    #
+    # # show original ROI
+    # cv2.imshow('ROI', roi)
+    #
+    # # show ROI with subtracted BG
+    # cv2.imshow('Background subtracted', roi_bg_subtracted)
+    #
+    # # show morphed subtracted BG-img
+    # cv2.imshow("morphed", roi_bg_subtracted_morphed)
+    #
+    # # show ROI img with canny edge detection
+    # cv2.imshow("canny", canny_edges)
 
     # if SAVE_FRAMES and img is not None:
         # cv2.imwrite(dir + "frames/" + str(frame_counter) + "_roi_bg_sub_morph" + ".jpg", roi_bg_subtracted_morphed)
@@ -321,10 +325,11 @@ def keep_nearest_contour(contour_list):
 
 # check if fish started from the right side
 def check_if_fish_started(contour_list, roi):
+    global starting_area_x_factor, starting_area_y1_factor, starting_area_y2_factor
     height, width, depth = roi.shape
-    non_starting_area_x = int(0.85 * width)
-    non_starting_area_y1 = int(0.30 * height)
-    non_starting_area_y2 = int(0.70 * height)
+    non_starting_area_x = int(starting_area_x_factor * width)
+    non_starting_area_y1 = int(starting_area_y1_factor * height)
+    non_starting_area_y2 = int(starting_area_y2_factor * height)
 
     if contour_list is not None:
         for i in range(0, len(contour_list)):
@@ -380,7 +385,7 @@ def append_to_travel_orientation(lx1, ly1, lx2, ly2):
 
 def append_to_travel_route():
     global ellipse
-    if ellipse != None:
+    if ellipse is not None:
         ellipse_x = int(round(ellipse[0][0]))
         ellipse_y = int(round(ellipse[0][1]))
         point = (ellipse_x, ellipse_y)
@@ -406,14 +411,14 @@ def save_fish_positions():
         all_pos_original.append((original_x,original_y))
 
 def set_last_orientation():
-    global last_ori
+    global last_ori, start_ori
     global ellipse
     if not fish_started or ellipse is None:
         return
 
     global last_ori
     if last_ori is None:
-        last_ori = 270
+        last_ori = start_ori
 
     if ellipse is None:
         return
@@ -452,6 +457,8 @@ def estimate_missing_pos():
     global all_pos_roi
     global estimated_pos_roi
     global estimated_pos_original
+    global ROI_X1
+    global ROI_Y1
 
     # init length of estimated-lists to amount of frames
     for x in range(0, frame_counter):
@@ -738,6 +745,10 @@ def print_None_to_file(file):
 
 
 def save_data_to_files():
+    global ROI_X1, ROI_X2, ROI_Y1, ROI_Y2
+    global fish_size_threshold
+    global start_ori
+
     file_name, file_directory = extract_video_file_name_and_path()
 
     ###
@@ -766,15 +777,28 @@ def save_data_to_files():
     output_file_path = output_directory + "/" + file_name + ".txt"
     output_file = open(output_file_path, 'w')
 
-    output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n\n")
+    output_file.write("# Tracking parameters:\n")
+    output_file.write("#     Region of Interest X-Axis         : [" + str(ROI_X1) + "," + str(ROI_X2) + "]\n")
+    output_file.write("#     Region of Interest Y-Axis         : [" + str(ROI_Y1) + "," + str(ROI_Y2) + "]\n")
+    output_file.write("#     Fish size threshold               : " + str(fish_size_threshold) + "\n")
+    output_file.write("#     Start orientation                 : " + str(start_ori) + "\n")
+    output_file.write("#     Fish starting area X-Axis factor  : " + str(starting_area_x_factor) + "\n")
+    output_file.write("#     Fish starting area Y-Axis factor 1: " + str(starting_area_y1_factor) + "\n")
+    output_file.write("#     Fish starting area Y-Axis factor 2: " + str(starting_area_y2_factor) + "\n")
+    output_file.write("#\n")
+    output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
+
+    output_file.write("\n#Key\n")
+    output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n")
 
     lc = 0
     spacing = 4
     for line in times_file:
 
         output_file.write("  ")
-        fill_spaces(output_file, line[:-1])
-        output_file.write(line[:-1])
+        line = line.strip()
+        fill_spaces(output_file, line)
+        output_file.write(line)
         output_file.write(" "*spacing)
 
         if all_pos_roi[lc] is None:
