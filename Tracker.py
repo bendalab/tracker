@@ -765,6 +765,8 @@ if __name__ == '__main__':
     tr.set_video_capture()
 
     tr.run()
+
+
     cv2.namedWindow("result")
     cv2.moveWindow("result", 200, 350)
 
