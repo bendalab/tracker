@@ -34,7 +34,7 @@ img_travel_orientation = []
 
 DRAW_TRAVEL_ROUTE = True
 img_travel_route = []
-DRAW_ORIGINAL_OUTPUT = True
+DRAW_ORIGINAL_OUTPUT = False
 
 number_contours_per_frame = []
 number_relevant_contours_per_frame = []
@@ -452,7 +452,11 @@ def save_fish_orientations():
     global last_ori
     all_oris.append(last_ori)
 
+
 def estimate_missing_pos():
+    if not ESTIMATE_MISSING_DATA:
+        return
+
     global frame_counter
     global all_pos_roi
     global estimated_pos_roi
@@ -561,6 +565,22 @@ def estimate_missing_ori():
                 estimated_oris[pointer] = (estimated_oris[pointer-1] + value_diff_part) % 360
             pointer += 1
 
+
+def draw_estimated_data():
+    if not ESTIMATE_MISSING_DATA:
+        return
+
+    global estimated_pos_roi
+    global last_frame
+    global last_frame_OV_output
+
+    if not ESTIMATE_MISSING_DATA:
+        return
+
+    for c in estimated_pos_roi:
+        if c is not None:
+            cv2.circle(last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
+            cv2.circle(last_frame_OV_output, (int(round(c[0]))+ROI_X1, int(round(c[1])+ROI_Y1)), 2, (0, 0, 255))
 
 
 def run_Tracker():
@@ -914,15 +934,9 @@ if __name__ == '__main__':
     cv2.namedWindow("result")
     cv2.moveWindow("result", 200, 350)
 
-
-    if ESTIMATE_MISSING_DATA:
-        estimate_missing_pos()
-        for c in estimated_pos_roi:
-            if c is not None:
-                cv2.circle(last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
-                cv2.circle(last_frame_OV_output, (int(round(c[0]))+ROI_X1, int(round(c[1])+ROI_Y1)), 2, (0, 0, 255))
-
-        estimate_missing_ori()
+    estimate_missing_pos()
+    estimate_missing_ori()
+    draw_estimated_data()
 
     print_data()
 
@@ -937,4 +951,5 @@ if __name__ == '__main__':
         cv2.namedWindow("result_ov")
         cv2.moveWindow("result_ov", 900, 350)
         cv2.imshow("result_ov", last_frame_OV_output)
+
     cv2.waitKey(0)
