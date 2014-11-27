@@ -19,7 +19,7 @@ class Tracker():
         self.cap = ""
 
         self.save_frames = False
-        self.frame_waittime = 1
+        self.frame_waittime = 25
 
         self.frame_counter = 0
 
@@ -73,7 +73,7 @@ class Tracker():
         self.draw_line = True
         self.draw_travel_orientation = True
         self.draw_travel_route = True
-        self.draw_original_output = False
+        self.draw_original_output = True
 
         self.estimate_missing_data = True
         self.estimated_pos_roi = []
@@ -91,6 +91,10 @@ class Tracker():
         else:
             self.video_file = self.dir + self.videofile_name + ".avi"
             return
+
+    def check_if_necessary_files_exist(self):
+        if not os.path.exists(self.video_file):
+            sys.exit("ERROR: Video File does not exist - Tracking aborted")
 
     def extract_video_file_name_and_path(self):
         pointer_end = len(self.video_file)-1
@@ -539,7 +543,7 @@ class Tracker():
 
             if self.draw_original_output:
                 for coordinates in self.img_travel_orientation:
-                    cv2.line(frame_output, (coordinates[0]+ROI_X1, coordinates[1]+ROI_Y1), (coordinates[2]+ROI_X1, coordinates[3]+ROI_Y1), (150,150,0), 1)
+                    cv2.line(frame_output, (coordinates[0]+self.roi_x1, coordinates[1]+self.roi_y1), (coordinates[2]+self.roi_x1, coordinates[3]+self.roi_y1), (150,150,0), 1)
                 for point in self.all_pos_original:
                     if point is not None:
                         cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
@@ -561,7 +565,6 @@ class Tracker():
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break
 
-
         self.cap.release()
         cv2.destroyAllWindows()
 
@@ -574,10 +577,13 @@ class Tracker():
         print "estimated orientations:       " + str(self.estimated_oris)
         print "number of contours in frames: " + str(self.number_contours_per_frame)
         print "number of fish-size contours: " + str(self.number_relevant_contours_per_frame)
+
+    def check_data_integrity(self):
         if not len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == self.frame_counter:
             print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
 
         print "All lists consistent with frame count: " + str(len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == len(self.number_contours_per_frame) == len(self.number_relevant_contours_per_frame) == self.frame_counter)
+
 
     @staticmethod
     def fill_spaces(file, string):
@@ -604,8 +610,7 @@ class Tracker():
         times_file_path = file_directory + file_name + "_times.dat"
         times_file = None
         if not os.path.exists(times_file_path):
-            print "times file missing - data saving abortet"
-            return
+            sys.exit("ERROR: times file missing - data saving abortet")
         else:
             times_file = open(times_file_path, 'r')
 
@@ -747,13 +752,9 @@ class Tracker():
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description='tracking fish in video file')
-    # parser.add_argument('path', type=str,
-    #                     help="absolute file path to video including file name")
-    # args = parser.parse_args()
-
-    #
-
+    parser = argparse.ArgumentParser(description='tracking fish in video file')
+    parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
+    args = parser.parse_args()
 
 
     cv2.namedWindow("contours")
@@ -762,22 +763,22 @@ if __name__ == '__main__':
     tr = Tracker()
 
     tr.set_video_file()
+    tr.check_if_necessary_files_exist()
     tr.set_video_capture()
 
     tr.run()
-
-
-    cv2.namedWindow("result")
-    cv2.moveWindow("result", 200, 350)
 
     tr.estimate_missing_pos()
     tr.estimate_missing_ori()
     tr.draw_estimated_data()
 
-    tr.print_data()
+    # tr.print_data()
+    tr.check_data_integrity()
 
+    # cv2.namedWindow("result")
+    # cv2.moveWindow("result", 200, 350)
+    # cv2.imshow("result", tr.last_frame)
 
-    cv2.imshow("result", tr.last_frame)
     # if SAVE_FRAMES:
     #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
 
