@@ -37,8 +37,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def setupUi(self, tracker_main_widget):
         #main widget
         tracker_main_widget.setObjectName(_fromUtf8("tracker_main_widget"))
-        tracker_main_widget.resize(1059, 835)
-        tracker_main_widget.setMinimumSize(QtCore.QSize(900, 770))
+        tracker_main_widget.resize(1059/2, 835)
+        tracker_main_widget.setMinimumSize(QtCore.QSize(900/2, 770))
 
         # main vertical layout
         self.vertLO_main = QtGui.QVBoxLayout(tracker_main_widget)
@@ -47,9 +47,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.hoLO_video_plus_options = QtGui.QHBoxLayout()
         self.hoLO_video_plus_options.setObjectName(_fromUtf8("hoLO_video_plus_options"))
         # graphical output viewer
-        self.graphic_output_viewer = QtGui.QGraphicsView(tracker_main_widget)
-        self.graphic_output_viewer.setObjectName(_fromUtf8("graphic_output_viewer"))
-        self.hoLO_video_plus_options.addWidget(self.graphic_output_viewer)
+        # self.graphic_output_viewer = QtGui.QGraphicsView(tracker_main_widget)
+        # self.graphic_output_viewer.setObjectName(_fromUtf8("graphic_output_viewer"))
+        # self.hoLO_video_plus_options.addWidget(self.graphic_output_viewer)
 
         # options tab widget
         self.tab_widget_options = QtGui.QTabWidget(tracker_main_widget)
