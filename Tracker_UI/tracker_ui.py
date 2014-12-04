@@ -290,27 +290,31 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # spacer
         spacerItem9 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem9)
-        # horizontal layout fishsize threshold
-        self.hoLO_fishsize_th = QtGui.QHBoxLayout()
-        self.hoLO_fishsize_th.setObjectName(_fromUtf8("hoLO_fishsize_th"))
+        # grid layout fishsize threshold
+        self.gridLO_fishsize_th = QtGui.QGridLayout()
+        self.gridLO_fishsize_th.setObjectName(_fromUtf8("gridLO_fishsize_th"))
         # label fishsize threshold
         self.lbl_fishsize_threshold = QtGui.QLabel(self.tab_adv)
         self.lbl_fishsize_threshold.setObjectName(_fromUtf8("lbl_fishsize_threshold"))
-        self.hoLO_fishsize_th.addWidget(self.lbl_fishsize_threshold)
+        self.gridLO_fishsize_th.addWidget(self.lbl_fishsize_threshold, 0, 0, 1, 1)
         # spinbox fishsize threshold
         self.spinBox_fish_threshold = QtGui.QSpinBox(self.tab_adv)
         self.spinBox_fish_threshold.setObjectName(_fromUtf8("spinBox_fish_threshold"))
-        self.hoLO_fishsize_th.addWidget(self.spinBox_fish_threshold)
+        self.gridLO_fishsize_th.addWidget(self.spinBox_fish_threshold, 0, 1, 1, 1)
         # label maximum fishsize threshold
         self.lbl_max_fishsize_threshold = QtGui.QLabel(self.tab_adv)
         self.lbl_max_fishsize_threshold.setObjectName(_fromUtf8("lbl_max_fishsize_threshold"))
-        self.hoLO_fishsize_th.addWidget(self.lbl_max_fishsize_threshold)
+        self.gridLO_fishsize_th.addWidget(self.lbl_max_fishsize_threshold, 1, 0, 1, 1)
         # spinbox maximum fishsize threshold
         self.spinBox_fish_max_threshold = QtGui.QSpinBox(self.tab_adv)
         self.spinBox_fish_max_threshold.setObjectName(_fromUtf8("spinBox_fish_max_threshold"))
-        self.hoLO_fishsize_th.addWidget(self.spinBox_fish_max_threshold)
+        self.gridLO_fishsize_th.addWidget(self.spinBox_fish_max_threshold, 1, 1, 1, 1)
         # add fishsize layout to tab layout
-        self.vertLO_tab_adv.addLayout(self.hoLO_fishsize_th)
+        self.vertLO_tab_adv.addLayout(self.gridLO_fishsize_th)
+        # checkbox enable maximum size threshold
+        self.cbx_enable_max_size_thresh = QtGui.QCheckBox(self.tab_adv)
+        self.cbx_enable_max_size_thresh.setObjectName(_fromUtf8("cbx_enable_max_size_thresh"))
+        self.vertLO_tab_adv.addWidget(self.cbx_enable_max_size_thresh)
         # spacer
         spacerItem10 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem10)
@@ -509,8 +513,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_start_y_end.setText(_translate("tracker_main_widget", "Y End", None))
         self.lbl_start_x_start.setText(_translate("tracker_main_widget", "X Start", None))
         self.lbl_start_orientation.setText(_translate("tracker_main_widget", "Starting Orientation", None))
-        self.lbl_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection Size Threshold", None))
+        self.lbl_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection min Size Threshold", None))
         self.lbl_max_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection max Size Threshold", None))
+        self.cbx_enable_max_size_thresh.setText(_translate("tracker_main_widget", "Enable max Size Threshold", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_adv), _translate("tracker_main_widget", "Advanced", None))
         self.lbl_img_morphing.setText(_translate("tracker_main_widget", "Image Morphing", None))
         self.lbl_erosion.setText(_translate("tracker_main_widget", "Erosion Faktor", None))
