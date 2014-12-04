@@ -6,7 +6,6 @@
 #      by: PyQt4 UI code generator 4.10.4
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QFileDialog
 from Tracker import Tracker
 import sys
 import cv2
@@ -545,6 +544,14 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.btn_start_tracking.setText(_translate("tracker_main_widget", "Start Tracking", None))
         self.btn_abort_tracking.setText(_translate("tracker_main_widget", "Abort Tracking", None))
 
+    def center_ui(self):
+        # screen = QDesktopWidget().screenGeometry()
+        screen = qApp.desktop().screenGeometry()
+        gui_size = self.geometry()
+        x_pos = (screen.width() - gui_size.width()) / 2
+        y_pos = (screen.height() - gui_size.height() - gui_size.height()) / 2
+        self.move(x_pos, y_pos)
+
     def preset_options(self):
         # video file
         self.lnEdit_file_path.setText(self.tracker.video_file)
@@ -594,5 +601,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 if __name__ == "__main__":
     qApp = QtGui.QApplication(sys.argv)
     ui_tr = Ui_tracker_main_widget()
+    ui_tr.center_ui()
     ui_tr.show()
     sys.exit(qApp.exec_())

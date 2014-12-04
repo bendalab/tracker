@@ -119,6 +119,7 @@ class Tracker():
 
     # captures video defined by path stored in video file
     def set_video_capture(self):
+        print self.video_file
         self.cap = cv2.VideoCapture(self.video_file)
 
     # # morph given img by erosion/dilation
@@ -623,9 +624,6 @@ class Tracker():
         if self.fish_not_detected_count > self.fish_not_detected_threshold:
             self.fish_not_detected_threshold_reached = True
 
-        print self.fish_not_detected_threshold
-        print self.fish_not_detected_threshold_reached
-
     @staticmethod
     def fill_spaces(file, string):
         for i in range(0, 20-len(string)):
@@ -796,36 +794,35 @@ class Tracker():
 
     def run(self):
 
+        self.check_if_necessary_files_exist()
+        self.set_video_capture()
+
         cv2.namedWindow("contours")
         cv2.moveWindow("contours", 570, 570)
-        tr.set_video_file()
 
-        tr.check_if_necessary_files_exist()
-        tr.set_video_capture()
+        self.extract_data()
 
-        tr.extract_data()
+        self.estimate_missing_pos()
+        self.estimate_missing_ori()
+        self.draw_estimated_data()
 
-        tr.estimate_missing_pos()
-        tr.estimate_missing_ori()
-        tr.draw_estimated_data()
-
-        # tr.print_data()
-        tr.check_data_integrity()
-        tr.check_frames_missing_fish()
+        # self.print_data()
+        self.check_data_integrity()
+        self.check_frames_missing_fish()
 
         # cv2.namedWindow("result")
         # cv2.moveWindow("result", 200, 350)
-        # cv2.imshow("result", tr.last_frame)
+        # cv2.imshow("result", self.last_frame)
 
         # if SAVE_FRAMES:
         #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
 
-        tr.save_data_to_files()
+        self.save_data_to_files()
 
-        if tr.draw_original_output:
+        if self.draw_original_output:
             cv2.namedWindow("result_ov")
             cv2.moveWindow("result_ov", 900, 350)
-            cv2.imshow("result_ov", tr.last_frame_OV_output)
+            cv2.imshow("result_ov", self.last_frame_OV_output)
 
         cv2.waitKey(0)
 
@@ -835,4 +832,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     tr = Tracker()
+    tr.set_video_file()
     tr.run()
