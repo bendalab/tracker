@@ -19,7 +19,7 @@ class Tracker():
         self.cap = ""
 
         self.save_frames = False
-        self.frame_waittime = 15
+        self.frame_waittime = 1
 
         self.frame_counter = 0
 
@@ -54,8 +54,8 @@ class Tracker():
         self.start_ori = 270
         self.all_oris = []
 
-        self.frame_count_missing_fish = 0
-        self.fish_not_detected_threshold = 50
+        self.fish_not_detected_count = 0
+        self.fish_not_detected_threshold = 35
         self.fish_not_detected_threshold_reached = False
 
         self.ellipse = None
@@ -617,12 +617,14 @@ class Tracker():
                 startPos += 1
 
         for i in range(startPos, len(self.all_oris), 1):
-            for entry in self.all_oris:
-                if entry is None:
-                    self.frame_count_missing_fish += 1
+            if self.all_oris[i] is None:
+                self.fish_not_detected_count += 1
 
-        if self.frame_count_missing_fish > self.fish_not_detected_threshold:
+        if self.fish_not_detected_count > self.fish_not_detected_threshold:
             self.fish_not_detected_threshold_reached = True
+
+        print self.fish_not_detected_threshold
+        print self.fish_not_detected_threshold_reached
 
     @staticmethod
     def fill_spaces(file, string):
@@ -672,6 +674,10 @@ class Tracker():
         output_file.write("#     Fish starting area Y-Axis factor 2: " + str(self.starting_area_y2_factor) + "\n")
         output_file.write("#\n")
         output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
+        if self.fish_not_detected_threshold_reached:
+            output_file.write("#\n")
+            output_file.write("#     WARNING: Fish was not detected in " + str(self.fish_not_detected_count) + " of " + str(self.frame_counter) + " frames. Orientation data may be incorrect.\n")
+
 
         output_file.write("\n#Key\n")
         output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n")
@@ -813,6 +819,7 @@ if __name__ == '__main__':
 
     # tr.print_data()
     tr.check_data_integrity()
+    tr.check_frames_missing_fish()
 
     # cv2.namedWindow("result")
     # cv2.moveWindow("result", 200, 350)
