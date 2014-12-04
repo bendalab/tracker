@@ -6,7 +6,10 @@
 #      by: PyQt4 UI code generator 4.10.4
 
 from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import QFileDialog
+from Tracker import Tracker
 import sys
+import cv2
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -26,6 +29,10 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         self.setupUi(self)
+
+        self.tracker = Tracker()
+        self.preset_options()
+        self.connect_widgets()
 
     def setupUi(self, tracker_main_widget):
         #main widget
@@ -299,6 +306,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.gridLO_fishsize_th.addWidget(self.lbl_fishsize_threshold, 0, 0, 1, 1)
         # spinbox fishsize threshold
         self.spinBox_fish_threshold = QtGui.QSpinBox(self.tab_adv)
+        self.spinBox_fish_threshold.setMaximum(9999)
         self.spinBox_fish_threshold.setObjectName(_fromUtf8("spinBox_fish_threshold"))
         self.gridLO_fishsize_th.addWidget(self.spinBox_fish_threshold, 0, 1, 1, 1)
         # label maximum fishsize threshold
@@ -307,6 +315,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.gridLO_fishsize_th.addWidget(self.lbl_max_fishsize_threshold, 1, 0, 1, 1)
         # spinbox maximum fishsize threshold
         self.spinBox_fish_max_threshold = QtGui.QSpinBox(self.tab_adv)
+        self.spinBox_fish_max_threshold.setMaximum(9999)
         self.spinBox_fish_max_threshold.setObjectName(_fromUtf8("spinBox_fish_max_threshold"))
         self.gridLO_fishsize_th.addWidget(self.spinBox_fish_max_threshold, 1, 1, 1, 1)
         # add fishsize layout to tab layout
@@ -353,12 +362,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.gridLO_img_morphing.addWidget(self.lbl_dilation, 4, 1, 1, 1)
         # spinbox set dilation factor
         self.spinBox_dilation = QtGui.QSpinBox(self.tab_visual)
-        self.spinBox_dilation.setMinimum(1)
+        self.spinBox_dilation.setMinimum(0)
         self.spinBox_dilation.setObjectName(_fromUtf8("spinBox_dilation"))
         self.gridLO_img_morphing.addWidget(self.spinBox_dilation, 4, 2, 1, 1)
         # spinbox set erosion factor
         self.spinBox_erosion = QtGui.QSpinBox(self.tab_visual)
-        self.spinBox_erosion.setMinimum(1)
+        self.spinBox_erosion.setMinimum(0)
         self.spinBox_erosion.setObjectName(_fromUtf8("spinBox_erosion"))
         self.gridLO_img_morphing.addWidget(self.spinBox_erosion, 1, 2, 1, 1)
         # add grid layout image morphing
@@ -414,7 +423,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.line_11.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_11.setObjectName(_fromUtf8("line_11"))
         self.vertLO_tab_visual.addWidget(self.line_11)
-        # label data visualization
+        # label data visualisation
         self.gridLO_data_visual = QtGui.QGridLayout()
         self.gridLO_data_visual.setObjectName(_fromUtf8("gridLO_data_visual"))
         # button set circle color
@@ -454,9 +463,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_ln_color.setObjectName(_fromUtf8("lbl_ln_color"))
         self.gridLO_data_visual.addWidget(self.lbl_ln_color, 3, 0, 1, 1)
         # label  data visualization
-        self.lbl_data_visualization = QtGui.QLabel(self.tab_visual)
-        self.lbl_data_visualization.setObjectName(_fromUtf8("lbl_data_visualization"))
-        self.gridLO_data_visual.addWidget(self.lbl_data_visualization, 0, 0, 1, 1)
+        self.lbl_data_visualisation = QtGui.QLabel(self.tab_visual)
+        self.lbl_data_visualisation.setObjectName(_fromUtf8("lbl_data_visualisation"))
+        self.gridLO_data_visual.addWidget(self.lbl_data_visualisation, 0, 0, 1, 1)
         # add data visualization layout
         self.vertLO_tab_visual.addLayout(self.gridLO_data_visual)
         # line
@@ -495,7 +504,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         QtCore.QMetaObject.connectSlotsByName(tracker_main_widget)
 
     def retranslateUi(self, tracker_main_widget):
-        tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "[TF]² 1.0", None))
+        tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
         self.lbl_file_path.setText(_translate("tracker_main_widget", "File Path", None))
         self.btn_browse_file.setText(_translate("tracker_main_widget", "Browse File", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_file), _translate("tracker_main_widget", "File", None))
@@ -531,10 +540,56 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_line_offset.setText(_translate("tracker_main_widget", "Lineend Offset", None))
         self.btn_set_line_color.setText(_translate("tracker_main_widget", "Set Color", None))
         self.lbl_ln_color.setText(_translate("tracker_main_widget", "Line Color", None))
-        self.lbl_data_visualization.setText(_translate("tracker_main_widget", "Data Visualization", None))
+        self.lbl_data_visualisation.setText(_translate("tracker_main_widget", "Data Visualisation", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_visual), _translate("tracker_main_widget", "Visualization", None))
         self.btn_start_tracking.setText(_translate("tracker_main_widget", "Start Tracking", None))
         self.btn_abort_tracking.setText(_translate("tracker_main_widget", "Abort Tracking", None))
+
+    def preset_options(self):
+        # video file
+        self.lnEdit_file_path.setText(self.tracker.video_file)
+
+        # region of interest
+        self.spinBox_x_start.setValue(self.tracker.roi_x1)
+        self.spinBox_x_end.setValue(self.tracker.roi_x2)
+        self.spinBox_y_start.setValue(self.tracker.roi_y1)
+        self.spinBox_y_end.setValue(self.tracker.roi_y2)
+
+        # frame waittime
+        self.spinBox_frame_waittime.setValue(self.tracker.frame_waittime)
+
+        # TODO starting area
+
+        # starting orientation
+        self.spinBox_start_orientation.setValue(self.tracker.start_ori)
+
+        # fish size thresholds
+        self.spinBox_fish_threshold.setValue(self.tracker.fish_size_threshold)
+        self.spinBox_fish_max_threshold.setValue(self.tracker.fish_max_size_threshold)
+        self.cbx_enable_max_size_thresh.setChecked(self.tracker.enable_max_size_threshold)
+
+        # image morphing
+        self.spinBox_erosion.setValue(self.tracker.erosion_iterations)
+        self.spinBox_dilation.setValue(self.tracker.dilation_iterations)
+
+        # TODO image processing steps
+
+        # data visualisation
+        self.spinBox_lineend_offset.setValue(self.tracker.lineend_offset)
+        # TODO
+        # self.spinBox_circle_size.setValue(self.tracker.draw_circle_size)
+
+    def connect_widgets(self):
+        self.btn_browse_file.clicked.connect(self.browse_file)
+        self.btn_start_tracking.clicked.connect(self.start_tracking)
+
+    def browse_file(self):
+        track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '/home')
+        self.lnEdit_file_path.setText(track_file)
+        self.tracker.video_file = str(track_file)
+
+    def start_tracking(self):
+        self.tracker.run()
 
 if __name__ == "__main__":
     qApp = QtGui.QApplication(sys.argv)
