@@ -14,7 +14,7 @@ class Tracker():
         self.videofile_name = "2014-08-27_33"
         # self.dir = "examples/"
         # self.videofile_name = "2014-10-01_33"
-        self.video_file = ""
+        self.video_file = "examples/2014-08-27_33.avi"
 
         self.cap = ""
 
@@ -55,12 +55,12 @@ class Tracker():
         self.all_oris = []
 
         self.fish_not_detected_count = 0
-        self.fish_not_detected_threshold = 35
+        self.fish_not_detected_threshold = 50
         self.fish_not_detected_threshold_reached = False
 
         self.ellipse = None
         self.line = None
-        self.line_point_offset = 5
+        self.lineend_offset = 5
         self.lx1 = 0
         self.ly1 = 0
         self.lx2 = 0
@@ -261,10 +261,10 @@ class Tracker():
         x_dif = math.sin(angle)
         y_dif = math.cos(angle)
 
-        x1 = int(round(center_x - self.line_point_offset*x_dif))
-        y1 = int(round(center_y - self.line_point_offset*y_dif))
-        x2 = int(round(center_x + self.line_point_offset*x_dif))
-        y2 = int(round(center_y + self.line_point_offset*y_dif))
+        x1 = int(round(center_x - self.lineend_offset*x_dif))
+        y1 = int(round(center_y - self.lineend_offset*y_dif))
+        x2 = int(round(center_x + self.lineend_offset*x_dif))
+        y2 = int(round(center_y + self.lineend_offset*y_dif))
 
         return x1, y1, x2, y2
 
@@ -449,7 +449,7 @@ class Tracker():
                 cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
                 cv2.circle(self.last_frame_OV_output, (int(round(c[0]))+self.roi_x1, int(round(c[1])+self.roi_y1)), 2, (0, 0, 255))
 
-    def run(self):
+    def extract_data(self):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG2()
 
@@ -794,45 +794,45 @@ class Tracker():
         #save last frame
         cv2.imwrite(self.output_directory + "/" + file_name + "_OV_path.png", self.last_frame_OV_output)
 
+    def run(self):
 
+        cv2.namedWindow("contours")
+        cv2.moveWindow("contours", 570, 570)
+        tr.set_video_file()
+
+        tr.check_if_necessary_files_exist()
+        tr.set_video_capture()
+
+        tr.extract_data()
+
+        tr.estimate_missing_pos()
+        tr.estimate_missing_ori()
+        tr.draw_estimated_data()
+
+        # tr.print_data()
+        tr.check_data_integrity()
+        tr.check_frames_missing_fish()
+
+        # cv2.namedWindow("result")
+        # cv2.moveWindow("result", 200, 350)
+        # cv2.imshow("result", tr.last_frame)
+
+        # if SAVE_FRAMES:
+        #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
+
+        tr.save_data_to_files()
+
+        if tr.draw_original_output:
+            cv2.namedWindow("result_ov")
+            cv2.moveWindow("result_ov", 900, 350)
+            cv2.imshow("result_ov", tr.last_frame_OV_output)
+
+        cv2.waitKey(0)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
     parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
     args = parser.parse_args()
 
-
-    cv2.namedWindow("contours")
-    cv2.moveWindow("contours", 570, 570)
-
     tr = Tracker()
-
-    tr.set_video_file()
-    tr.check_if_necessary_files_exist()
-    tr.set_video_capture()
-
     tr.run()
-
-    tr.estimate_missing_pos()
-    tr.estimate_missing_ori()
-    tr.draw_estimated_data()
-
-    # tr.print_data()
-    tr.check_data_integrity()
-    tr.check_frames_missing_fish()
-
-    # cv2.namedWindow("result")
-    # cv2.moveWindow("result", 200, 350)
-    # cv2.imshow("result", tr.last_frame)
-
-    # if SAVE_FRAMES:
-    #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
-
-    tr.save_data_to_files()
-
-    if tr.draw_original_output:
-        cv2.namedWindow("result_ov")
-        cv2.moveWindow("result_ov", 900, 350)
-        cv2.imshow("result_ov", tr.last_frame_OV_output)
-
-    cv2.waitKey(0)
