@@ -19,7 +19,7 @@ class Tracker():
         self.cap = ""
 
         self.save_frames = False
-        self.frame_waittime = 25
+        self.frame_waittime = 15
 
         self.frame_counter = 0
 
@@ -35,7 +35,10 @@ class Tracker():
         # tracking data
         self.contour_list = None
 
+        # fish size thresholds
         self.fish_size_threshold = 700
+        self.fish_max_size_threshold = 4000
+        self.enable_max_size_threshold = True
 
         self.fish_started = False
         self.starting_area_x_factor = 0.85
@@ -50,6 +53,10 @@ class Tracker():
         self.last_ori = None
         self.start_ori = 270
         self.all_oris = []
+
+        self.frame_count_missing_fish = 0
+        self.fish_not_detected_threshold = 50
+        self.fish_not_detected_threshold_reached = False
 
         self.ellipse = None
         self.line = None
@@ -138,6 +145,21 @@ class Tracker():
                 popped = False
 
                 if cv2.contourArea(self.contour_list[counter]) < area_threshold:
+                    self.contour_list.pop(counter)
+                    popped = True
+                if not popped:
+                    counter += 1
+
+    def del_oversized_contours(self):
+        area_threshold = self.fish_max_size_threshold
+        if self.contour_list is not None and len(self.contour_list) > 0:
+
+            counter = 0
+            while counter < len(self.contour_list):
+
+                popped = False
+
+                if cv2.contourArea(self.contour_list[counter]) > area_threshold:
                     self.contour_list.pop(counter)
                     popped = True
                 if not popped:
@@ -475,6 +497,10 @@ class Tracker():
             # everything below fish_size_threshold is being ignored
             self.del_small_contours()
 
+            # everything above fish_size_max_threshold is being ignored
+            if self.enable_max_size_threshold:
+                self.del_oversized_contours()
+
             # save number of remaining contours
             self.save_number_of_contours(self.contour_list, self.number_relevant_contours_per_frame)
 
@@ -584,6 +610,19 @@ class Tracker():
 
         print "All lists consistent with frame count: " + str(len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == len(self.number_contours_per_frame) == len(self.number_relevant_contours_per_frame) == self.frame_counter)
 
+    def check_frames_missing_fish(self):
+        startPos = 0
+        for entry in self.all_oris:
+            if entry is None:
+                startPos += 1
+
+        for i in range(startPos, len(self.all_oris), 1):
+            for entry in self.all_oris:
+                if entry is None:
+                    self.frame_count_missing_fish += 1
+
+        if self.frame_count_missing_fish > self.fish_not_detected_threshold:
+            self.fish_not_detected_threshold_reached = True
 
     @staticmethod
     def fill_spaces(file, string):
