@@ -798,7 +798,7 @@ class Tracker():
         self.set_video_capture()
 
         cv2.namedWindow("contours")
-        cv2.moveWindow("contours", 570, 570)
+        cv2.moveWindow("contours", 50, 50)
 
         self.extract_data()
 
@@ -819,12 +819,12 @@ class Tracker():
 
         self.save_data_to_files()
 
-        if self.draw_original_output:
-            cv2.namedWindow("result_ov")
-            cv2.moveWindow("result_ov", 900, 350)
-            cv2.imshow("result_ov", self.last_frame_OV_output)
-
-        cv2.waitKey(0)
+        # if self.draw_original_output:
+        #     cv2.namedWindow("result_ov")
+        #     cv2.moveWindow("result_ov", 900, 350)
+        #     cv2.imshow("result_ov", self.last_frame_OV_output)
+        #
+        # cv2.waitKey(0)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
