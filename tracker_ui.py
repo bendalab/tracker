@@ -7,6 +7,7 @@
 
 from PyQt4 import QtCore, QtGui
 from Tracker import Tracker
+import os
 import sys
 import cv2
 
@@ -32,6 +33,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.tracker = Tracker()
 
         self.preset_options()
+        self.track_file = ""
         self.last_selected_folder = "/home"
 
         self.connect_widgets()
@@ -594,12 +596,15 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.btn_start_tracking.clicked.connect(self.start_tracking)
 
     def browse_file(self):
-        track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
-        if track_file == "":
+        self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
+        if self.track_file == "":
             return
-        self.lnEdit_file_path.setText(track_file)
-        self.tracker.video_file = str(track_file)
-        self.set_last_selected_folder(track_file)
+        self.lnEdit_file_path.setText(self.track_file)
+        self.set_tracker_video_file()
+
+    def set_tracker_video_file(self):
+        self.tracker.video_file = str(self.track_file)
+        self.set_last_selected_folder(self.track_file)
 
     def set_last_selected_folder(self, path_string):
         slashpos = 0
@@ -610,11 +615,15 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.last_selected_folder = path_string[0:slashpos]
 
     def start_tracking(self):
-        if (self.last_selected_folder == ""):
+        if self.last_selected_folder == "":
             self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
+            return
+        if not os.path.exists(self.track_file):
+            self.lnEdit_file_path.setText("--- FILE DOES NOT EXIST ---")
             return
         self.tracker.run()
         self.tracker = Tracker()
+
 
 if __name__ == "__main__":
     qApp = QtGui.QApplication(sys.argv)
