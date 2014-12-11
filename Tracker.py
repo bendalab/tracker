@@ -94,8 +94,8 @@ class Tracker():
 
     @staticmethod
     def show_imgs(img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
-        cv2.imshow("bgsub", roi_bg_sub)
-        cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+        # cv2.imshow("bgsub", roi_bg_sub)
+        # cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
     # sets video file to terminal-attribute path to video file
