@@ -19,14 +19,19 @@ class Tracker():
         self.cap = ""
 
         self.save_frames = False
-        self.frame_waittime = 1
+        self.frame_waittime = 10
 
         self.frame_counter = 0
 
-        self.roi_x1 = 15
-        self.roi_x2 = 695
+        # self.roi_x1 = 15
+        # self.roi_x2 = 695
+        # self.roi_y1 = 80
+        # self.roi_y2 = 515
+
+        self.roi_x1 = 160
+        self.roi_x2 = 700
         self.roi_y1 = 80
-        self.roi_y2 = 515
+        self.roi_y2 = 525
 
         # image morphing data
         self.erosion_iterations = 1
@@ -38,7 +43,7 @@ class Tracker():
         # fish size thresholds
         self.fish_size_threshold = 700
         self.fish_max_size_threshold = 4000
-        self.enable_max_size_threshold = True
+        self.enable_max_size_threshold = False
 
         self.fish_started = False
         self.starting_area_x_factor = 0.85
@@ -89,6 +94,8 @@ class Tracker():
 
     @staticmethod
     def show_imgs(img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
+        cv2.imshow("bgsub", roi_bg_sub)
+        cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
     # sets video file to terminal-attribute path to video file
