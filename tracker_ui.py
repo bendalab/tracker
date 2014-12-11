@@ -9,6 +9,7 @@ from PyQt4 import QtCore, QtGui
 from Tracker import Tracker
 import os
 import sys
+import numpy
 import cv2
 
 try:
@@ -37,6 +38,11 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.last_selected_folder = "/home"
 
         self.connect_widgets()
+        self.set_shortcuts()
+
+        # ROI variables
+        self.roi_preview_main_img = None
+        self.roi_preview_draw = None
 
     def setupUi(self, tracker_main_widget):
         #main widget
@@ -118,11 +124,18 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_roi = QtGui.QLabel(self.tab_roi)
         self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
         self.vertLO_tab_roi.addWidget(self.lbl_roi)
+        # TESTLABEL
+        self.lbl_test = QtGui.QLabel(self.tab_roi)
+        self.lbl_test.setObjectName(_fromUtf8("lbl_testlabel"))
+        # self.lbl_test.setMinimumSize(QtCore.QSize(0, 350))
+        # self.lbl_test.setMaximumSize(QtCore.QSize(0, 350))
+        # self.lbl_test.setScaledContents(True)
+        self.vertLO_tab_roi.addWidget(self.lbl_test)
         # graphics viewer roi
-        self.grView_roi = QtGui.QGraphicsView(self.tab_roi)
-        self.grView_roi.setMinimumSize(QtCore.QSize(0, 350))
-        self.grView_roi.setObjectName(_fromUtf8("grView_roi"))
-        self.vertLO_tab_roi.addWidget(self.grView_roi)
+        # self.grView_roi = QtGui.QGraphicsView(self.tab_roi)
+        # self.grView_roi.setMinimumSize(QtCore.QSize(0, 350))
+        # self.grView_roi.setObjectName(_fromUtf8("grView_roi"))
+        # self.vertLO_tab_roi.addWidget(self.grView_roi)
         # grid layout set roi
         self.gridLO_set_roi = QtGui.QGridLayout()
         self.gridLO_set_roi.setObjectName(_fromUtf8("gridLO_set_roi"))
@@ -286,6 +299,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # spinbox set start orientation
         self.spinBox_start_orientation = QtGui.QSpinBox(self.tab_adv)
         self.spinBox_start_orientation.setObjectName(_fromUtf8("spinBox_start_orientation"))
+        self.spinBox_start_orientation.setMaximum(359)
         self.hoLO_start_ori.addWidget(self.spinBox_start_orientation)
         # add start orientation layout to tab layout
         self.vertLO_tab_adv.addLayout(self.hoLO_start_ori)
@@ -549,6 +563,13 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.btn_start_tracking.setText(_translate("tracker_main_widget", "Start Tracking", None))
         self.btn_abort_tracking.setText(_translate("tracker_main_widget", "Abort Tracking", None))
 
+    def set_shortcuts(self):
+        self.btn_start_tracking.setShortcut('Ctrl+s')
+        self.btn_start_tracking.setToolTip("Strg + S")
+
+        self.btn_browse_file.setShortcut('Ctrl+f')
+        self.btn_browse_file.setToolTip("Strg + F")
+
     def center_ui(self):
         # screen = QDesktopWidget().screenGeometry()
         screen = qApp.desktop().screenGeometry()
@@ -601,6 +622,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
             return
         self.lnEdit_file_path.setText(self.track_file)
 
+        # self.set_roi_preview()
+
     def set_tracker_video_file(self):
         self.track_file = self.lnEdit_file_path.text()
         self.tracker.video_file = str(self.track_file)
@@ -613,6 +636,29 @@ class Ui_tracker_main_widget(QtGui.QWidget):
                 slash_pos = i
                 break
         self.last_selected_folder = path_string[0:slash_pos]
+
+    def set_roi_preview(self):
+        cap = cv2.VideoCapture(str(self.track_file))
+
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if frame is not None:
+                self.roi_preview_main_img = frame
+                self.roi_preview_draw = frame
+                # cv2.imshow("roi preview", frame)
+                break
+        cap.release()
+
+        # convert numpy-array to qimage
+        roi_qimage = QtGui.QImage(self.roi_preview_main_img.tostring(), self.roi_preview_main_img.shape[1], self.roi_preview_main_img.shape[0], QtGui.QImage.Format_RGB888)
+        roi_qimage.scaled(50, 50, QtCore.Qt.KeepAspectRatio)
+        # TODO resizing not working!
+        roi_pixmap = QtGui.QPixmap.fromImage(roi_qimage)
+        # self.lbl_test.setText(str(roi_pixmap))
+        self.lbl_test.setPixmap(roi_pixmap)
+
+
+
 
     def start_tracking(self):
         self.set_tracker_video_file()
@@ -627,6 +673,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
 
 if __name__ == "__main__":
+    print "ignore Gtk-warning..."
     qApp = QtGui.QApplication(sys.argv)
     ui_tr = Ui_tracker_main_widget()
     ui_tr.center_ui()
