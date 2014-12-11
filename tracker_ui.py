@@ -595,6 +595,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def browse_file(self):
         track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
+        if track_file == "":
+            return
         self.lnEdit_file_path.setText(track_file)
         self.tracker.video_file = str(track_file)
         self.set_last_selected_folder(track_file)
@@ -608,6 +610,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.last_selected_folder = path_string[0:slashpos]
 
     def start_tracking(self):
+        if (self.last_selected_folder == ""):
+            self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
+            return
         self.tracker.run()
         self.tracker = Tracker()
 
