@@ -600,26 +600,27 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         if self.track_file == "":
             return
         self.lnEdit_file_path.setText(self.track_file)
-        self.set_tracker_video_file()
 
     def set_tracker_video_file(self):
+        self.track_file = self.lnEdit_file_path.text()
         self.tracker.video_file = str(self.track_file)
         self.set_last_selected_folder(self.track_file)
 
     def set_last_selected_folder(self, path_string):
-        slashpos = 0
+        slash_pos = 0
         for i in range(len(path_string)-1, 0, -1):
             if path_string[i] == "/":
-                slashpos = i
+                slash_pos = i
                 break
-        self.last_selected_folder = path_string[0:slashpos]
+        self.last_selected_folder = path_string[0:slash_pos]
 
     def start_tracking(self):
-        if self.last_selected_folder == "":
+        self.set_tracker_video_file()
+        if self.track_file == "":
             self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
             return
         if not os.path.exists(self.track_file):
-            self.lnEdit_file_path.setText("--- FILE DOES NOT EXIST ---")
+            self.lnEdit_file_path.setText(self.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
             return
         self.tracker.run()
         self.tracker = Tracker()
