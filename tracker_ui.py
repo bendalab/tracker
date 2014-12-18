@@ -540,7 +540,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_roi_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_roi), _translate("tracker_main_widget", "ROI", None))
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))
-        self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area", None))
+        self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))
         self.lbl_start_x_end.setText(_translate("tracker_main_widget", "X End", None))
         self.lbl_start_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
         self.lbl_start_y_end.setText(_translate("tracker_main_widget", "Y End", None))
@@ -593,15 +593,23 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.spinBox_x_end.setValue(self.tracker.roi_x2)
         self.spinBox_y_start.setValue(self.tracker.roi_y1)
         self.spinBox_y_end.setValue(self.tracker.roi_y2)
+        self.spinBox_x_start.setMaximum(self.spinBox_x_end.value())
+        self.spinBox_x_end.setMinimum(self.spinBox_x_start.value())
+        self.spinBox_y_start.setMaximum(self.spinBox_y_end.value())
+        self.spinBox_y_end.setMinimum(self.spinBox_y_start.value())
 
         # frame waittime
         self.spinBox_frame_waittime.setValue(self.tracker.frame_waittime)
 
-        # TODO starting area
+        # starting area spinboxes
         self.spinBox_starting_x_start.setValue(self.tracker.starting_area_x1_factor * 100)
         self.spinBox_starting_x_end.setValue(self.tracker.starting_area_x2_factor * 100)
         self.spinBox_starting_y_start.setValue(self.tracker.starting_area_y1_factor * 100)
         self.spinBox_starting_y_end.setValue(self.tracker.starting_area_y2_factor * 100)
+        self.spinBox_starting_x_start.setMaximum(self.spinBox_starting_x_end.value())
+        self.spinBox_starting_x_end.setMinimum(self.spinBox_starting_x_start.value())
+        self.spinBox_starting_y_start.setMaximum(self.spinBox_starting_y_end.value())
+        self.spinBox_starting_y_end.setMinimum(self.spinBox_starting_y_start.value())
 
         # starting orientation
         self.spinBox_start_orientation.setValue(self.tracker.start_ori)
@@ -687,12 +695,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
 
     def display_starting_area_preview(self):
-        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi_y1:self.tracker.roi_y2, self.tracker.roi_x1:self.tracker.roi_x2])
+        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.spinBox_y_start.value():self.spinBox_y_end.value(), self.spinBox_x_start.value():self.spinBox_x_end.value()])
         height, width, depth = roi_only_draw_numpy.shape
-        x1 = int(self.tracker.starting_area_x1_factor * width)
-        x2 = int(self.tracker.starting_area_x2_factor * width)
-        y1 = int(self.tracker.starting_area_y1_factor * height)
-        y2 = int(self.tracker.starting_area_y2_factor * height)
+        x1 = int(self.spinBox_starting_x_start.value()/100.0 * width)
+        x2 = int(self.spinBox_starting_x_end.value()/100.0 * width)
+        y1 = int(self.spinBox_starting_y_start.value()/100.0 * height)
+        y2 = int(self.spinBox_starting_y_end.value()/100.0 * height)
         cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
         # convert to qimage
         sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
@@ -704,23 +712,26 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
 
     def change_roi_values(self):
-        if self.roi_preview_is_set:
-            self.tracker.roi_x1 = self.spinBox_x_start.value()
-            self.tracker.roi_x2 = self.spinBox_x_end.value()
-            self.tracker.roi_y1 = self.spinBox_y_start.value()
-            self.tracker.roi_y2 = self.spinBox_y_end.value()
+        self.tracker.roi_x1 = self.spinBox_x_start.value()
+        self.tracker.roi_x2 = self.spinBox_x_end.value()
+        self.tracker.roi_y1 = self.spinBox_y_start.value()
+        self.tracker.roi_y2 = self.spinBox_y_end.value()
 
+        if self.roi_preview_is_set:
             self.display_roi_preview()
+            self.display_starting_area_preview()
 
     def change_starting_area_factors(self):
-        if self.roi_preview_is_set:
-            self.tracker.starting_area_x1_factor = self.spinBox_starting_x_start.value()/100.0
-            self.tracker.starting_area_x2_factor = self.spinBox_starting_x_end.value()/100.0
-            self.spinBox_starting_x_end.setMinimum(self.spinBox_starting_x_start.value())
-            self.tracker.starting_area_y1_factor = self.spinBox_starting_y_start.value()/100.0
-            self.tracker.starting_area_y2_factor = self.spinBox_starting_y_end.value()/100.0
-            self.spinBox_starting_y_end.setMinimum(self.spinBox_starting_y_start.value())
+        self.tracker.starting_area_x1_factor = self.spinBox_starting_x_start.value()/100.0
+        self.spinBox_starting_x_start.setMaximum(self.spinBox_starting_x_end.value())
+        self.tracker.starting_area_x2_factor = self.spinBox_starting_x_end.value()/100.0
+        self.spinBox_starting_x_end.setMinimum(self.spinBox_starting_x_start.value())
+        self.tracker.starting_area_y1_factor = self.spinBox_starting_y_start.value()/100.0
+        self.spinBox_starting_y_start.setMaximum(self.spinBox_starting_y_end.value())
+        self.tracker.starting_area_y2_factor = self.spinBox_starting_y_end.value()/100.0
+        self.spinBox_starting_y_end.setMinimum(self.spinBox_starting_y_start.value())
 
+        if self.roi_preview_is_set:
             self.display_starting_area_preview()
         return
 
