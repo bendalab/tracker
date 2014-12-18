@@ -44,6 +44,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # ROI variables
         self.first_frame_numpy = None
         self.roi_preview_draw_numpy = None
+        self.roi_previea_is_set = False
 
     def setupUi(self, tracker_main_widget):
         #main widget
@@ -656,6 +657,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         cap.release()
 
         self.display_roi_preview()
+        self.roi_previea_is_set = True
 
     def display_roi_preview(self):
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
@@ -670,12 +672,13 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_test.setPixmap(output_pixm_rescaled)
 
     def change_roi_values(self):
-        self.tracker.roi_x1 = self.spinBox_x_start.value()
-        self.tracker.roi_x2 = self.spinBox_x_end.value()
-        self.tracker.roi_y1 = self.spinBox_y_start.value()
-        self.tracker.roi_y2 = self.spinBox_y_end.value()
+        if self.roi_previea_is_set:
+            self.tracker.roi_x1 = self.spinBox_x_start.value()
+            self.tracker.roi_x2 = self.spinBox_x_end.value()
+            self.tracker.roi_y1 = self.spinBox_y_start.value()
+            self.tracker.roi_y2 = self.spinBox_y_end.value()
 
-        self.display_roi_preview()
+            self.display_roi_preview()
         return
 
 
