@@ -33,6 +33,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.setupUi(self)
 
         self.tracker = Tracker()
+        # self.tracker.ui_mode_on = True
 
         self.preset_options()
         self.track_file = ""
@@ -44,7 +45,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # ROI variables
         self.first_frame_numpy = None
         self.roi_preview_draw_numpy = None
-        self.roi_previea_is_set = False
+        self.roi_preview_is_set = False
 
     def setupUi(self, tracker_main_widget):
         #main widget
@@ -618,6 +619,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def connect_widgets(self):
         self.btn_browse_file.clicked.connect(self.browse_file)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
+        self.btn_abort_tracking.clicked.connect(self.abort_tracking)
 
         self.connect(self.spinBox_x_start, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
         self.connect(self.spinBox_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
@@ -657,7 +659,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         cap.release()
 
         self.display_roi_preview()
-        self.roi_previea_is_set = True
+        self.roi_preview_is_set = True
 
     def display_roi_preview(self):
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
@@ -672,7 +674,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_test.setPixmap(output_pixm_rescaled)
 
     def change_roi_values(self):
-        if self.roi_previea_is_set:
+        if self.roi_preview_is_set:
             self.tracker.roi_x1 = self.spinBox_x_start.value()
             self.tracker.roi_x2 = self.spinBox_x_end.value()
             self.tracker.roi_y1 = self.spinBox_y_start.value()
@@ -693,6 +695,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
             return
         self.tracker.run()
         self.tracker = Tracker()
+
+    def abort_tracking(self):
+        self.tracker.ui_abort_button_pressed = True
 
 
 if __name__ == "__main__":
