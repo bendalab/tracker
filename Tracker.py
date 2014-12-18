@@ -49,7 +49,7 @@ class Tracker():
         self.enable_max_size_threshold = False
 
         self.fish_started = False
-        self.starting_area_x_factor = 0.85
+        self.starting_area_x1_factor = 0.85
         self.starting_area_x2_factor = 1.00
         self.starting_area_y1_factor = 0.30
         self.starting_area_y2_factor = 0.70
@@ -238,7 +238,8 @@ class Tracker():
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
         height, width, depth = roi.shape
-        non_starting_area_x = int(self.starting_area_x_factor * width)
+        non_starting_area_x1 = int(self.starting_area_x1_factor * width)
+        non_starting_area_x2 = int(self.starting_area_x2_factor * width)
         non_starting_area_y1 = int(self.starting_area_y1_factor * height)
         non_starting_area_y2 = int(self.starting_area_y2_factor * height)
 
@@ -246,7 +247,7 @@ class Tracker():
             for i in range(0, len(self.contour_list)):
                 cnt = self.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
-                if ellipse[0][0] > non_starting_area_x and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
+                if ellipse[0][0] > non_starting_area_x1 and ellipse[0][1] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
                     self.fish_started = True
 
     # fitting ellipse onto contour
@@ -680,7 +681,7 @@ class Tracker():
         output_file.write("#     Region of Interest Y-Axis         : [" + str(self.roi_y1) + "," + str(self.roi_y2) + "]\n")
         output_file.write("#     Fish size threshold               : " + str(self.fish_size_threshold) + "\n")
         output_file.write("#     Start orientation                 : " + str(self.start_ori) + "\n")
-        output_file.write("#     Fish starting area X-Axis factor  : " + str(self.starting_area_x_factor) + "\n")
+        output_file.write("#     Fish starting area X-Axis factor  : " + str(self.starting_area_x1_factor) + "\n")
         output_file.write("#     Fish starting area Y-Axis factor 1: " + str(self.starting_area_y1_factor) + "\n")
         output_file.write("#     Fish starting area Y-Axis factor 2: " + str(self.starting_area_y2_factor) + "\n")
         output_file.write("#\n")
