@@ -804,8 +804,8 @@ class Tracker():
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
-        cv2.namedWindow("contours")
-        cv2.moveWindow("contours", 50, 50)
+        # cv2.namedWindow("contours")
+        # cv2.moveWindow("contours", 50, 50)
 
         self.extract_data()
 
