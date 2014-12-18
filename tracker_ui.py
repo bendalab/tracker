@@ -12,6 +12,8 @@ import sys
 import numpy
 import cv2
 import copy
+# TODO config file, save after value alteration
+import ConfigParser
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -32,7 +34,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.setupUi(self)
 
-        self.tracker = Tracker()
+        self.set_new_tracker()
         # self.tracker.ui_mode_on = True
 
         self.preset_options()
@@ -584,6 +586,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         y_pos = (screen.height() - gui_size.height() - gui_size.height()) / 2
         self.move(x_pos, y_pos)
 
+    # TODO
+    # should create a new tracker instance loading variable values from config file
+    def set_new_tracker(self):
+        self.tracker = Tracker()
+        return
+
     def preset_options(self):
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
@@ -644,6 +652,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.spinBox_starting_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
         self.connect(self.spinBox_starting_y_start, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
         self.connect(self.spinBox_starting_y_end, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
+
+        self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), self.change_frame_waittime)
 
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
@@ -741,6 +751,16 @@ class Ui_tracker_main_widget(QtGui.QWidget):
             self.display_starting_area_preview()
         return
 
+    def change_frame_waittime(self, value):
+        self.tracker.frame_waittime = value
+
+    # TODO
+    # should be called if tracking is started
+    def write_cfg_file(self):
+        cfg_handler = ConfigParser.ConfigParser()
+        cfg_file = open("tracker.cnf", 'w')
+        return
+
     def start_tracking(self):
         self.set_tracker_video_file()
         if self.track_file == "":
@@ -750,7 +770,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
             self.lnEdit_file_path.setText(self.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
             return
         self.tracker.run()
-        self.tracker = Tracker()
+        self.set_new_tracker()
 
     def abort_tracking(self):
         self.tracker.ui_abort_button_pressed = True
