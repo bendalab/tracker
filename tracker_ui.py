@@ -653,7 +653,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         self.set_first_frame_numpy()
         self.display_roi_preview()
-        self.display_starting_area_preview()
+        # self.display_starting_area_preview()
 
 
     def set_tracker_video_file(self):
@@ -689,27 +689,33 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
         # fit picture to window size
-        width = self.tab_file.geometry().width() - 20
-        output_pixm_rescaled = output_pixm.scaled(width, width, QtCore.Qt.KeepAspectRatio)
+        width = self.tab_widget_options.geometry().width() - 20
+        height = int(width)
+        size = QtCore.QSize(width, height)
+        output_pixm_rescaled = output_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
         # display picture
         self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
 
     def display_starting_area_preview(self):
-        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.spinBox_y_start.value():self.spinBox_y_end.value(), self.spinBox_x_start.value():self.spinBox_x_end.value()])
+        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi_y1:self.tracker.roi_y2, self.tracker.roi_x1:self.tracker.roi_x2])
         height, width, depth = roi_only_draw_numpy.shape
-        x1 = int(self.spinBox_starting_x_start.value()/100.0 * width)
-        x2 = int(self.spinBox_starting_x_end.value()/100.0 * width)
-        y1 = int(self.spinBox_starting_y_start.value()/100.0 * height)
-        y2 = int(self.spinBox_starting_y_end.value()/100.0 * height)
+        x1 = int(self.tracker.starting_area_x1_factor * width)
+        x2 = int(self.tracker.starting_area_x2_factor * width)
+        y1 = int(self.tracker.starting_area_y1_factor * height)
+        y2 = int(self.tracker.starting_area_y2_factor * height)
         cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
         # convert to qimage
         sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
         sa_pixm = QtGui.QPixmap.fromImage(sa_qimg)
         # fit img to size
-        tab_width = self.tab_file.geometry().width() - 20
-        sa_pixm_rescaled = sa_pixm.scaled(tab_width, tab_width, QtCore.Qt.KeepAspectRatio)
+        max_width = self.tab_widget_options.geometry().width() - 20
+        max_height = int(max_width * 0.5)
+        size = QtCore.QSize(max_width, max_height)
+        sa_pixm_rescaled = sa_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
         # display img
-        self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
+        # following line doesn't work because of %4-bug noone knows... -.-
+        # self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
+        cv2.imshow("starting area", roi_only_draw_numpy)
 
     def change_roi_values(self):
         self.tracker.roi_x1 = self.spinBox_x_start.value()
@@ -719,7 +725,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         if self.roi_preview_is_set:
             self.display_roi_preview()
-            self.display_starting_area_preview()
+            # self.display_starting_area_preview()
 
     def change_starting_area_factors(self):
         self.tracker.starting_area_x1_factor = self.spinBox_starting_x_start.value()/100.0
