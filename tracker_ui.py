@@ -250,12 +250,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
         # spinbox starting_x end
         self.spinBox_starting_x_end = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_x_end.setMaximum(9999)
+        self.spinBox_starting_x_end.setMaximum(100)
         self.spinBox_starting_x_end.setObjectName(_fromUtf8("spinBox_starting_x_end"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_x_end, 0, 3, 1, 1)
         # spinbox starting_x start
         self.spinBox_starting_x_start = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_x_start.setMaximum(9999)
+        self.spinBox_starting_x_start.setMaximum(100)
         self.spinBox_starting_x_start.setObjectName(_fromUtf8("spinBox_starting_x_start"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_x_start, 0, 1, 1, 1)
         # label starting_x end
@@ -272,12 +272,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.gridLO_start_area.addWidget(self.lbl_start_y_end, 1, 2, 1, 1)
         # spinbox starting_y end
         self.spinBox_starting_y_end = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_y_end.setMaximum(9999)
+        self.spinBox_starting_y_end.setMaximum(100)
         self.spinBox_starting_y_end.setObjectName(_fromUtf8("spinBox_starting_y_end"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_y_end, 1, 3, 1, 1)
         # spinbox starting_y start
         self.spinBox_starting_y_start = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_y_start.setMaximum(9999)
+        self.spinBox_starting_y_start.setMaximum(100)
         self.spinBox_starting_y_start.setObjectName(_fromUtf8("spinBox_starting_y_start"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_y_start, 1, 1, 1, 1)
         # label starting_x start
@@ -598,6 +598,10 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.spinBox_frame_waittime.setValue(self.tracker.frame_waittime)
 
         # TODO starting area
+        self.spinBox_starting_x_start.setValue(self.tracker.starting_area_x1_factor * 100)
+        self.spinBox_starting_x_end.setValue(self.tracker.starting_area_x2_factor * 100)
+        self.spinBox_starting_y_start.setValue(self.tracker.starting_area_y1_factor * 100)
+        self.spinBox_starting_y_end.setValue(self.tracker.starting_area_y2_factor * 100)
 
         # starting orientation
         self.spinBox_start_orientation.setValue(self.tracker.start_ori)
@@ -627,6 +631,11 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.spinBox_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
         self.connect(self.spinBox_y_start, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
         self.connect(self.spinBox_y_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
+
+        self.connect(self.spinBox_starting_x_start, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
+        self.connect(self.spinBox_starting_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y_start, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y_end, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
 
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
@@ -693,7 +702,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         sa_pixm_rescaled = sa_pixm.scaled(tab_width, tab_width, QtCore.Qt.KeepAspectRatio)
         # display img
         self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
-        return
 
     def change_roi_values(self):
         if self.roi_preview_is_set:
@@ -703,9 +711,18 @@ class Ui_tracker_main_widget(QtGui.QWidget):
             self.tracker.roi_y2 = self.spinBox_y_end.value()
 
             self.display_roi_preview()
+
+    def change_starting_area_factors(self):
+        if self.roi_preview_is_set:
+            self.tracker.starting_area_x1_factor = self.spinBox_starting_x_start.value()/100.0
+            self.tracker.starting_area_x2_factor = self.spinBox_starting_x_end.value()/100.0
+            self.spinBox_starting_x_end.setMinimum(self.spinBox_starting_x_start.value())
+            self.tracker.starting_area_y1_factor = self.spinBox_starting_y_start.value()/100.0
+            self.tracker.starting_area_y2_factor = self.spinBox_starting_y_end.value()/100.0
+            self.spinBox_starting_y_end.setMinimum(self.spinBox_starting_y_start.value())
+
+            self.display_starting_area_preview()
         return
-
-
 
     def start_tracking(self):
         self.set_tracker_video_file()
