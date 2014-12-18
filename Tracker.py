@@ -9,6 +9,9 @@ import argparse
 class Tracker():
     def __init__(self):
         # program data
+        self.ui_mode_on = False
+        self.ui_abort_button_pressed = False
+
         self.output_directory = ""
         self.dir = "examples/"
         self.videofile_name = "2014-08-27_33"
@@ -589,7 +592,8 @@ class Tracker():
                 self.show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
 
             # show output img
-            cv2.imshow("contours", roi)
+            if not self.ui_mode_on:
+                cv2.imshow("contours", roi)
             # if SAVE_FRAMES:
             #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
@@ -597,6 +601,8 @@ class Tracker():
             self.last_frame_OV_output = frame_output
 
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
+                break
+            if self.ui_abort_button_pressed:
                 break
 
         self.cap.release()
