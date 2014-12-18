@@ -47,6 +47,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.roi_preview_draw_numpy = None
         self.roi_preview_is_set = False
 
+        # starting area variables
+
     def setupUi(self, tracker_main_widget):
         #main widget
         tracker_main_widget.setObjectName(_fromUtf8("tracker_main_widget"))
@@ -59,10 +61,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # horizontal layout video + options
         self.hoLO_video_plus_options = QtGui.QHBoxLayout()
         self.hoLO_video_plus_options.setObjectName(_fromUtf8("hoLO_video_plus_options"))
-        # graphical output viewer
-        # self.graphic_output_viewer = QtGui.QGraphicsView(tracker_main_widget)
-        # self.graphic_output_viewer.setObjectName(_fromUtf8("graphic_output_viewer"))
-        # self.hoLO_video_plus_options.addWidget(self.graphic_output_viewer)
+        # graphical output label
+        # self.lbl_video_output_label = QtGui.QLabel(tracker_main_widget)
+        # self.lbl_video_output_label.setMinimumWidth((tracker_main_widget.geometry().width()-22)/2)
+        # self.lbl_video_output_label.setObjectName(_fromUtf8("lbl_videl_output_label"))
+        # self.lbl_video_output_label.setAlignment(QtCore.Qt.AlignCenter)
+        # self.hoLO_video_plus_options.addWidget(self.lbl_video_output_label)
 
         # options tab widget
         self.tab_widget_options = QtGui.QTabWidget(tracker_main_widget)
@@ -127,14 +131,11 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_roi = QtGui.QLabel(self.tab_roi)
         self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
         self.vertLO_tab_roi.addWidget(self.lbl_roi)
-        # TESTLABEL
-        self.lbl_test = QtGui.QLabel(self.tab_roi)
-        self.lbl_test.setObjectName(_fromUtf8("lbl_testlabel"))
-        # self.lbl_test.setMinimumSize(QtCore.QSize(0, 350))
-        # self.lbl_test.setMaximumSize(QtCore.QSize(0, 350))
-        # self.lbl_test.setScaledContents(True)
-        self.lbl_test.setAlignment(QtCore.Qt.AlignCenter)
-        self.vertLO_tab_roi.addWidget(self.lbl_test)
+        # roi preview output
+        self.lbl_roi_preview_label = QtGui.QLabel(self.tab_roi)
+        self.lbl_roi_preview_label.setObjectName(_fromUtf8("lbl_testlabel"))
+        self.lbl_roi_preview_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.vertLO_tab_roi.addWidget(self.lbl_roi_preview_label)
         # graphics viewer roi
         # self.grView_roi = QtGui.QGraphicsView(self.tab_roi)
         # self.grView_roi.setMinimumSize(QtCore.QSize(0, 350))
@@ -239,10 +240,11 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_start_area.setObjectName(_fromUtf8("lbl_start_area"))
         self.vertLO_tab_adv.addWidget(self.lbl_start_area)
         # graphics view starting area
-        self.grView_starting_area = QtGui.QGraphicsView(self.tab_adv)
-        self.grView_starting_area.setMinimumSize(QtCore.QSize(0, 350))
-        self.grView_starting_area.setObjectName(_fromUtf8("grView_starting_area"))
-        self.vertLO_tab_adv.addWidget(self.grView_starting_area)
+         # roi preview output
+        self.lbl_starting_area_preview_label = QtGui.QLabel(self.tab_roi)
+        self.lbl_starting_area_preview_label.setObjectName(_fromUtf8("lbl_starting_area_preview_label"))
+        self.lbl_starting_area_preview_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.vertLO_tab_adv.addWidget(self.lbl_starting_area_preview_label)
         # grid layout set starting area
         self.gridLO_start_area = QtGui.QGridLayout()
         self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
@@ -633,6 +635,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lnEdit_file_path.setText(self.track_file)
 
         self.set_roi_preview_img()
+        self.set_starting_area_preview_img()
 
     def set_tracker_video_file(self):
         self.track_file = self.lnEdit_file_path.text()
@@ -671,7 +674,24 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         width = self.tab_file.geometry().width() - 20
         output_pixm_rescaled = output_pixm.scaled(width, width, QtCore.Qt.KeepAspectRatio)
         # display picture
-        self.lbl_test.setPixmap(output_pixm_rescaled)
+        self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
+
+    def set_starting_area_preview_img(self):
+        # roi_only_img = copy.copy(self.first_frame_numpy[self.tracker.roi_y1:self.tracker.roi_y2, self.tracker.roi_x1:self.tracker.roi_x2])
+        return
+
+    def display_startin_area_preview(self):
+        # self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
+        # cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi_x1, self.tracker.roi_y1), (self.tracker.roi_x2, self.tracker.roi_y2), (0, 0, 255), 2)
+        # # convert numpy-array to qimage
+        # output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
+        # output_pixm = QtGui.QPixmap.fromImage(output_qimg)
+        # # fit picture to window size
+        # width = self.tab_file.geometry().width() - 20
+        # output_pixm_rescaled = output_pixm.scaled(width, width, QtCore.Qt.KeepAspectRatio)
+        # # display picture
+        # self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
+        return
 
     def change_roi_values(self):
         if self.roi_preview_is_set:
