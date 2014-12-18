@@ -43,8 +43,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         # ROI variables
         self.first_frame_numpy = None
-        self.roi_preview_main_pixm = None
-        self.roi_preview_draw_pixm = None
+        self.roi_preview_draw_numpy = None
 
     def setupUi(self, tracker_main_widget):
         #main widget
@@ -619,13 +618,18 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.btn_browse_file.clicked.connect(self.browse_file)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
 
+        self.connect(self.spinBox_x_start, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
+        self.connect(self.spinBox_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
+        self.connect(self.spinBox_y_start, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
+        self.connect(self.spinBox_y_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
+
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
         if self.track_file == "":
             return
         self.lnEdit_file_path.setText(self.track_file)
 
-        self.set_roi_preview_pixmaps()
+        self.set_roi_preview_img()
 
     def set_tracker_video_file(self):
         self.track_file = self.lnEdit_file_path.text()
@@ -640,7 +644,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
                 break
         self.last_selected_folder = path_string[0:slash_pos]
 
-    def set_roi_preview_pixmaps(self):
+    def set_roi_preview_img(self):
         cap = cv2.VideoCapture(str(self.track_file))
 
         while cap.isOpened():
@@ -651,25 +655,28 @@ class Ui_tracker_main_widget(QtGui.QWidget):
                 break
         cap.release()
 
-        # convert numpy-array to qimage
-        roi_preview_main_qimg = QtGui.QImage(self.first_frame_numpy.tostring(), self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
-
-        self.roi_preview_main_pixm = QtGui.QPixmap.fromImage(roi_preview_main_qimg)
         self.display_roi_preview()
 
     def display_roi_preview(self):
-        # NOT WORKING -- possibly should draw on QImage, not on pixmap
-
-        self.roi_preview_draw_pixm = QtGui.QPixmap(self.roi_preview_main_pixm)
-        # rect = QtCore.QRectF(self.tracker.roi_x1, self.tracker.roi_x2, self.tracker.roi_y1, self.tracker.roi_y2)
-        painter = QtGui.QPainter(self.roi_preview_draw_pixm)
-        # painter.begin(self.roi_preview_draw_pixm)
-        painter.setPen(QtCore.Qt.blue)
-        painter.drawRect(self.tracker.roi_x1, self.tracker.roi_x2, self.tracker.roi_y1, self.tracker.roi_y2)
-
+        self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
+        cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi_x1, self.tracker.roi_y1), (self.tracker.roi_x2, self.tracker.roi_y2), (0, 0, 255), 2)
+        # convert numpy-array to qimage
+        output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
+        output_pixm = QtGui.QPixmap.fromImage(output_qimg)
+        # fit picture to window size
         width = self.tab_file.geometry().width() - 20
-        roi_pixmap_rescaled = self.roi_preview_draw_pixm.scaled(width, width, QtCore.Qt.KeepAspectRatio)
-        self.lbl_test.setPixmap(roi_pixmap_rescaled)
+        output_pixm_rescaled = output_pixm.scaled(width, width, QtCore.Qt.KeepAspectRatio)
+        # display picture
+        self.lbl_test.setPixmap(output_pixm_rescaled)
+
+    def change_roi_values(self):
+        self.tracker.roi_x1 = self.spinBox_x_start.value()
+        self.tracker.roi_x2 = self.spinBox_x_end.value()
+        self.tracker.roi_y1 = self.spinBox_y_start.value()
+        self.tracker.roi_y2 = self.spinBox_y_end.value()
+
+        self.display_roi_preview()
+        return
 
 
 
