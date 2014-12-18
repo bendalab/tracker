@@ -5,6 +5,7 @@ import sys
 import copy
 import os
 import argparse
+import ConfigParser
 
 class Tracker():
     def __init__(self):
@@ -94,6 +95,12 @@ class Tracker():
         self.estimated_pos_roi = []
         self.estimated_pos_original = []
         self.estimated_oris = []
+
+        # TODO import config file values
+        self.import_config_values()
+
+    def import_config_values(self):
+        return
 
     @staticmethod
     def show_imgs(img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
@@ -247,7 +254,7 @@ class Tracker():
             for i in range(0, len(self.contour_list)):
                 cnt = self.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
-                if ellipse[0][0] > non_starting_area_x1 and ellipse[0][1] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
+                if ellipse[0][0] > non_starting_area_x1 and ellipse[0][0] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
                     self.fish_started = True
 
     # fitting ellipse onto contour
