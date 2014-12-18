@@ -52,7 +52,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def setupUi(self, tracker_main_widget):
         #main widget
         tracker_main_widget.setObjectName(_fromUtf8("tracker_main_widget"))
-        tracker_main_widget.resize(1059/2, 835)
+        tracker_main_widget.resize(1400/2, 835)
         tracker_main_widget.setMinimumSize(QtCore.QSize(900/2, 770))
 
         # main vertical layout
@@ -667,7 +667,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def display_roi_preview(self):
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
-        cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi_x1, self.tracker.roi_y1), (self.tracker.roi_x2, self.tracker.roi_y2), (0, 0, 255), 2)
+        cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi_x1, self.tracker.roi_y1), (self.tracker.roi_x2, self.tracker.roi_y2), (255, 0, 255), 2)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
@@ -684,7 +684,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         x2 = int(self.tracker.starting_area_x2_factor * width)
         y1 = int(self.tracker.starting_area_y1_factor * height)
         y2 = int(self.tracker.starting_area_y2_factor * height)
-        cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
         # convert to qimage
         sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
         sa_pixm = QtGui.QPixmap.fromImage(sa_qimg)
