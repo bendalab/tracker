@@ -597,10 +597,10 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # self.lnEdit_file_path.setText(self.tracker.video_file)
 
         # region of interest
-        self.spinBox_x_start.setValue(self.tracker.roi_x1)
-        self.spinBox_x_end.setValue(self.tracker.roi_x2)
-        self.spinBox_y_start.setValue(self.tracker.roi_y1)
-        self.spinBox_y_end.setValue(self.tracker.roi_y2)
+        self.spinBox_x_start.setValue(self.tracker.roi.x1)
+        self.spinBox_x_end.setValue(self.tracker.roi.x2)
+        self.spinBox_y_start.setValue(self.tracker.roi.y1)
+        self.spinBox_y_end.setValue(self.tracker.roi.y2)
         self.spinBox_x_start.setMaximum(self.spinBox_x_end.value())
         self.spinBox_x_end.setMinimum(self.spinBox_x_start.value())
         self.spinBox_y_start.setMaximum(self.spinBox_y_end.value())
@@ -694,7 +694,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def display_roi_preview(self):
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
-        cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi_x1, self.tracker.roi_y1), (self.tracker.roi_x2, self.tracker.roi_y2), (255, 0, 255), 2)
+        cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi.x1, self.tracker.roi.y1), (self.tracker.roi.x2, self.tracker.roi.y2), (255, 0, 255), 2)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
@@ -707,7 +707,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
 
     def display_starting_area_preview(self):
-        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi_y1:self.tracker.roi_y2, self.tracker.roi_x1:self.tracker.roi_x2])
+        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi.y1:self.tracker.roi.y2, self.tracker.roi.x1:self.tracker.roi.x2])
         height, width, depth = roi_only_draw_numpy.shape
         x1 = int(self.tracker.starting_area_x1_factor * width)
         x2 = int(self.tracker.starting_area_x2_factor * width)
@@ -728,10 +728,10 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         cv2.imshow("starting area", roi_only_draw_numpy)
 
     def change_roi_values(self):
-        self.tracker.roi_x1 = self.spinBox_x_start.value()
-        self.tracker.roi_x2 = self.spinBox_x_end.value()
-        self.tracker.roi_y1 = self.spinBox_y_start.value()
-        self.tracker.roi_y2 = self.spinBox_y_end.value()
+        self.tracker.roi.x1 = self.spinBox_x_start.value()
+        self.tracker.roi.x2 = self.spinBox_x_end.value()
+        self.tracker.roi.y1 = self.spinBox_y_start.value()
+        self.tracker.roi.y2 = self.spinBox_y_end.value()
 
         if self.roi_preview_is_set:
             self.display_roi_preview()
