@@ -31,11 +31,7 @@ class Tracker():
         # self.roi_x2 = 695
         # self.roi_y1 = 80
         # self.roi_y2 = 515
-
-        self.roi_x1 = 160
-        self.roi_x2 = 700
-        self.roi_y1 = 80
-        self.roi_y2 = 525
+        self.roi = ROI(160, 80, 700, 525)
 
         # image morphing data
         self.erosion_iterations = 1
@@ -98,6 +94,10 @@ class Tracker():
 
         # TODO import config file values
         self.import_config_values()
+
+    @property
+    def roi(self):
+        return self.roi
 
     def import_config_values(self):
         return
@@ -218,7 +218,7 @@ class Tracker():
     # if two or more contours (of same size) in contour_list delete which is farthest away from last pos fish was
     def keep_nearest_contour(self):
         if self.last_pos is None:
-            self.last_pos = (self.roi_y2-self.roi_y1, int((self.roi_x2-self.roi_x1)/2))
+            self.last_pos = (self.roi.y2 - self.roi.y1, int((self.roi.x2 - self.roi.x1) / 2))
 
         cnt_center = self.get_center(self.ellipse[0])
         biggest_dist = self.calculate_distance(cnt_center, self.last_pos)
@@ -310,8 +310,8 @@ class Tracker():
         if self.last_pos is None:
             self.all_pos_original.append(self.last_pos)
         else:
-            original_x = self.last_pos[0]+self.roi_x1
-            original_y = self.last_pos[1]+self.roi_y1
+            original_x = self.last_pos[0] + self.roi.x1
+            original_y = self.last_pos[1] + self.roi.y1
             self.all_pos_original.append((original_x, original_y))
 
     def set_last_orientation(self):
@@ -403,11 +403,11 @@ class Tracker():
             while pointer < gap_end_pointer:
                 if not first_pos_estimated:
                     self.estimated_pos_roi[pointer] = ((self.all_pos_roi[pointer-1][0] + value_diff_x_part), (self.all_pos_roi[pointer-1][1] + value_diff_y_part))
-                    self.estimated_pos_original[pointer] = (self.estimated_pos_roi[pointer][0] + self.roi_x1, self.estimated_pos_roi[pointer][1] + self.roi_y1)
+                    self.estimated_pos_original[pointer] = (self.estimated_pos_roi[pointer][0] + self.roi.x1, self.estimated_pos_roi[pointer][1] + self.roi.y1)
                     first_pos_estimated = True
                 else:
                     self.estimated_pos_roi[pointer] = ((self.estimated_pos_roi[pointer-1][0] + value_diff_x_part), (self.estimated_pos_roi[pointer-1][1] + value_diff_y_part))
-                    self.estimated_pos_original[pointer] = (self.estimated_pos_roi[pointer][0] + self.roi_x1, self.estimated_pos_roi[pointer][1] + self.roi_y1)
+                    self.estimated_pos_original[pointer] = (self.estimated_pos_roi[pointer][0] + self.roi.x1, self.estimated_pos_roi[pointer][1] + self.roi.y1)
                 pointer += 1
 
     def estimate_missing_ori(self):
@@ -466,7 +466,7 @@ class Tracker():
         for c in self.estimated_pos_roi:
             if c is not None:
                 cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
-                cv2.circle(self.last_frame_OV_output, (int(round(c[0]))+self.roi_x1, int(round(c[1])+self.roi_y1)), 2, (0, 0, 255))
+                cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), 2, (0, 0, 255))
 
     def extract_data(self):
         # create BG subtractor
@@ -484,7 +484,7 @@ class Tracker():
             self.frame_counter += 1
 
             # set region of interest ROI
-            roi = copy.copy(frame[self.roi_y1:self.roi_y2, self.roi_x1:self.roi_x2])
+            roi = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
             roi_output = copy.copy(roi)
 
             frame_output = copy.copy(frame)
@@ -588,7 +588,8 @@ class Tracker():
 
             if self.draw_original_output:
                 for coordinates in self.img_travel_orientation:
-                    cv2.line(frame_output, (coordinates[0]+self.roi_x1, coordinates[1]+self.roi_y1), (coordinates[2]+self.roi_x1, coordinates[3]+self.roi_y1), (150,150,0), 1)
+                    cv2.line(frame_output, (coordinates[0] + self.roi.x1, coordinates[1] + self.roi.y1), 
+                             (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
                 for point in self.all_pos_original:
                     if point is not None:
                         cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
@@ -684,8 +685,8 @@ class Tracker():
         output_file = open(output_file_path, 'w')
 
         output_file.write("# Tracking parameters:\n")
-        output_file.write("#     Region of Interest X-Axis         : [" + str(self.roi_x1) + "," + str(self.roi_x2) + "]\n")
-        output_file.write("#     Region of Interest Y-Axis         : [" + str(self.roi_y1) + "," + str(self.roi_y2) + "]\n")
+        output_file.write("#     Region of Interest X-Axis         : [" + str(self.roi.x1) + "," + str(self.roi.x2) + "]\n")
+        output_file.write("#     Region of Interest Y-Axis         : [" + str(self.roi.y1) + "," + str(self.roi.y2) + "]\n")
         output_file.write("#     Fish size threshold               : " + str(self.fish_size_threshold) + "\n")
         output_file.write("#     Start orientation                 : " + str(self.start_ori) + "\n")
         output_file.write("#     Fish starting area X-Axis factor  : " + str(self.starting_area_x1_factor) + "\n")
