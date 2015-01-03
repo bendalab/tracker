@@ -8,18 +8,29 @@ import argparse
 import ConfigParser
 
 class Tracker():
-    def __init__(self):
+    def __init__(self, path=None, nix_io=False):
         # program data
         self.ui_mode_on = False
         self.ui_abort_button_pressed = False
+        
+        if path is not None:
+            self.video_file = path
+        if nix_io:
+            try:
+                import nix
+            except ImportError as e:
+                print e
+                print 'falling back to text output!'
+                nix_io = False
 
+        self.nix_io = nix_io
         self.output_directory = ""
-        self.dir = "examples/"
-        self.videofile_name = "2014-08-27_33"
+        self.dir = "examples/" # FIXME this overrides the python builtin function dir!
+        # self.videofile_name = "2014-08-27_33"
         # self.dir = "examples/"
         # self.videofile_name = "2014-10-01_33"
-        self.video_file = "examples/2014-08-27_33.avi"
-
+        # self.video_file = "examples/2014-08-27_33.avi"
+        
         self.cap = ""
 
         self.save_frames = False
@@ -681,18 +692,23 @@ class Tracker():
         #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
 
         file_name, file_directory = self.extract_video_file_name_and_path()
+        print file_name, file_directory
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
-        output_file_name = file_directory + file_name + "/" + file_name + ".txt"
+        output_file_name = file_directory + file_name + "/" + file_name
         params = {}
         params['fish size'] = self.fish_size_threshold
         params['start ori'] = self.start_ori
         params['starting area x1'] = self.starting_area_x1_factor
         params['starting area y1'] = self.starting_area_y1_factor
         params['starting area y2'] = self.starting_area_y2_factor
-        
-        DataWriter.write_ascii(output_file_name, times, self.all_pos_original, self.all_oris, 
-                               self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
-                               self.number_relevant_contours_per_frame, self.roi, params)
+        if not self.nix_io:
+            DataWriter.write_ascii(output_file_name  + ".txt", times, self.all_pos_original, self.all_oris, 
+                                   self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
+                                   self.number_relevant_contours_per_frame, self.roi, params)
+        else:
+            DataWriter.write_nix(output_file_name + ".h5", times, self.all_pos_original, self.all_oris, 
+                                 self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
+                                 self.number_relevant_contours_per_frame, self.roi, params)
         cv2.imwrite(file_directory + file_name + "/" + file_name + "_OV_path.png", self.last_frame_OV_output)
 
         # if self.draw_original_output:
@@ -832,7 +848,7 @@ class DataWriter(object):
         output_file.close()
 
     @staticmethod
-    def write_nix():
+    def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
         pass
 
 
