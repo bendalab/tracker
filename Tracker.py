@@ -646,29 +646,6 @@ class Tracker():
         if self.fish_not_detected_count > self.fish_not_detected_threshold:
             self.fish_not_detected_threshold_reached = True
 
-    @staticmethod
-    def fill_spaces(file, string):
-        for i in range(0, 20-len(string)):
-            file.write(" ")
-
-    @staticmethod
-    def print_None_to_file(file):
-        for i in range(0, 16):
-            file.write(" ")
-        file.write("None")
-
-    def save_data_to_files(self):
-        file_name, file_directory = self.extract_video_file_name_and_path()
-
-        ###
-        ### save data into txt file
-        ###
-
-        # define ouput directory name as file name
-        self.output_directory = file_directory + file_name
-
-        #check if times file in same folder as video file
-        times_file_path = file_directory + file_name + "_times.dat"
         times_file = None
         if not os.path.exists(times_file_path):
             sys.exit("ERROR: times file missing - data saving abortet")
@@ -887,13 +864,27 @@ class ROI(object):
     def y2(self, x):
         self.__y_2 = x
 
+
 class DataWriter(object):
 
-    def __init__(self, file_name):
-        self.file_name = file_name
-    
-    def write_ascii():
-        pass
+    @staticmethod
+    def fill_spaces(file, string):
+        file.write(" " * (20 - len(string)))
+
+    @staticmethod
+    def print_none_to_file(file):
+        file.write(" " * 16)
+        file.write("None")
+
+    @staticmethod
+    def write_position(p, out_file, spacing):
+        if p is None:
+            DataWriter.print_none_to_file(out_file)
+        else:
+            p = str(round(p, 2))
+            DataWriter.fill_spaces(out_file, p)
+            out_file.write(p)
+            out_file.write(" " * spacing)
 
     def write_nix():
         pass
