@@ -665,7 +665,6 @@ class Tracker():
         # cv2.moveWindow("contours", 50, 50)
 
         self.extract_data()
-
         self.estimate_missing_pos()
         self.estimate_missing_ori()
         self.draw_estimated_data()
@@ -681,7 +680,20 @@ class Tracker():
         # if SAVE_FRAMES:
         #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
 
-        self.save_data_to_files()
+        file_name, file_directory = self.extract_video_file_name_and_path()
+        times = self.load_frame_times(file_directory + file_name + "_times.dat")
+        output_file_name = file_directory + file_name + "/" + file_name + ".txt"
+        params = {}
+        params['fish size'] = self.fish_size_threshold
+        params['start ori'] = self.start_ori
+        params['starting area x1'] = self.starting_area_x1_factor
+        params['starting area y1'] = self.starting_area_y1_factor
+        params['starting area y2'] = self.starting_area_y2_factor
+        
+        DataWriter.write_ascii(output_file_name, times, self.all_pos_original, self.all_oris, 
+                               self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
+                               self.number_relevant_contours_per_frame, self.roi, params)
+        cv2.imwrite(file_directory + file_name + "/" + file_name + "_OV_path.png", self.last_frame_OV_output)
 
         # if self.draw_original_output:
         #     cv2.namedWindow("result_ov")
@@ -751,6 +763,75 @@ class DataWriter(object):
             out_file.write(p)
             out_file.write(" " * spacing)
 
+    @staticmethod
+    def write_ascii(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
+        """
+         save data to text file
+        """
+        spacing = 4
+        out_dir = '/'.join(file_name.split('/')[:-1])
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        
+        none_count = 0
+        for p in position:
+            if p is None:
+                none_count += 1
+
+        output_file = open(file_name, 'w')
+        output_file.write("# Tracking parameters:\n")
+        output_file.write("#     Region of Interest X-Axis         : [" + str(roi.x1) + "," + str(roi.x2) + "]\n")
+        output_file.write("#     Region of Interest Y-Axis         : [" + str(roi.y1) + "," + str(roi.y2) + "]\n")
+        output_file.write("#     Fish size threshold               : " + str(parameters['fish size']) + "\n")
+        output_file.write("#     Start orientation                 : " + str(parameters['start ori']) + "\n")
+        output_file.write("#     Fish starting area X-Axis factor  : " + str(parameters['starting area x1']) + "\n")
+        output_file.write("#     Fish starting area Y-Axis factor 1: " + str(parameters['starting area y1']) + "\n")
+        output_file.write("#     Fish starting area Y-Axis factor 2: " + str(parameters['starting area y2']) + "\n")
+        output_file.write("#\n")
+        output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
+        if none_count > 0:
+            output_file.write("#\n")
+            output_file.write("#     WARNING: Fish was not detected in " + str(none_count) + " of " + str(len(times)) + " frames. Orientation data may be incorrect.\n")
+
+        output_file.write("\n#Key\n")
+        output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n")
+
+        for i, t in enumerate(times):
+            output_file.write("  ")
+            DataWriter.fill_spaces(output_file, t)
+            output_file.write(t)
+            output_file.write(" " * spacing)
+
+            if i >= len(times):
+                return
+            # TODO substact ROI
+            DataWriter.write_position(position[i][0] - roi.x1 if position[i] is not None else None, output_file, spacing) # x position roi
+            DataWriter.write_position(position[i][1] - roi.y1 if position[i] is not None else None, output_file, spacing) # y position roi
+            DataWriter.write_position(est_position[i][0] - roi.x1 if est_position[i] is not None else None, output_file, spacing) # estimated x position roi
+            DataWriter.write_position(est_position[i][1] - roi.y1 if est_position[i] is not None else None, output_file, spacing) # estimated y position roi
+            
+            DataWriter.write_position(position[i][0] if position[i] is not None else None, output_file, spacing) # x position
+            DataWriter.write_position(position[i][1] if position[i] is not None else None, output_file, spacing) # y position
+            DataWriter.write_position(est_position[i][0] if est_position[i] is not None else None, output_file, spacing) # estimated x position
+            DataWriter.write_position(est_position[i][1] if est_position[i] is not None else None, output_file, spacing) # estimated y position
+
+            DataWriter.write_position(orientation[i], output_file, spacing) # orientation
+            DataWriter.write_position(est_orientation[i], output_file, spacing) # estimated orientation
+            
+
+            cnt_of_frame = str(object_count[i])
+            DataWriter.fill_spaces(output_file, cnt_of_frame)
+            output_file.write(cnt_of_frame)
+            output_file.write(" " * spacing)
+
+            rel_cnt_of_frame = str(fish_object_count[i])
+            DataWriter.fill_spaces(output_file, rel_cnt_of_frame)
+            output_file.write(rel_cnt_of_frame)
+
+            output_file.write("\n")
+        output_file.close()
+
+    @staticmethod
     def write_nix():
         pass
 
