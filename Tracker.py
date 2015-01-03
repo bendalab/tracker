@@ -646,153 +646,18 @@ class Tracker():
         if self.fish_not_detected_count > self.fish_not_detected_threshold:
             self.fish_not_detected_threshold_reached = True
 
+    def load_frame_times(self, file_name):
         times_file = None
-        if not os.path.exists(times_file_path):
+        if not os.path.exists(file_name):
             sys.exit("ERROR: times file missing - data saving abortet")
-        else:
-            times_file = open(times_file_path, 'r')
-
-        # create directory name after video file
-        if not os.path.exists(self.output_directory):
-            os.makedirs(self.output_directory)
-        # else:
-        #     print "directory exists"
-
-        output_file_path = self.output_directory + "/" + file_name + ".txt"
-        output_file = open(output_file_path, 'w')
-
-        output_file.write("# Tracking parameters:\n")
-        output_file.write("#     Region of Interest X-Axis         : [" + str(self.roi.x1) + "," + str(self.roi.x2) + "]\n")
-        output_file.write("#     Region of Interest Y-Axis         : [" + str(self.roi.y1) + "," + str(self.roi.y2) + "]\n")
-        output_file.write("#     Fish size threshold               : " + str(self.fish_size_threshold) + "\n")
-        output_file.write("#     Start orientation                 : " + str(self.start_ori) + "\n")
-        output_file.write("#     Fish starting area X-Axis factor  : " + str(self.starting_area_x1_factor) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor 1: " + str(self.starting_area_y1_factor) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor 2: " + str(self.starting_area_y2_factor) + "\n")
-        output_file.write("#\n")
-        output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
-        if self.fish_not_detected_threshold_reached:
-            output_file.write("#\n")
-            output_file.write("#     WARNING: Fish was not detected in " + str(self.fish_not_detected_count) + " of " + str(self.frame_counter) + " frames. Orientation data may be incorrect.\n")
+        
+        with open(file_name, 'r') as f:
+            times = map(lambda x: x.strip(), f)
+        return times
 
 
-        output_file.write("\n#Key\n")
-        output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n")
-
-        lc = 0
-        spacing = 4
-        for line in times_file:
-
-            output_file.write("  ")
-            line = line.strip()
-            self.fill_spaces(output_file, line)
-            output_file.write(line)
-            output_file.write(" "*spacing)
-
-            if lc >= self.frame_counter:
-                return
-
-            if self.all_pos_roi[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_x_pos_original = str(round(self.all_pos_roi[lc][0], 2))
-                self.fill_spaces(output_file, rounded_x_pos_original)
-                output_file.write(rounded_x_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.all_pos_roi[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_y_pos_original = str(round(self.all_pos_roi[lc][1], 2))
-                self.fill_spaces(output_file, rounded_y_pos_original)
-                output_file.write(rounded_y_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.estimated_pos_roi[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_est_x_pos_original = str(round(self.estimated_pos_roi[lc][0], 2))
-                self.fill_spaces(output_file, rounded_est_x_pos_original)
-                output_file.write(rounded_est_x_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.estimated_pos_roi[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_est_y_pos_original = str(round(self.estimated_pos_roi[lc][1], 2))
-                self.fill_spaces(output_file, rounded_est_y_pos_original)
-                output_file.write(rounded_est_y_pos_original)
-            output_file.write(" "*spacing)
-
-
-            if self.all_pos_original[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_x_pos_original = str(round(self.all_pos_original[lc][0], 2))
-                self.fill_spaces(output_file, rounded_x_pos_original)
-                output_file.write(rounded_x_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.all_pos_original[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_y_pos_original = str(round(self.all_pos_original[lc][1], 2))
-                self.fill_spaces(output_file, rounded_y_pos_original)
-                output_file.write(rounded_y_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.estimated_pos_original[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_est_x_pos_original = str(round(self.estimated_pos_original[lc][0], 2))
-                self.fill_spaces(output_file, rounded_est_x_pos_original)
-                output_file.write(rounded_est_x_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.estimated_pos_original[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_est_y_pos_original = str(round(self.estimated_pos_original[lc][1], 2))
-                self.fill_spaces(output_file, rounded_est_y_pos_original)
-                output_file.write(rounded_est_y_pos_original)
-            output_file.write(" "*spacing)
-
-            if self.all_oris[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_ori = str(round(self.all_oris[lc], 2))
-                self.fill_spaces(output_file, rounded_ori)
-                output_file.write(rounded_ori)
-            output_file.write(" "*spacing)
-
-            if self.estimated_oris[lc] is None:
-                self.print_None_to_file(output_file)
-            else:
-                rounded_est_ori = str(round(self.estimated_oris[lc], 2))
-                self.fill_spaces(output_file, rounded_est_ori)
-                output_file.write(rounded_est_ori)
-            output_file.write(" "*spacing)
-
-            cnt_of_frame = str(self.number_contours_per_frame[lc])
-            self.fill_spaces(output_file, cnt_of_frame)
-            output_file.write(cnt_of_frame)
-            output_file.write(" "*spacing)
-
-            rel_cnt_of_frame = str(self.number_relevant_contours_per_frame[lc])
-            self.fill_spaces(output_file, rel_cnt_of_frame)
-            output_file.write(rel_cnt_of_frame)
-
-
-
-            output_file.write("\n")
-
-            lc += 1
-
-        #save last frame
-        cv2.imwrite(self.output_directory + "/" + file_name + "_OV_path.png", self.last_frame_OV_output)
-
+        
     def run(self):
-
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
