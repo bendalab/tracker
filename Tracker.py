@@ -9,6 +9,7 @@ import os
 import argparse
 import ConfigParser
 import collections
+from IPython import embed
 
 class Tracker():
     def __init__(self, path=None, nix_io=False):
@@ -136,7 +137,7 @@ class Tracker():
 
     def extract_video_file_name_and_path(self):
         pointer_end = len(self.video_file)-1
-        while self.video_file[pointer_end] != ".":
+        while self.video_file[pointer_end] != ".": # FIXME You can use split to get this information much easier
             pointer_end -= 1
             if pointer_end == 0:
                 print "no valid file"
@@ -796,7 +797,7 @@ class DataWriter(object):
         for p in position:
             if p is None:
                 none_count += 1
-
+        # FIXME the starting area x2 is missing?
         output_file = open(file_name, 'w')
         output_file.write("# Tracking parameters:\n")
         output_file.write("#     Region of Interest X-Axis         : [" + str(roi.x1) + "," + str(roi.x2) + "]\n")

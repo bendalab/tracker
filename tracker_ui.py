@@ -668,7 +668,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def set_tracker_video_file(self):
         self.track_file = self.lnEdit_file_path.text()
-        self.tracker.video_file = str(self.track_file)
+        self.tracker.video_file = str(self.track_file) # FIXME you should make video_file a property in Tracker
         self.set_last_selected_folder(self.track_file)
 
     def set_last_selected_folder(self, path_string):
