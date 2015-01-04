@@ -8,6 +8,7 @@ import copy
 import os
 import argparse
 import ConfigParser
+import collections
 
 class Tracker():
     def __init__(self, path=None, nix_io=False):
@@ -694,7 +695,6 @@ class Tracker():
         #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
 
         file_name, file_directory = self.extract_video_file_name_and_path()
-        print file_name, file_directory
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
         output_file_name = file_directory + file_name + "/" + file_name
         params = {}
@@ -703,6 +703,7 @@ class Tracker():
         params['starting area x1'] = self.starting_area_x1_factor
         params['starting area y1'] = self.starting_area_y1_factor
         params['starting area y2'] = self.starting_area_y2_factor
+        params['source file'] = self.video_file
         if not self.nix_io:
             DataWriter.write_ascii(output_file_name  + ".txt", times, self.all_pos_original, self.all_oris, 
                                    self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
@@ -822,7 +823,6 @@ class DataWriter(object):
 
             if i >= len(times):
                 return
-            # TODO substact ROI
             DataWriter.write_position(position[i][0] - roi.x1 if position[i] is not None else None, output_file, spacing) # x position roi
             DataWriter.write_position(position[i][1] - roi.y1 if position[i] is not None else None, output_file, spacing) # y position roi
             DataWriter.write_position(est_position[i][0] - roi.x1 if est_position[i] is not None else None, output_file, spacing) # estimated x position roi
@@ -848,6 +848,53 @@ class DataWriter(object):
 
             output_file.write("\n")
         output_file.close()
+
+    @staticmethod
+    def time_to_seconds(time):
+        if isinstance(time, collections.Iterable) and not isinstance(time, str):
+            return map(DataWriter.time_to_seconds, time)
+        else:
+            ts = time.split(':')
+            seconds = 0.
+            seconds += float(ts[0]) * 3600
+            seconds += float(ts[1]) * 60
+            seconds += float(ts[-1])
+        return seconds
+
+    @staticmethod
+    def save_trace(time, data, nix_block, name, nix_type, label, unit=None):
+        # get only those that are valid
+        valid = []
+        stamps = []
+        for t, d in zip(time, data):
+            if d is not None:
+                valid.append(d)
+                stamps.append(t)
+        # check if valid data is tuple
+        if len(valid) > 0 and isinstance(valid[0], tuple):
+            d = np.zeros((len(valid), len(valid[0])))
+            for i, v in enumerate(valid):
+                d[i,:] = list(v)
+            array = nix_block.create_data_array(name, nix_type, data=d)
+            array.label = label
+            if unit is not None:
+                array.unit = unit
+            dim = array.append_range_dimension(stamps)
+            dim.label = 'time'
+            dim.unit = 's'
+            dim = array.append_set_dimension()
+            dim.labels = ['x', 'y']
+            return array
+        else:
+            d = np.asarray(valid)
+            array = nix_block.create_data_array(name, nix_type, data=d)
+            array.label = label
+            if unit is not None:
+                array.unit = unit
+            dim = array.append_range_dimension(stamps)
+            dim.label = 'time'
+            dim.unit = 's'
+            return array
 
     @staticmethod
     def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
