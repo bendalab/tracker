@@ -898,14 +898,86 @@ class DataWriter(object):
 
     @staticmethod
     def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
-        pass
+        import nix
+        name = file_name.split('/')[-1].split('.')[0]
+        nix_file = nix.File.open(file_name, nix.FileMode.Overwrite)
+        block = nix_file.create_block(name, 'nix.tracking')
+
+        # some metadata
+        recording = nix_file.create_section('recording', 'recording')
+        recording['Date'] = name.split('_')[0]
+        recording['Experimenter'] = 'Some One'
+
+        tracker = nix_file.create_section('Tracker', 'software.tracker')
+        tracker['Version'] = 0.5
+        tracker['Source location'] = 'raven.am28.uni-tuebingen.de:tracker.git'
+        settings = tracker.create_section('settings', 'software.settings')
+        settings['Region of Interest X'] = roi.x1
+        settings['Region of Interest Y'] = roi.y1
+        settings['Region of Interest width'] = roi.x2 - roi.x1
+        settings['Region of Interest height'] = roi.y2 - roi.y1
+        settings['Fish size threshold'] = parameters['fish size']
+        settings['Start orientation'] = parameters['start ori']
+        settings['Fish starting area X-Axis factor'] = parameters['starting area x1']
+        settings['Fish starting area Y-Axis factor1'] = parameters['starting area y1']
+        settings['Fish starting area Y-Axis factor2'] = parameters['starting area y2']
+
+        movie = nix_file.create_section('Movie', 'recording.movie')
+        movie['Filename'] = parameters['source file']
+
+        camera = movie.create_section('Camera', 'hardware.camera')
+        camera['Model'] = 'Guppy F-038B NIR'
+        camera['Vendor'] = 'Allied Vision Technologies'
+        
+        # create sources and link entities to metadata
+        block.metadata = recording
+        movie_source = block.create_source('Original movie', 'nix.source.movie')
+        movie_source.metadata = movie
+        tracking_source = block.create_source('Video tracking', 'nix.source.analysis')
+        tracking_source.metadata = tracker
+
+        # save data
+        time_stamps = np.asarray(DataWriter.time_to_seconds(times))
+        
+        a = DataWriter.save_trace(time_stamps, position, block, 'positions', 'nix.irregular_sampled.coordinates', label='position')
+        a.sources.append(movie_source)
+        a.sources.append(tracking_source)
+        
+        a = DataWriter.save_trace(time_stamps, est_position, block, 'estimated positions', 'nix.irregular_sampled.coordinates', label='position')
+        a.sources.append(movie_source)
+        a.sources.append(tracking_source)
+
+        a = DataWriter.save_trace(time_stamps, orientation, block, 'orientations', 'nix.irregular_sampled', label='orientation')
+        a.sources.append(movie_source)
+        a.sources.append(tracking_source)
+
+        a = DataWriter.save_trace(time_stamps, est_orientation, block, 'estimated_orientations', 'nix.irregular_sampled', label='orientation')
+        a.sources.append(movie_source)
+        a.sources.append(tracking_source)
+        
+        a = DataWriter.save_trace(time_stamps, object_count, block, 'object count', 'nix.irregular_sampled', label='count')
+        a.sources.append(movie_source)
+        a.sources.append(tracking_source)
+        
+        a = DataWriter.save_trace(time_stamps, fish_object_count, block, 'fish object count', 'nix.irregular_sampled', label='count')
+        a.sources.append(movie_source)
+        a.sources.append(tracking_source)
+
+        # TODO need more metadata like info about the subject, who, when, where etc. 
+        # TODO If we support this (and we should suupport this) in the gui, we probably need a more elaborate DataWriter class!
+        nix_file.close()
 
 
 if __name__ == '__main__':
-    #parser = argparse.ArgumentParser(description='tracking fish in video file')
-    #parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
-    #args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='tracking fish in video file')
+    parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
+    parser.add_argument('-n', '--nix_output', type=bool, default=False,
+                        help="output tracking results to nix file")
 
-    tr = Tracker()
+    args = parser.parse_args()
+    if not os.path.exists(args.path):
+        print('File does not exits!')
+        exit()
+    tr = Tracker(args.path, args.nix_output)
     tr.set_video_file()
     tr.run()
