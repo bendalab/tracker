@@ -33,7 +33,7 @@ class Tracker(object):
         self.cap = ""
 
         self.save_frames = False
-        self.frame_waittime = 10
+        self.frame_waittime = 50
 
         self.frame_counter = 0
 
@@ -94,6 +94,12 @@ class Tracker(object):
         self.draw_travel_route = True
         self.draw_original_output = True
 
+        # img output
+        self.show_bg_sub_img = True
+        self.show_morphed_img = True
+        # self.show_contour = False
+        # self.show_ellipse = True
+
         self.estimate_missing_data = True
         self.estimated_pos_roi = []
         self.estimated_pos_original = []
@@ -134,12 +140,15 @@ class Tracker(object):
         self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
+
         return
 
-    @staticmethod
-    def show_imgs(img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
-        # cv2.imshow("bgsub", roi_bg_sub)
-        # cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+    # @staticmethod
+    def show_imgs(self, img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
+        if self.show_bg_sub_img:
+            cv2.imshow("bgsub", roi_bg_sub)
+        if self.show_morphed_img:
+            cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
     # sets video file to terminal-attribute path to video file
