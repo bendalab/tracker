@@ -109,6 +109,10 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_2.setObjectName(_fromUtf8("line_2"))
         self.vertLO_tab_file.addWidget(self.line_2)
+        # checkbox nix output TODO checkbox, preset, connect
+        self.cbx_enable_nix_output = QtGui.QCheckBox(self.tab_file)
+        self.cbx_enable_nix_output.setObjectName(_fromUtf8("cbx_enable_nix_output"))
+        self.vertLO_tab_file.addWidget(self.cbx_enable_nix_output)
         # spacer
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_file.addItem(spacerItem1)
@@ -551,6 +555,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_start_orientation.setText(_translate("tracker_main_widget", "Starting Orientation", None))
         self.lbl_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection min Size Threshold", None))
         self.lbl_max_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection max Size Threshold", None))
+        self.cbx_enable_nix_output.setText(_translate("tracker_main_widget", "Enable Output to NIX file", None))
         self.cbx_enable_max_size_thresh.setText(_translate("tracker_main_widget", "Enable max Size Threshold", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_adv), _translate("tracker_main_widget", "Advanced", None))
         self.lbl_img_morphing.setText(_translate("tracker_main_widget", "Image Morphing", None))
@@ -596,6 +601,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def preset_options(self):
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
+        self.cbx_enable_nix_output.setChecked(self.tracker.nix_io)
 
         # region of interest
         self.spinBox_x_start.setValue(self.tracker.roi.x1)
@@ -648,6 +654,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.btn_browse_file.clicked.connect(self.browse_file)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.abort_tracking)
+
+        self.connect(self.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_nix_output)
 
         self.connect(self.spinBox_x_start, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
         self.connect(self.spinBox_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
@@ -755,6 +763,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
         cv2.imshow("starting area", roi_only_draw_numpy)
 
+    def change_enable_nix_output(self):
+        self.tracker.nix_io = self.cbx_enable_nix_output.isChecked()
+
     def change_roi_values(self):
         self.tracker.roi.x1 = self.spinBox_x_start.value()
         self.tracker.roi.x2 = self.spinBox_x_end.value()
@@ -820,7 +831,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def write_cfg_file(self):
         cfg = ConfigParser.SafeConfigParser()
         cfg.add_section('system')
-        cfg.set('system', 'frame_waittime', str(self.spinBox_frame_waittime))
+        cfg.set('system', 'frame_waittime', str(self.spinBox_frame_waittime.value()))
         cfg.add_section('roi')
         cfg.set('roi', 'x1', str(self.spinBox_x_start.value()))
         cfg.set('roi', 'x2', str(self.spinBox_x_end.value()))
@@ -865,6 +876,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
             return
         self.tracker.run()
         self.set_new_tracker()
+        self.preset_options() # make sure options match tracker-object (esp. nix-output option)
 
     def abort_tracking(self):
         self.tracker.ui_abort_button_pressed = True
