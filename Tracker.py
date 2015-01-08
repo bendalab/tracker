@@ -778,6 +778,7 @@ class DataWriter(object):
     def write_position(p, out_file, spacing):
         if p is None:
             DataWriter.print_none_to_file(out_file)
+            out_file.write(" " * spacing)
         else:
             p = str(round(p, 2))
             DataWriter.fill_spaces(out_file, p)
