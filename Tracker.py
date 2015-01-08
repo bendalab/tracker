@@ -107,13 +107,16 @@ class Tracker(object):
         self.estimated_oris = []
 
         # TODO import config file values
-        self.import_config_values()
+        self.will_import_config_values = True
 
     @property
     def roi(self):
         return self.__roi
 
     def import_config_values(self):
+        if not self.will_import_config_values:
+            return
+
         cfg = ConfigParser.ConfigParser()
         cfg_file = open('tracker.cnf')
         cfg.readfp(cfg_file)
@@ -674,6 +677,7 @@ class Tracker(object):
     def run(self):
         self.set_video_file()
         self.check_if_necessary_files_exist()
+        self.import_config_values()
         self.set_video_capture()
 
         # cv2.namedWindow("contours")
