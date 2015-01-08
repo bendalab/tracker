@@ -660,6 +660,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), self.change_frame_waittime)
 
+        self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), self.change_start_orientation)
+
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
         if self.track_file == "":
@@ -758,6 +760,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def change_frame_waittime(self, value):
         self.tracker.frame_waittime = value
+
+    def change_start_orientation(self, value):
+        self.tracker.start_ori = value
 
     # TODO
     # should be called if tracking is started
