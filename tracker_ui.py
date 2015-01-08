@@ -678,6 +678,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.change_lineend_offset)
 
     def browse_file(self):
+        self.roi_preview_displayed = False
+
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
         if self.track_file == "":
             return
