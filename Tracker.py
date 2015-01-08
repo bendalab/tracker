@@ -140,6 +140,10 @@ class Tracker(object):
         self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
+        self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
+        self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
+        # self.show_contour = cfg.getboolean('image_processing', 'show_contour')
+        # self.show_ellipse = cfg.getboolean('image_processing', 'show_ellipse')
 
         return
 
