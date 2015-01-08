@@ -674,6 +674,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_contour)
         self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_ellipse)
 
+        self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.change_lineend_offset)
+
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
         if self.track_file == "":
@@ -802,6 +804,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def change_draw_ellipse(self):
         self.tracker.draw_ellipse = self.cbx_show_ellipse.isChecked()
+
+    def change_lineend_offset(self, value):
+        self.tracker.lineend_offset = value
 
     # TODO
     # should be called if tracking is started
