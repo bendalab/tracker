@@ -793,6 +793,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         cfg.set('detection_values', 'start_orientation', str(self.spinBox_start_orientation.value()))
         cfg.set('detection_values', 'min_area_threshold', str(self.spinBox_fish_threshold.value()))
         cfg.set('detection_values', 'max_area_threshold', str(self.spinBox_fish_max_threshold.value()))
+        cfg.set('detection_values', 'enable_max_size_threshold', str(self.cbx_enable_max_size_thresh.isChecked()))
         cfg.add_section('image_morphing')
         cfg.set('image_morphing', 'erosion_factor', str(self.spinBox_erosion.value()))
         cfg.set('image_morphing', 'dilation_factor', str(self.spinBox_dilation.value()))
