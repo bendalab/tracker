@@ -172,11 +172,15 @@ class Tracker(object):
                 print "no valid file"
                 return "", ""
 
-        pointer_end = len(file_plus_extension)-1
+        print file_plus_extension
+        pointer_end = len(file_plus_extension[0])
 
         pointer_start = pointer_end
         while self.video_file[pointer_start-1] != "/":
             pointer_start -= 1
+
+        print self.video_file[:pointer_start]
+        print self.video_file[pointer_start:pointer_end]
 
         return self.video_file[pointer_start:pointer_end], self.video_file[:pointer_start]
 
@@ -726,6 +730,7 @@ class Tracker(object):
 
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
+            print "d1"
             return
 
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
