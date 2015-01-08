@@ -684,7 +684,6 @@ class Tracker():
         self.draw_estimated_data()
 
         # self.print_data()
-        self.check_data_integrity()
         self.check_frames_missing_fish()
 
         # cv2.namedWindow("result")
@@ -717,6 +716,8 @@ class Tracker():
                                  self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
                                  self.number_relevant_contours_per_frame, self.roi, params)
         cv2.imwrite(file_directory + file_name + "/" + file_name + "_OV_path.png", self.last_frame_OV_output)
+
+        self.check_data_integrity()
 
         # if self.draw_original_output:
         #     cv2.namedWindow("result_ov")
