@@ -631,13 +631,18 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.spinBox_erosion.setValue(self.tracker.erosion_iterations)
         self.spinBox_dilation.setValue(self.tracker.dilation_iterations)
 
-        # TODO image processing steps
+        # image processing steps
+        self.cbx_show_bgsub_img.setChecked(self.tracker.show_bg_sub_img)
+        self.cbx_show_morph_img.setChecked(self.tracker.show_morphed_img)
+        self.cbx_show_contour.setChecked(self.tracker.draw_contour)
+        self.cbx_show_ellipse.setChecked(self.tracker.draw_ellipse)
 
         # data visualisation
         self.spinBox_lineend_offset.setValue(self.tracker.lineend_offset)
         # TODO
         # self.spinBox_circle_size.setValue(self.tracker.draw_circle_size)
 
+    # TODO finish connecting!
     def connect_widgets(self):
         self.btn_browse_file.clicked.connect(self.browse_file)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
@@ -780,8 +785,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         cfg.add_section('image_processing')
         cfg.set('image_processing', 'show_bg_sub_img', str(self.cbx_show_bgsub_img.isChecked()))
         cfg.set('image_processing', 'show_morphed_img', str(self.cbx_show_morph_img.isChecked()))
-        cfg.set('image_processing', 'show_contour', str(self.cbx_show_contour.isChecked()))
-        cfg.set('image_processing', 'show_ellipse', str(self.cbx_show_ellipse.isChecked()))
+        cfg.set('image_processing', 'draw_contour', str(self.cbx_show_contour.isChecked()))
+        cfg.set('image_processing', 'draw_ellipse', str(self.cbx_show_ellipse.isChecked()))
         cfg.add_section('visualization')
         cfg.set('visualization', 'lineend_offset', str(self.spinBox_lineend_offset.value()))
         cfg.set('visualization', 'circle_size', str(self.spinBox_circle_size.value()))
