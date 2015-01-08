@@ -29,7 +29,7 @@ class Tracker():
 
         self.nix_io = nix_io
         self.output_directory = ""
-        self.dir = "examples/" # FIXME this overrides the python builtin function dir!
+        # self.dir = "examples/" #
         # self.videofile_name = "2014-08-27_33"
         # self.dir = "examples/"
         # self.videofile_name = "2014-10-01_33"
@@ -128,7 +128,6 @@ class Tracker():
         if len(sys.argv) > 1:
             self.video_file = sys.argv[1]
         else:
-            self.video_file = self.dir + self.videofile_name + ".avi"
             return
 
     def check_if_necessary_files_exist(self):
