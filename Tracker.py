@@ -702,6 +702,7 @@ class Tracker():
         params['fish size'] = self.fish_size_threshold
         params['start ori'] = self.start_ori
         params['starting area x1'] = self.starting_area_x1_factor
+        params['starting area x2'] = self.starting_area_x2_factor
         params['starting area y1'] = self.starting_area_y1_factor
         params['starting area y2'] = self.starting_area_y2_factor
         params['source file'] = self.video_file
@@ -919,7 +920,8 @@ class DataWriter(object):
         settings['Region of Interest height'] = roi.y2 - roi.y1
         settings['Fish size threshold'] = parameters['fish size']
         settings['Start orientation'] = parameters['start ori']
-        settings['Fish starting area X-Axis factor'] = parameters['starting area x1']
+        settings['Fish starting area X-Axis factor1'] = parameters['starting area x1']
+        settings['Fish starting area X-Axis factor2'] = parameters['starting area x2']
         settings['Fish starting area Y-Axis factor1'] = parameters['starting area y1']
         settings['Fish starting area Y-Axis factor2'] = parameters['starting area y2']
 
