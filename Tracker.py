@@ -135,6 +135,8 @@ class Tracker(object):
         self.fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
         self.enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
 
+        self.frame_waittime = cfg.getint('system', 'frame_waittime')
+
         self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
@@ -737,7 +739,7 @@ class Tracker(object):
         params['starting area y2'] = self.starting_area_y2_factor
         params['source file'] = self.video_file
         if not self.nix_io:
-            DataWriter.write_ascii(output_file_name  + ".txt", times, self.all_pos_original, self.all_oris, 
+            DataWriter.write_ascii(output_file_name + ".txt", times, self.all_pos_original, self.all_oris,
                                    self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
                                    self.number_relevant_contours_per_frame, self.roi, params)
         else:
