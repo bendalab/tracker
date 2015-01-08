@@ -87,18 +87,15 @@ class Tracker(object):
         self.last_frame = None
         self.last_frame_OV_output = None
 
+        # img output
         self.draw_contour = False
         self.draw_ellipse = True
         self.draw_line = True
         self.draw_travel_orientation = True
         self.draw_travel_route = True
         self.draw_original_output = True
-
-        # img output
         self.show_bg_sub_img = True
         self.show_morphed_img = True
-        # self.show_contour = False
-        # self.show_ellipse = True
 
         self.estimate_missing_data = True
         self.estimated_pos_roi = []
@@ -106,7 +103,7 @@ class Tracker(object):
         self.estimated_oris = []
 
         # TODO import config file values
-        self.will_import_config_values = True
+        self.will_import_config_values = False
         if self.will_import_config_values:
             self.import_config_values()
 
@@ -142,8 +139,8 @@ class Tracker(object):
 
         self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
         self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
-        # self.show_contour = cfg.getboolean('image_processing', 'show_contour')
-        # self.show_ellipse = cfg.getboolean('image_processing', 'show_ellipse')
+        self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
+        self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
         return
 
