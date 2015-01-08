@@ -664,6 +664,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_min_fish_threshold)
         self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_max_fish_threshold)
+        self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_max_size_threshold)
+
+
 
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
@@ -772,6 +775,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def change_max_fish_threshold(self, value):
         self.tracker.fish_max_size_threshold = value
+
+    def change_enable_max_size_threshold(self, value):
+        self.tracker.enable_max_size_threshold = self.cbx_enable_max_size_thresh.isChecked()
 
     # TODO
     # should be called if tracking is started
