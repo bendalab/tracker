@@ -666,7 +666,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_max_fish_threshold)
         self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_max_size_threshold)
 
-
+        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), self.change_erosion_factor)
+        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), self.change_dilation_factor)
 
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
@@ -776,8 +777,14 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def change_max_fish_threshold(self, value):
         self.tracker.fish_max_size_threshold = value
 
-    def change_enable_max_size_threshold(self, value):
+    def change_enable_max_size_threshold(self):
         self.tracker.enable_max_size_threshold = self.cbx_enable_max_size_thresh.isChecked()
+
+    def change_erosion_factor(self, value):
+        self.tracker.erosion_iterations = value
+
+    def change_dilation_factor(self, value):
+        self.tracker.dilation_iterations = value
 
     # TODO
     # should be called if tracking is started
