@@ -10,10 +10,9 @@ import argparse
 import ConfigParser
 import collections
 from IPython import embed
-from gtk._gtk import Object
 
 
-class Tracker(Object):
+class Tracker(object):
     def __init__(self, path=None, nix_io=False):
         # program data
         self.ui_mode_on = False
@@ -31,7 +30,7 @@ class Tracker(Object):
 
         self.nix_io = nix_io
         self.output_directory = ""
-        # self.dir = "examples/" #
+        # self.dir = "examples/"
         # self.videofile_name = "2014-08-27_33"
         # self.dir = "examples/"
         # self.videofile_name = "2014-10-01_33"
@@ -48,8 +47,7 @@ class Tracker(Object):
         # self.roi_x2 = 695
         # self.roi_y1 = 80
         # self.roi_y2 = 515
-        self.roi = ROI(160, 80, 700, 525)
-
+        self.__roi = ROI(160, 80, 700, 525)
         # image morphing data
         self.erosion_iterations = 1
         self.dilation_iterations = 4
@@ -114,7 +112,7 @@ class Tracker(Object):
 
     @property
     def roi(self):
-        return self.roi
+        return self.__roi
 
     def import_config_values(self):
         return
@@ -138,7 +136,6 @@ class Tracker(Object):
 
     def extract_video_file_name_and_path(self):
         file_plus_extension = self.video_file.split(".")
-        print file_plus_extension
         if len(file_plus_extension) < 2:
                 print "no valid file"
                 return "", ""
@@ -491,8 +488,6 @@ class Tracker(Object):
 
         # main loop
         while self.cap.isOpened():
-
-
             ret, frame = self.cap.read()
 
             if frame is None:
