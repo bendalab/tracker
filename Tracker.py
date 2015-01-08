@@ -103,7 +103,7 @@ class Tracker(object):
         self.estimated_oris = []
 
         # TODO import config file values
-        self.will_import_config_values = False
+        self.will_import_config_values = True
         if self.will_import_config_values:
             self.import_config_values()
 
@@ -133,7 +133,7 @@ class Tracker(object):
         self.start_ori = cfg.getint('detection_values', 'start_orientation')
         self.fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
         self.fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
-        self.enable_max_size_threshold = cfg.getboolean('detection_values', 'enamble_max_size_threshold')
+        self.enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
 
         self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
