@@ -47,7 +47,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # ROI variables
         self.first_frame_numpy = None
         self.roi_preview_draw_numpy = None
-        self.roi_preview_is_set = False
+        self.preview_is_set = False
+        self.roi_preview_displayed = False
 
         # starting area variables
 
@@ -711,11 +712,14 @@ class Ui_tracker_main_widget(QtGui.QWidget):
                 break
         cap.release()
 
-        self.roi_preview_is_set = True
+        self.preview_is_set = True
 
     def display_roi_preview(self):
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
         cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi.x1, self.tracker.roi.y1), (self.tracker.roi.x2, self.tracker.roi.y2), (255, 0, 255), 2)
+        if self.roi_preview_displayed:
+            cv2_output = copy.copy(self.first_frame_numpy[self.tracker.roi.y1: self.tracker.roi.y2, self.tracker.roi.x1:self.tracker.roi.x2])
+            cv2.imshow("roi preview", cv2_output)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
@@ -726,6 +730,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         output_pixm_rescaled = output_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
         # display picture
         self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
+        self.roi_preview_displayed = True
 
     def display_starting_area_preview(self):
         roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi.y1:self.tracker.roi.y2, self.tracker.roi.x1:self.tracker.roi.x2])
@@ -754,7 +759,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.tracker.roi.y1 = self.spinBox_y_start.value()
         self.tracker.roi.y2 = self.spinBox_y_end.value()
 
-        if self.roi_preview_is_set:
+        if self.preview_is_set:
             self.display_roi_preview()
             # self.display_starting_area_preview()
 
@@ -768,7 +773,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.tracker.starting_area_y2_factor = self.spinBox_starting_y_end.value()/100.0
         self.spinBox_starting_y_end.setMinimum(self.spinBox_starting_y_start.value())
 
-        if self.roi_preview_is_set:
+        if self.preview_is_set:
             self.display_starting_area_preview()
         return
 
