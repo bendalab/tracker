@@ -757,12 +757,44 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     # TODO
     # should be called if tracking is started
     def write_cfg_file(self):
-        cfg_handler = ConfigParser.ConfigParser()
-        cfg_file = open("tracker.cnf", 'w')
+        cfg = ConfigParser.SafeConfigParser()
+        cfg.add_section('system')
+        cfg.set('system', 'frame_waittime', str(self.spinBox_frame_waittime))
+        cfg.add_section('roi')
+        cfg.set('roi', 'x1', str(self.spinBox_x_start.value()))
+        cfg.set('roi', 'x2', str(self.spinBox_x_end.value()))
+        cfg.set('roi', 'y1', str(self.spinBox_y_start.value()))
+        cfg.set('roi', 'y2', str(self.spinBox_y_end.value()))
+        cfg.add_section('starting_area')
+        cfg.set('starting_area', 'x1_factor', str(float(self.spinBox_starting_x_start.value()/100.0)))
+        cfg.set('starting_area', 'x2_factor', str(float(self.spinBox_starting_x_end.value()/100.0)))
+        cfg.set('starting_area', 'y1_factor', str(float(self.spinBox_starting_y_start.value()/100.0)))
+        cfg.set('starting_area', 'y2_factor', str(float(self.spinBox_starting_y_end.value()/100.0)))
+        cfg.add_section('detection_values')
+        cfg.set('detection_values', 'start_orientation', str(self.spinBox_start_orientation.value()))
+        cfg.set('detection_values', 'min_area_threshold', str(self.spinBox_fish_threshold.value()))
+        cfg.set('detection_values', 'max_area_threshold', str(self.spinBox_fish_max_threshold.value()))
+        cfg.add_section('image_morphing')
+        cfg.set('image_morphing', 'erosion_factor', str(self.spinBox_erosion.value()))
+        cfg.set('image_morphing', 'dilation_factor', str(self.spinBox_dilation.value()))
+        cfg.add_section('image_processing')
+        cfg.set('image_processing', 'show_bg_sub_img', str(self.cbx_show_bgsub_img.isChecked()))
+        cfg.set('image_processing', 'show_morphed_img', str(self.cbx_show_morph_img.isChecked()))
+        cfg.set('image_processing', 'show_contour', str(self.cbx_show_contour.isChecked()))
+        cfg.set('image_processing', 'show_ellipse', str(self.cbx_show_ellipse.isChecked()))
+        cfg.add_section('visualization')
+        cfg.set('visualization', 'lineend_offset', str(self.spinBox_lineend_offset.value()))
+        cfg.set('visualization', 'circle_size', str(self.spinBox_circle_size.value()))
+        # cfg.set('visualization', 'line_color', str(self.))
+        # cfg.set('visualization', 'circle_color', str(self.))
+
+        with open("tracker.cnf", 'w') as cfg_file:
+            cfg.write(cfg_file)
         return
 
     def start_tracking(self):
         self.set_tracker_video_file()
+        self.write_cfg_file()
         if self.track_file == "":
             self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
             return
