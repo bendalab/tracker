@@ -140,7 +140,7 @@ class Tracker():
             pointer_end -= 1
             if pointer_end == 0:
                 print "no valid file"
-                return ""
+                return "", ""
 
         pointer_start = pointer_end
         while self.video_file[pointer_start-1] != "/":
@@ -695,6 +695,9 @@ class Tracker():
         #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
 
         file_name, file_directory = self.extract_video_file_name_and_path()
+        if file_name == "":
+            return
+
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
         output_file_name = file_directory + file_name + "/" + file_name
         params = {}
