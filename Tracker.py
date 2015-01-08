@@ -135,12 +135,12 @@ class Tracker():
             sys.exit("ERROR: Video File does not exist - Tracking aborted")
 
     def extract_video_file_name_and_path(self):
-        pointer_end = len(self.video_file)-1
-        while self.video_file[pointer_end] != ".": # FIXME You can use split to get this information much easier
-            pointer_end -= 1
-            if pointer_end == 0:
+        file_plus_extension = self.video_file.split(".")
+        if len(file_plus_extension) < 2:
                 print "no valid file"
                 return "", ""
+
+        pointer_end = len(file_plus_extension)-1
 
         pointer_start = pointer_end
         while self.video_file[pointer_start-1] != "/":
