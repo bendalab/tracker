@@ -662,6 +662,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), self.change_start_orientation)
 
+        self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_min_fish_threshold)
+        self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_max_fish_threshold)
+
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
         if self.track_file == "":
@@ -763,6 +766,12 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def change_start_orientation(self, value):
         self.tracker.start_ori = value
+
+    def change_min_fish_threshold(self, value):
+        self.tracker.fish_size_threshold = value
+
+    def change_max_fish_threshold(self, value):
+        self.tracker.fish_max_size_threshold = value
 
     # TODO
     # should be called if tracking is started
