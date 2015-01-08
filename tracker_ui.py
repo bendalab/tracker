@@ -669,6 +669,11 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), self.change_erosion_factor)
         self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), self.change_dilation_factor)
 
+        self.connect(self.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"), self.change_show_bg_sub_img)
+        self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), self.change_show_morphed_img)
+        self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_contour)
+        self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_ellipse)
+
     def browse_file(self):
         self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
         if self.track_file == "":
@@ -785,6 +790,18 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def change_dilation_factor(self, value):
         self.tracker.dilation_iterations = value
+
+    def change_show_bg_sub_img(self):
+        self.tracker.show_bg_sub_img = self.cbx_show_bgsub_img.isChecked()
+
+    def change_show_morphed_img(self):
+        self.tracker.show_morphed_img = self.cbx_show_morph_img.isChecked()
+
+    def change_draw_contour(self):
+        self.tracker.draw_contour = self.cbx_show_contour.isChecked()
+
+    def change_draw_ellipse(self):
+        self.tracker.draw_ellipse = self.cbx_show_ellipse.isChecked()
 
     # TODO
     # should be called if tracking is started
