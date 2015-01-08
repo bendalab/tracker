@@ -29,11 +29,6 @@ class Tracker(object):
 
         self.nix_io = nix_io
         self.output_directory = ""
-        # self.dir = "examples/"
-        # self.videofile_name = "2014-08-27_33"
-        # self.dir = "examples/"
-        # self.videofile_name = "2014-10-01_33"
-        # self.video_file = "examples/2014-08-27_33.avi"
         
         self.cap = ""
 
@@ -42,11 +37,9 @@ class Tracker(object):
 
         self.frame_counter = 0
 
-        # self.roi_x1 = 15
-        # self.roi_x2 = 695
-        # self.roi_y1 = 80
-        # self.roi_y2 = 515
-        self.__roi = ROI(160, 80, 700, 525)
+        # self.__roi = ROI(15, 695, 80, 515) # Eileen setup
+        self.__roi = ROI(160, 80, 700, 525) # Isabell setup
+
         # image morphing data
         self.erosion_iterations = 1
         self.dilation_iterations = 4
@@ -108,6 +101,8 @@ class Tracker(object):
 
         # TODO import config file values
         self.will_import_config_values = True
+        if self.will_import_config_values:
+            self.import_config_values()
 
     @property
     def roi(self):
@@ -116,10 +111,29 @@ class Tracker(object):
     def import_config_values(self):
         if not self.will_import_config_values:
             return
+        if not os.path.exists('tracker.cnf'):
+            print "Couldn't import config data from file - file doesn't exist"
+            return
 
         cfg = ConfigParser.ConfigParser()
         cfg_file = open('tracker.cnf')
         cfg.readfp(cfg_file)
+
+        self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
+        self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
+        # roi
+        self.__roi.x1 = cfg.getint('roi', 'x1')
+        self.__roi.x2 = cfg.getint('roi', 'x2')
+        self.__roi.y1 = cfg.getint('roi', 'y1')
+        self.__roi.y2 = cfg.getint('roi', 'y2')
+
+        self.start_ori = cfg.getint('detection_values', 'start_orientation')
+        self.fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
+        self.fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
+
+        self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
+        self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
+
         return
 
     @staticmethod
@@ -677,7 +691,6 @@ class Tracker(object):
     def run(self):
         self.set_video_file()
         self.check_if_necessary_files_exist()
-        self.import_config_values()
         self.set_video_capture()
 
         # cv2.namedWindow("contours")
