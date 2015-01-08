@@ -94,8 +94,8 @@ class Tracker(object):
         self.draw_travel_orientation = True
         self.draw_travel_route = True
         self.draw_original_output = True
-        self.show_bg_sub_img = True
-        self.show_morphed_img = True
+        self.show_bg_sub_img = False
+        self.show_morphed_img = False
 
         self.estimate_missing_data = True
         self.estimated_pos_roi = []
@@ -133,6 +133,7 @@ class Tracker(object):
         self.start_ori = cfg.getint('detection_values', 'start_orientation')
         self.fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
         self.fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
+        self.enable_max_size_threshold = cfg.getboolean('detection_values', 'enamble_max_size_threshold')
 
         self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
