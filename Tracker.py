@@ -10,8 +10,10 @@ import argparse
 import ConfigParser
 import collections
 from IPython import embed
+from gtk._gtk import Object
 
-class Tracker():
+
+class Tracker(Object):
     def __init__(self, path=None, nix_io=False):
         # program data
         self.ui_mode_on = False
