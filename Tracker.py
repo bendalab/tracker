@@ -136,6 +136,7 @@ class Tracker():
 
     def extract_video_file_name_and_path(self):
         file_plus_extension = self.video_file.split(".")
+        print file_plus_extension
         if len(file_plus_extension) < 2:
                 print "no valid file"
                 return "", ""
@@ -984,7 +985,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if not os.path.exists(args.path):
-        print('File does not exits!')
+        print('File does not exist!')
         exit()
     tr = Tracker(args.path, args.nix_output)
     tr.set_video_file()
