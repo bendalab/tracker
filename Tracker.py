@@ -9,7 +9,6 @@ import os
 import argparse
 import ConfigParser
 import collections
-from IPython import embed
 
 
 class Tracker(object):
@@ -115,6 +114,9 @@ class Tracker(object):
         return self.__roi
 
     def import_config_values(self):
+        cfg = ConfigParser.ConfigParser()
+        cfg_file = open('tracker.cnf')
+        cfg.readfp(cfg_file)
         return
 
     @staticmethod
@@ -670,6 +672,7 @@ class Tracker(object):
 
         
     def run(self):
+        self.set_video_file()
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
@@ -985,5 +988,4 @@ if __name__ == '__main__':
         print('File does not exist!')
         exit()
     tr = Tracker(args.path, args.nix_output)
-    tr.set_video_file()
     tr.run()
