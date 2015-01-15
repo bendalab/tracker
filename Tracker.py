@@ -73,6 +73,7 @@ class Tracker(object):
         self.ellipse = None
         self.line = None
         self.lineend_offset = 5
+        self.circle_size = 2
         self.lx1 = 0
         self.ly1 = 0
         self.lx2 = 0
@@ -515,8 +516,8 @@ class Tracker(object):
 
         for c in self.estimated_pos_roi:
             if c is not None:
-                cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
-                cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), 2, (0, 0, 255))
+                cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self.circle_size, (0, 0, 255))
+                cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self.circle_size, (0, 0, 255))
 
     def extract_data(self):
         # create BG subtractor
@@ -632,7 +633,7 @@ class Tracker(object):
             # draw travel orientation
             if self.draw_travel_route:
                 for point in self.img_travel_route:
-                    cv2.circle(roi, point, 2, (255, 0, 0))
+                    cv2.circle(roi, point, self.circle_size, (255, 0, 0))
 
             if self.draw_original_output:
                 for coordinates in self.img_travel_orientation:
@@ -640,7 +641,7 @@ class Tracker(object):
                              (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
                 for point in self.all_pos_original:
                     if point is not None:
-                        cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
+                        cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self.circle_size, (255, 0, 0))
 
             # show all imgs
             if self.draw_original_output:
