@@ -170,22 +170,12 @@ class Tracker(object):
             sys.exit("ERROR: Video File does not exist - Tracking aborted")
 
     def extract_video_file_name_and_path(self):
-        file_plus_extension = self.video_file.split(".")
-        if len(file_plus_extension) < 2:
-                print "no valid file"
-                return "", ""
-
-        print file_plus_extension
-        pointer_end = len(file_plus_extension[0])
-
-        pointer_start = pointer_end
-        while self.video_file[pointer_start-1] != "/":
-            pointer_start -= 1
-
-        print self.video_file[:pointer_start]
-        print self.video_file[pointer_start:pointer_end]
-
-        return self.video_file[pointer_start:pointer_end], self.video_file[:pointer_start]
+        parts = self.video_file.split('/')
+        filename = parts[-1].split('.')[0]
+        path = '/'.join(parts[:-1])
+        if len(path) > 0:
+            path += '/'
+        return filename, path
 
     # captures video defined by path stored in video file
     def set_video_capture(self):
