@@ -103,7 +103,7 @@ class Tracker(object):
         self.estimated_pos_original = []
         self.estimated_oris = []
 
-        # TODO import config file values
+        # import config file values
         self.will_import_config_values = True
         if self.will_import_config_values:
             self.import_config_values()
@@ -723,7 +723,6 @@ class Tracker(object):
 
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
-            print "d1"
             return
 
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
@@ -736,6 +735,11 @@ class Tracker(object):
         params['starting area y1'] = self.starting_area_y1_factor
         params['starting area y2'] = self.starting_area_y2_factor
         params['source file'] = self.video_file
+
+        out_dir = '/'.join(output_file_name.split('/')[:-1])
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
         if not self.nix_io:
             DataWriter.write_ascii(output_file_name + ".txt", times, self.all_pos_original, self.all_oris,
                                    self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
@@ -823,9 +827,9 @@ class DataWriter(object):
          save data to text file
         """
         spacing = 4
-        out_dir = '/'.join(file_name.split('/')[:-1])
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        # out_dir = '/'.join(file_name.split('/')[:-1])
+        # if not os.path.exists(out_dir):
+        #     os.makedirs(out_dir)
         
         none_count = 0
         for p in position:
