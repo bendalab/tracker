@@ -29,6 +29,7 @@ class Tracker(object):
 
         self.nix_io = nix_io
         self.output_directory = ""
+        self.output_path_isset = False
         
         self.cap = ""
 
@@ -176,6 +177,17 @@ class Tracker(object):
         if len(path) > 0:
             path += '/'
         return filename, path
+
+    # TODO make it work
+    def get_output_file_and_dir(self, file_name, file_directory):
+        if not self.output_path_isset:
+            output_file_name = file_directory + file_name + "/" + file_name
+            out_dir = '/'.join(output_file_name.split('/')[:-1])
+            return output_file_name, out_dir
+        else:
+            output_file_name = self.output_directory + file_name
+            out_dir = self.output_directory
+            return output_file_name, out_dir
 
     # captures video defined by path stored in video file
     def set_video_capture(self):
@@ -703,9 +715,6 @@ class Tracker(object):
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
-        # cv2.namedWindow("contours")
-        # cv2.moveWindow("contours", 50, 50)
-
         self.extract_data()
         self.estimate_missing_pos()
         self.estimate_missing_ori()
@@ -714,19 +723,13 @@ class Tracker(object):
         # self.print_data()
         self.check_frames_missing_fish()
 
-        # cv2.namedWindow("result")
-        # cv2.moveWindow("result", 200, 350)
-        # cv2.imshow("result", self.last_frame)
-
-        # if SAVE_FRAMES:
-        #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
-
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
             return
 
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
-        output_file_name = file_directory + file_name + "/" + file_name
+        output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
+
         params = {}
         params['fish size'] = self.fish_size_threshold
         params['start ori'] = self.start_ori
@@ -736,7 +739,6 @@ class Tracker(object):
         params['starting area y2'] = self.starting_area_y2_factor
         params['source file'] = self.video_file
 
-        out_dir = '/'.join(output_file_name.split('/')[:-1])
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
