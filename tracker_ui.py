@@ -592,8 +592,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         y_pos = (screen.height() - gui_size.height() - gui_size.height()) / 2
         self.move(x_pos, y_pos)
 
-    # TODO
-    # should create a new tracker instance loading variable values from config file
     def set_new_tracker(self):
         self.tracker = Tracker()
         return
@@ -684,6 +682,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_ellipse)
 
         self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.change_lineend_offset)
+        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), self.change_circle_size())
 
     def browse_file(self):
         self.roi_preview_displayed = False
@@ -826,8 +825,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def change_lineend_offset(self, value):
         self.tracker.lineend_offset = value
 
-    # TODO
-    # should be called if tracking is started
+    def change_circle_size(self, value):
+        self.tracker.circle_size = value
+
     def write_cfg_file(self):
         cfg = ConfigParser.SafeConfigParser()
         cfg.add_section('system')
