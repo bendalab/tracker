@@ -880,6 +880,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def abort_tracking(self):
         self.tracker.ui_abort_button_pressed = True
+        self.set_new_tracker()
 
 
 if __name__ == "__main__":
