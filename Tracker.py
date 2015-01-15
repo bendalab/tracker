@@ -146,6 +146,8 @@ class Tracker(object):
         self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
         self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
+        self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
+        self.circle_size = cfg.getint('visualization', 'circle_size')
         return
 
     # @staticmethod
@@ -747,7 +749,7 @@ class Tracker(object):
         if not self.nix_io:
             DataWriter.write_ascii(output_file_name + ".txt", times, self.all_pos_original, self.all_oris,
                                    self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
-                                   self.number_relevant_contours_per_frame, self.roi, params)
+                                   self.number_relevant_contours_per_frame, self.roi, self.frame_counter, params)
         else:
             DataWriter.write_nix(output_file_name + ".h5", times, self.all_pos_original, self.all_oris, 
                                  self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
@@ -826,7 +828,7 @@ class DataWriter(object):
             out_file.write(" " * spacing)
 
     @staticmethod
-    def write_ascii(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
+    def write_ascii(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, frame_count, parameters):
         """
          save data to text file
         """
@@ -839,7 +841,7 @@ class DataWriter(object):
         for p in position:
             if p is None:
                 none_count += 1
-        # FIXME the starting area x2 is missing?
+
         output_file = open(file_name, 'w')
         output_file.write("# Tracking parameters:\n")
         output_file.write("#     Region of Interest X-Axis         : [" + str(roi.x1) + "," + str(roi.x2) + "]\n")
@@ -848,8 +850,8 @@ class DataWriter(object):
         output_file.write("#     Start orientation                 : " + str(parameters['start ori']) + "\n")
         output_file.write("#     Fish starting area X-Axis factor1 : " + str(parameters['starting area x1']) + "\n")
         output_file.write("#     Fish starting area X-Axis factor2 : " + str(parameters['starting area x2']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor 1: " + str(parameters['starting area y1']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor 2: " + str(parameters['starting area y2']) + "\n")
+        output_file.write("#     Fish starting area Y-Axis factor1 : " + str(parameters['starting area y1']) + "\n")
+        output_file.write("#     Fish starting area Y-Axis factor2 : " + str(parameters['starting area y2']) + "\n")
         output_file.write("#\n")
         output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
         if none_count > 0:
@@ -865,7 +867,7 @@ class DataWriter(object):
             output_file.write(t)
             output_file.write(" " * spacing)
 
-            if i >= len(times):
+            if i >= frame_count:
                 return
             DataWriter.write_position(position[i][0] - roi.x1 if position[i] is not None else None, output_file, spacing) # x position roi
             DataWriter.write_position(position[i][1] - roi.y1 if position[i] is not None else None, output_file, spacing) # y position roi
