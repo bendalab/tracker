@@ -618,6 +618,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         return
 
     def preset_options(self):
+        self.lnEdit_output_path.setText("no function yet :/")
+
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
         self.cbx_enable_nix_output.setChecked(self.tracker.nix_io)
@@ -670,6 +672,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     # TODO finish connecting!
     def connect_widgets(self):
         self.btn_browse_file.clicked.connect(self.browse_file)
+        self.btn_browse_output.clicked.connect(self.set_output_directory)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.abort_tracking)
 
@@ -716,6 +719,10 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.display_roi_preview()
         # self.display_starting_area_preview()
 
+    def set_output_directory(self):
+        self.lnEdit_output_path.setText("output folder selection not working yet, sorry! :/")
+        # TODO
+        return
 
     def set_tracker_video_file(self):
         self.track_file = self.lnEdit_file_path.text()
