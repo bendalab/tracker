@@ -464,7 +464,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # spinbox
         self.spinBox_circle_size = QtGui.QSpinBox(self.tab_visual)
         self.spinBox_circle_size.setMinimum(1)
-        self.spinBox_circle_size.setMaximum(25)
+        self.spinBox_circle_size.setMaximum(10)
         self.spinBox_circle_size.setObjectName(_fromUtf8("spinBox_circle_size"))
         self.gridLO_data_visual.addWidget(self.spinBox_circle_size, 2, 1, 1, 1)
         # label circle color
@@ -682,7 +682,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_ellipse)
 
         self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.change_lineend_offset)
-        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), self.change_circle_size())
+        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), self.change_circle_size)
 
     def browse_file(self):
         self.roi_preview_displayed = False
