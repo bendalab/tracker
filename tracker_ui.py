@@ -644,8 +644,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
         # data visualisation
         self.spinBox_lineend_offset.setValue(self.tracker.lineend_offset)
-        # TODO
-        # self.spinBox_circle_size.setValue(self.tracker.draw_circle_size)
+        self.spinBox_circle_size.setValue(self.tracker.circle_size)
 
     # TODO finish connecting!
     def connect_widgets(self):
