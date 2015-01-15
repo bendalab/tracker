@@ -109,7 +109,25 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_2.setObjectName(_fromUtf8("line_2"))
         self.vertLO_tab_file.addWidget(self.line_2)
-        # checkbox nix output TODO checkbox, preset, connect
+        # label output path
+        self.lbl_output_path = QtGui.QLabel(self.tab_file)
+        self.lbl_output_path.setObjectName(_fromUtf8("lbl_output_path"))
+        self.vertLO_tab_file.addWidget(self.lbl_output_path)
+        # TODO line edit output path
+        self.lnEdit_output_path = QtGui.QLineEdit(self.tab_file)
+        self.lnEdit_output_path.setObjectName(_fromUtf8("lnEdit_output_path"))
+        self.vertLO_tab_file.addWidget(self.lnEdit_output_path)
+        # TODO button browse output folder
+        self.btn_browse_output = QtGui.QPushButton(self.tab_file)
+        self.btn_browse_output.setObjectName(_fromUtf8("btn_browse_file"))
+        self.vertLO_tab_file.addWidget(self.btn_browse_output)
+        # line
+        self.line_2_1 = QtGui.QFrame(self.tab_file)
+        self.line_2_1.setFrameShape(QtGui.QFrame.HLine)
+        self.line_2_1.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_2_1.setObjectName(_fromUtf8("line_2_1"))
+        self.vertLO_tab_file.addWidget(self.line_2_1)
+        # checkbox nix output
         self.cbx_enable_nix_output = QtGui.QCheckBox(self.tab_file)
         self.cbx_enable_nix_output.setObjectName(_fromUtf8("cbx_enable_nix_output"))
         self.vertLO_tab_file.addWidget(self.cbx_enable_nix_output)
@@ -538,6 +556,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
         self.lbl_file_path.setText(_translate("tracker_main_widget", "File Path", None))
         self.btn_browse_file.setText(_translate("tracker_main_widget", "Browse File", None))
+        self.lbl_output_path.setText(_translate("tracker_main_widget", "Output Path", None))
+        self.btn_browse_output.setText(_translate("tracker_main_widget", "Browse Output Folder", None))
+
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_file), _translate("tracker_main_widget", "File", None))
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
         self.lbl_roi.setText(_translate("tracker_main_widget", "Region of interest", None))
