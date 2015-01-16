@@ -29,6 +29,7 @@ class Tracker(object):
 
         self.nix_io = nix_io
         self.output_directory = ""
+        self.output_path_isset = False
         
         self.cap = ""
 
@@ -76,6 +77,7 @@ class Tracker(object):
         self.ellipse = None
         self.line = None
         self.lineend_offset = 5
+        self.circle_size = 2
         self.lx1 = 0
         self.ly1 = 0
         self.lx2 = 0
@@ -105,7 +107,7 @@ class Tracker(object):
         self.estimated_pos_original = []
         self.estimated_oris = []
 
-        # TODO import config file values
+        # import config file values
         self.will_import_config_values = True
         if self.will_import_config_values:
             self.import_config_values()
@@ -148,6 +150,8 @@ class Tracker(object):
         self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
         self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
+        self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
+        self.circle_size = cfg.getint('visualization', 'circle_size')
         return
 
     # @staticmethod
@@ -176,6 +180,17 @@ class Tracker(object):
         if len(path) > 0:
             path += '/'
         return filename, path
+
+    # TODO make it work
+    def get_output_file_and_dir(self, file_name, file_directory):
+        if not self.output_path_isset:
+            output_file_name = file_directory + file_name + "/" + file_name
+            out_dir = '/'.join(output_file_name.split('/')[:-1])
+            return output_file_name, out_dir
+        else:
+            output_file_name = self.output_directory + file_name
+            out_dir = self.output_directory
+            return output_file_name, out_dir
 
     # captures video defined by path stored in video file
     def set_video_capture(self):
@@ -508,8 +523,8 @@ class Tracker(object):
 
         for c in self.estimated_pos_roi:
             if c is not None:
-                cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), 2, (0, 0, 255))
-                cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), 2, (0, 0, 255))
+                cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self.circle_size, (0, 0, 255))
+                cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self.circle_size, (0, 0, 255))
 
     def extract_data(self):
         # create BG subtractor
@@ -625,7 +640,7 @@ class Tracker(object):
             # draw travel orientation
             if self.draw_travel_route:
                 for point in self.img_travel_route:
-                    cv2.circle(roi, point, 2, (255, 0, 0))
+                    cv2.circle(roi, point, self.circle_size, (255, 0, 0))
 
             if self.draw_original_output:
                 for coordinates in self.img_travel_orientation:
@@ -633,7 +648,7 @@ class Tracker(object):
                              (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
                 for point in self.all_pos_original:
                     if point is not None:
-                        cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), 2, (255, 0, 0))
+                        cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self.circle_size, (255, 0, 0))
 
             # show all imgs
             if self.draw_original_output:
@@ -702,9 +717,6 @@ class Tracker(object):
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
-        # cv2.namedWindow("contours")
-        # cv2.moveWindow("contours", 50, 50)
-
         self.extract_data()
         self.estimate_missing_pos()
         self.estimate_missing_ori()
@@ -713,20 +725,13 @@ class Tracker(object):
         # self.print_data()
         self.check_frames_missing_fish()
 
-        # cv2.namedWindow("result")
-        # cv2.moveWindow("result", 200, 350)
-        # cv2.imshow("result", self.last_frame)
-
-        # if SAVE_FRAMES:
-        #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_estimation" + ".jpg", last_frame)
-
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
-            print "d1"
             return
 
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
-        output_file_name = file_directory + file_name + "/" + file_name
+        output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
+
         params = {}
         params['fish size'] = self.fish_size_threshold
         params['start ori'] = self.start_ori
@@ -735,10 +740,14 @@ class Tracker(object):
         params['starting area y1'] = self.starting_area_y1_factor
         params['starting area y2'] = self.starting_area_y2_factor
         params['source file'] = self.video_file
+
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
         if not self.nix_io:
             DataWriter.write_ascii(output_file_name + ".txt", times, self.all_pos_original, self.all_oris,
                                    self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
-                                   self.number_relevant_contours_per_frame, self.roi, params)
+                                   self.number_relevant_contours_per_frame, self.roi, self.frame_counter, params)
         else:
             DataWriter.write_nix(output_file_name + ".h5", times, self.all_pos_original, self.all_oris, 
                                  self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
@@ -817,20 +826,20 @@ class DataWriter(object):
             out_file.write(" " * spacing)
 
     @staticmethod
-    def write_ascii(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
+    def write_ascii(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, frame_count, parameters):
         """
          save data to text file
         """
         spacing = 4
-        out_dir = '/'.join(file_name.split('/')[:-1])
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        # out_dir = '/'.join(file_name.split('/')[:-1])
+        # if not os.path.exists(out_dir):
+        #     os.makedirs(out_dir)
         
         none_count = 0
         for p in position:
             if p is None:
                 none_count += 1
-        # FIXME the starting area x2 is missing?
+
         output_file = open(file_name, 'w')
         output_file.write("# Tracking parameters:\n")
         output_file.write("#     Region of Interest X-Axis         : [" + str(roi.x1) + "," + str(roi.x2) + "]\n")
@@ -839,8 +848,8 @@ class DataWriter(object):
         output_file.write("#     Start orientation                 : " + str(parameters['start ori']) + "\n")
         output_file.write("#     Fish starting area X-Axis factor1 : " + str(parameters['starting area x1']) + "\n")
         output_file.write("#     Fish starting area X-Axis factor2 : " + str(parameters['starting area x2']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor 1: " + str(parameters['starting area y1']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor 2: " + str(parameters['starting area y2']) + "\n")
+        output_file.write("#     Fish starting area Y-Axis factor1 : " + str(parameters['starting area y1']) + "\n")
+        output_file.write("#     Fish starting area Y-Axis factor2 : " + str(parameters['starting area y2']) + "\n")
         output_file.write("#\n")
         output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
         if none_count > 0:
@@ -856,7 +865,7 @@ class DataWriter(object):
             output_file.write(t)
             output_file.write(" " * spacing)
 
-            if i >= len(times):
+            if i >= frame_count:
                 return
             DataWriter.write_position(position[i][0] - roi.x1 if position[i] is not None else None, output_file, spacing) # x position roi
             DataWriter.write_position(position[i][1] - roi.y1 if position[i] is not None else None, output_file, spacing) # y position roi
