@@ -9,10 +9,10 @@ import os
 import argparse
 import ConfigParser
 import collections
-
+from IPython import embed
 
 class Tracker(object):
-    def __init__(self, path=None, nix_io=False):
+    def __init__(self, path=None, nix_io=False, wait_time=50):
         # program data
         self.ui_mode_on = False
         self.ui_abort_button_pressed = False
@@ -34,7 +34,10 @@ class Tracker(object):
         self.cap = ""
 
         self.save_frames = False
-        self.frame_waittime = 50
+        if wait_time > 0:
+            self.frame_waittime = wait_time
+        else:
+            self.frame_waittime = 50
 
         self.frame_counter = 0
 
@@ -669,7 +672,6 @@ class Tracker(object):
 
             self.last_frame = roi
             self.last_frame_OV_output = frame_output
-
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break
             if self.ui_abort_button_pressed:
@@ -920,6 +922,8 @@ class DataWriter(object):
             if d is not None:
                 valid.append(d)
                 stamps.append(t)
+        if len(valid) == 0:
+            return
         # check if valid data is tuple
         if len(valid) > 0 and isinstance(valid[0], tuple):
             d = np.zeros((len(valid), len(valid[0])))
@@ -946,6 +950,11 @@ class DataWriter(object):
             dim.label = 'time'
             dim.unit = 's'
             return array
+    
+    @staticmethod
+    def append_sources(entity, sources):
+        if entity is not None and hasattr(entity, "sources"):
+            entity.sources.extend(sources)
 
     @staticmethod
     def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
@@ -990,30 +999,23 @@ class DataWriter(object):
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
-        
         a = DataWriter.save_trace(time_stamps, position, block, 'positions', 'nix.irregular_sampled.coordinates', label='position')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
         
         a = DataWriter.save_trace(time_stamps, est_position, block, 'estimated positions', 'nix.irregular_sampled.coordinates', label='position')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
 
         a = DataWriter.save_trace(time_stamps, orientation, block, 'orientations', 'nix.irregular_sampled', label='orientation')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
 
         a = DataWriter.save_trace(time_stamps, est_orientation, block, 'estimated_orientations', 'nix.irregular_sampled', label='orientation')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
-        
+        DataWriter.append_sources(a, [movie_source, tracking_source])
+
         a = DataWriter.save_trace(time_stamps, object_count, block, 'object count', 'nix.irregular_sampled', label='count')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
-        
+        DataWriter.append_sources(a, [movie_source, tracking_source])
+
         a = DataWriter.save_trace(time_stamps, fish_object_count, block, 'fish object count', 'nix.irregular_sampled', label='count')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
 
         # TODO need more metadata like info about the subject, who, when, where etc. 
         # TODO If we support this (and we should suupport this) in the gui, we probably need a more elaborate DataWriter class!
@@ -1025,10 +1027,12 @@ if __name__ == '__main__':
     parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
     parser.add_argument('-n', '--nix_output', type=bool, default=False,
                         help="output tracking results to nix file")
-
+    parser.add_argument('-w', '--wait_time', type=int, default=50,
+                        help="display time of wach frame in ms.")
+    
     args = parser.parse_args()
     if not os.path.exists(args.path):
         print('File does not exist!')
         exit()
-    tr = Tracker(args.path, args.nix_output)
+    tr = Tracker(args.path, args.nix_output, args.wait_time)
     tr.run()
