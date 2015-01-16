@@ -42,6 +42,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.last_selected_folder = "/home"
 
         self.output_directory = ""
+        self.output_is_input = False
 
         self.connect_widgets()
         self.set_shortcuts()
@@ -115,11 +116,15 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_output_path = QtGui.QLabel(self.tab_file)
         self.lbl_output_path.setObjectName(_fromUtf8("lbl_output_path"))
         self.vertLO_tab_file.addWidget(self.lbl_output_path)
-        # TODO line edit output path
+        # checkbox output is input
+        self.cbx_output_is_input = QtGui.QCheckBox(self.tab_file)
+        self.cbx_output_is_input.setObjectName(_fromUtf8("cbx_output_is_input"))
+        self.vertLO_tab_file.addWidget(self.cbx_output_is_input)
+        # line edit output path
         self.lnEdit_output_path = QtGui.QLineEdit(self.tab_file)
         self.lnEdit_output_path.setObjectName(_fromUtf8("lnEdit_output_path"))
         self.vertLO_tab_file.addWidget(self.lnEdit_output_path)
-        # TODO button browse output folder
+        # button browse output folder
         self.btn_browse_output = QtGui.QPushButton(self.tab_file)
         self.btn_browse_output.setObjectName(_fromUtf8("btn_browse_file"))
         self.vertLO_tab_file.addWidget(self.btn_browse_output)
@@ -557,9 +562,11 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     def retranslateUi(self, tracker_main_widget):
         tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
         self.lbl_file_path.setText(_translate("tracker_main_widget", "File Path", None))
+        self.cbx_output_is_input.setText(_translate("tracker_main_widget", "Save in Input Directory", None))
         self.btn_browse_file.setText(_translate("tracker_main_widget", "Browse File", None))
         self.lbl_output_path.setText(_translate("tracker_main_widget", "Output Path", None))
         self.btn_browse_output.setText(_translate("tracker_main_widget", "Browse Output Folder", None))
+        self.cbx_enable_nix_output.setText(_translate("tracker_main_widget", "Enable Output to NIX file", None))
 
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_file), _translate("tracker_main_widget", "File", None))
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
@@ -578,7 +585,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_start_orientation.setText(_translate("tracker_main_widget", "Starting Orientation", None))
         self.lbl_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection min Size Threshold", None))
         self.lbl_max_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection max Size Threshold", None))
-        self.cbx_enable_nix_output.setText(_translate("tracker_main_widget", "Enable Output to NIX file", None))
         self.cbx_enable_max_size_thresh.setText(_translate("tracker_main_widget", "Enable max Size Threshold", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_adv), _translate("tracker_main_widget", "Advanced", None))
         self.lbl_img_morphing.setText(_translate("tracker_main_widget", "Image Morphing", None))
@@ -677,6 +683,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.btn_abort_tracking.clicked.connect(self.abort_tracking)
 
         self.connect(self.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_nix_output)
+        self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), self.change_output_is_input)
 
         self.connect(self.spinBox_x_start, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
         self.connect(self.spinBox_x_end, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
@@ -720,6 +727,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # self.display_starting_area_preview()
 
     def browse_output_directory(self):
+        if self.output_is_input:
+            self.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
+            return
         dial = QtGui.QFileDialog()
         dial.setFileMode(QtGui.QFileDialog.Directory)
         dial.setViewMode(QtGui.QFileDialog.List)
@@ -734,8 +744,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.set_last_selected_folder(self.track_file)
 
     def set_output_directory(self):
-        self.output_directory = str(self.lnEdit_output_path.text())
-        self.tracker.set_output_path(self.output_directory)
+        if not self.output_is_input:
+            self.output_directory = str(self.lnEdit_output_path.text())
+            self.tracker.set_output_path(self.output_directory)
 
     def set_last_selected_folder(self, path_string):
         slash_pos = 0
@@ -799,6 +810,13 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def change_enable_nix_output(self):
         self.tracker.nix_io = self.cbx_enable_nix_output.isChecked()
+
+    def change_output_is_input(self):
+        checked = self.cbx_output_is_input.isChecked()
+        if checked:
+            self.tracker.unset_output_path()
+            self.lnEdit_output_path.setText("Output = Input Folder")
+        self.output_is_input = checked
 
     def change_roi_values(self):
         self.tracker.roi.x1 = self.spinBox_x_start.value()
@@ -907,15 +925,17 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         if self.track_file == "":
             self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
             return
-        if self.output_directory == "":
-            self.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
-            return
+        if not self.output_is_input:
+            if self.output_directory == "":
+                self.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
+                return
         if not os.path.exists(self.track_file):
             self.lnEdit_file_path.setText(self.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
             return
-        if not os.path.exists(self.output_directory):
-            self.lnEdit_output_path.setText(self.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
-            return
+        if not self.output_is_input:
+            if not os.path.exists(self.output_directory):
+                self.lnEdit_output_path.setText(self.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+                return
         self.tracker.run()
         self.set_new_tracker()
         self.preset_options() # make sure options match tracker-object (esp. nix-output option)
