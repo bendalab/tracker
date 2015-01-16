@@ -185,8 +185,8 @@ class Tracker(object):
             out_dir = '/'.join(output_file_name.split('/')[:-1])
             return output_file_name, out_dir
         else:
-            output_file_name = self.output_directory + file_name
-            out_dir = self.output_directory
+            output_file_name = self.output_directory + file_name + "/" + file_name
+            out_dir = '/'.join(output_file_name.split('/')[:-1])
             return output_file_name, out_dir
 
     # captures video defined by path stored in video file
@@ -750,7 +750,7 @@ class Tracker(object):
             DataWriter.write_nix(output_file_name + ".h5", times, self.all_pos_original, self.all_oris, 
                                  self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
                                  self.number_relevant_contours_per_frame, self.roi, params)
-        cv2.imwrite(file_directory + file_name + "/" + file_name + "_OV_path.png", self.last_frame_OV_output)
+        cv2.imwrite(output_file_name + "_OV_path.png", self.last_frame_OV_output)
 
         self.check_data_integrity()
 
