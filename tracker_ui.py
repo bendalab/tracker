@@ -41,6 +41,8 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.track_file = ""
         self.last_selected_folder = "/home"
 
+        self.output_directory = ""
+
         self.connect_widgets()
         self.set_shortcuts()
 
@@ -618,8 +620,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         return
 
     def preset_options(self):
-        self.lnEdit_output_path.setText("no function yet :/")
-
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
         self.cbx_enable_nix_output.setChecked(self.tracker.nix_io)
@@ -672,7 +672,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
     # TODO finish connecting!
     def connect_widgets(self):
         self.btn_browse_file.clicked.connect(self.browse_file)
-        self.btn_browse_output.clicked.connect(self.set_output_directory)
+        self.btn_browse_output.clicked.connect(self.browse_output_directory)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.abort_tracking)
 
@@ -719,15 +719,23 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.display_roi_preview()
         # self.display_starting_area_preview()
 
-    def set_output_directory(self):
-        self.lnEdit_output_path.setText("output folder selection not working yet, sorry! :/")
-        # TODO
+    def browse_output_directory(self):
+        dial = QtGui.QFileDialog()
+        dial.setFileMode(QtGui.QFileDialog.Directory)
+        dial.setViewMode(QtGui.QFileDialog.List)
+        if dial.exec_():
+            self.output_directory = dial.selectedFiles()[0] + "/"
+        self.lnEdit_output_path.setText(self.output_directory)
         return
 
     def set_tracker_video_file(self):
         self.track_file = self.lnEdit_file_path.text()
         self.tracker.video_file = str(self.track_file) # FIXME you should make video_file a property in Tracker
         self.set_last_selected_folder(self.track_file)
+
+    def set_output_directory(self):
+        self.output_directory = str(self.lnEdit_output_path.text())
+        self.tracker.set_output_path(self.output_directory)
 
     def set_last_selected_folder(self, path_string):
         slash_pos = 0
@@ -894,12 +902,16 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 
     def start_tracking(self):
         self.set_tracker_video_file()
+        self.set_output_directory()
         self.write_cfg_file()
         if self.track_file == "":
             self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
             return
         if not os.path.exists(self.track_file):
             self.lnEdit_file_path.setText(self.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
+            return
+        if not os.path.exists(self.output_directory):
+            self.lnEdit_output_path.setText(self.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
             return
         self.tracker.run()
         self.set_new_tracker()
