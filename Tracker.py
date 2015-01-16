@@ -166,6 +166,14 @@ class Tracker(object):
         else:
             return
 
+    def set_output_path(self, path):
+        self.output_directory = path
+        self.output_path_isset = True
+
+    def unset_output_path(self):
+        self.output_directory = ""
+        self.output_path_isset = False
+
     def check_if_necessary_files_exist(self):
         if not os.path.exists(self.video_file):
             sys.exit("ERROR: Video File does not exist - Tracking aborted")
@@ -933,6 +941,7 @@ class DataWriter(object):
             array.label = label
             if unit is not None:
                 array.unit = unit
+            print len(stamps)
             dim = array.append_range_dimension(stamps)
             dim.label = 'time'
             dim.unit = 's'
