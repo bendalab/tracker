@@ -9,7 +9,7 @@ import os
 import argparse
 import ConfigParser
 import collections
-
+from IPython import embed
 
 class Tracker(object):
     def __init__(self, path=None, nix_io=False, wait_time=50):
@@ -914,6 +914,8 @@ class DataWriter(object):
             if d is not None:
                 valid.append(d)
                 stamps.append(t)
+        if len(valid) == 0:
+            return
         # check if valid data is tuple
         if len(valid) > 0 and isinstance(valid[0], tuple):
             d = np.zeros((len(valid), len(valid[0])))
@@ -939,6 +941,11 @@ class DataWriter(object):
             dim.label = 'time'
             dim.unit = 's'
             return array
+    
+    @staticmethod
+    def append_sources(entity, sources):
+        if entity is not None and hasattr(entity, "sources"):
+            entity.sources.extend(sources)
 
     @staticmethod
     def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
@@ -983,30 +990,23 @@ class DataWriter(object):
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
-        
         a = DataWriter.save_trace(time_stamps, position, block, 'positions', 'nix.irregular_sampled.coordinates', label='position')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
         
         a = DataWriter.save_trace(time_stamps, est_position, block, 'estimated positions', 'nix.irregular_sampled.coordinates', label='position')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
 
         a = DataWriter.save_trace(time_stamps, orientation, block, 'orientations', 'nix.irregular_sampled', label='orientation')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
 
         a = DataWriter.save_trace(time_stamps, est_orientation, block, 'estimated_orientations', 'nix.irregular_sampled', label='orientation')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
-        
+        DataWriter.append_sources(a, [movie_source, tracking_source])
+
         a = DataWriter.save_trace(time_stamps, object_count, block, 'object count', 'nix.irregular_sampled', label='count')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
-        
+        DataWriter.append_sources(a, [movie_source, tracking_source])
+
         a = DataWriter.save_trace(time_stamps, fish_object_count, block, 'fish object count', 'nix.irregular_sampled', label='count')
-        a.sources.append(movie_source)
-        a.sources.append(tracking_source)
+        DataWriter.append_sources(a, [movie_source, tracking_source])
 
         # TODO need more metadata like info about the subject, who, when, where etc. 
         # TODO If we support this (and we should suupport this) in the gui, we probably need a more elaborate DataWriter class!
