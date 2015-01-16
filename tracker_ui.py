@@ -907,6 +907,9 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         if self.track_file == "":
             self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
             return
+        if self.output_directory == "":
+            self.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
+            return
         if not os.path.exists(self.track_file):
             self.lnEdit_file_path.setText(self.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
             return
