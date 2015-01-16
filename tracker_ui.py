@@ -181,37 +181,37 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.spinBox_roi_x1.setMaximum(9999)
         self.spinBox_roi_x1.setObjectName(_fromUtf8("spinBox_x_start"))
         self.gridLO_set_roi.addWidget(self.spinBox_roi_x1, 0, 1, 1, 1)
-        # label y end
-        self.lbl_roi_y_end = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_y_end.setObjectName(_fromUtf8("lbl_roi_y_end"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_y_end, 1, 2, 1, 1)
-        # spin box y end
-        self.spinBox_roi_y2 = QtGui.QSpinBox(self.tab_roi)
-        self.spinBox_roi_y2.setMaximum(9999)
-        self.spinBox_roi_y2.setObjectName(_fromUtf8("spinBox_y_end"))
-        self.gridLO_set_roi.addWidget(self.spinBox_roi_y2, 1, 3, 1, 1)
-        # spin box y start
-        self.spinBox_roi_y1 = QtGui.QSpinBox(self.tab_roi)
-        self.spinBox_roi_y1.setMaximum(9999)
-        self.spinBox_roi_y1.setObjectName(_fromUtf8("spinBox_y_start"))
-        self.gridLO_set_roi.addWidget(self.spinBox_roi_y1, 1, 1, 1, 1)
-        # label x end
-        self.lbl_roi_x_end = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_x_end.setObjectName(_fromUtf8("lbl_roi_x_end"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_x_end, 0, 2, 1, 1)
-        # label x start
-        self.lbl_roi_x_start = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_x_start.setObjectName(_fromUtf8("lbl_roi_x_start"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_x_start, 0, 0, 1, 1)
-        # label y start
-        self.lbl_roi_y_start = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_y_start.setObjectName(_fromUtf8("lbl_roi_y_start"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_y_start, 1, 0, 1, 1)
         # spin box x end
         self.spinBox_roi_x2 = QtGui.QSpinBox(self.tab_roi)
         self.spinBox_roi_x2.setMaximum(9999)
         self.spinBox_roi_x2.setObjectName(_fromUtf8("spinBox_x_end"))
         self.gridLO_set_roi.addWidget(self.spinBox_roi_x2, 0, 3, 1, 1)
+        # spin box y start
+        self.spinBox_roi_y1 = QtGui.QSpinBox(self.tab_roi)
+        self.spinBox_roi_y1.setMaximum(9999)
+        self.spinBox_roi_y1.setObjectName(_fromUtf8("spinBox_y_start"))
+        self.gridLO_set_roi.addWidget(self.spinBox_roi_y1, 1, 1, 1, 1)
+        # spin box y end
+        self.spinBox_roi_y2 = QtGui.QSpinBox(self.tab_roi)
+        self.spinBox_roi_y2.setMaximum(9999)
+        self.spinBox_roi_y2.setObjectName(_fromUtf8("spinBox_y_end"))
+        self.gridLO_set_roi.addWidget(self.spinBox_roi_y2, 1, 3, 1, 1)
+        # label x start
+        self.lbl_roi_x_start = QtGui.QLabel(self.tab_roi)
+        self.lbl_roi_x_start.setObjectName(_fromUtf8("lbl_roi_x_start"))
+        self.gridLO_set_roi.addWidget(self.lbl_roi_x_start, 0, 0, 1, 1)
+        # label x end
+        self.lbl_roi_x_end = QtGui.QLabel(self.tab_roi)
+        self.lbl_roi_x_end.setObjectName(_fromUtf8("lbl_roi_x_end"))
+        self.gridLO_set_roi.addWidget(self.lbl_roi_x_end, 0, 2, 1, 1)
+        # label y start
+        self.lbl_roi_y_start = QtGui.QLabel(self.tab_roi)
+        self.lbl_roi_y_start.setObjectName(_fromUtf8("lbl_roi_y_start"))
+        self.gridLO_set_roi.addWidget(self.lbl_roi_y_start, 1, 0, 1, 1)
+        # label y end
+        self.lbl_roi_y_end = QtGui.QLabel(self.tab_roi)
+        self.lbl_roi_y_end.setObjectName(_fromUtf8("lbl_roi_y_end"))
+        self.gridLO_set_roi.addWidget(self.lbl_roi_y_end, 1, 2, 1, 1)
         # add grid_layout_set_roi to vertical layout of tab
         self.vertLO_tab_roi.addLayout(self.gridLO_set_roi)
         # line
@@ -280,16 +280,30 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # grid layout set starting area
         self.gridLO_start_area = QtGui.QGridLayout()
         self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
-        # spinbox starting_x end
-        self.spinBox_starting_x2_factor = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_x2_factor.setMaximum(100)
-        self.spinBox_starting_x2_factor.setObjectName(_fromUtf8("spinBox_starting_x_end"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_x2_factor, 0, 3, 1, 1)
         # spinbox starting_x start
         self.spinBox_starting_x1_factor = QtGui.QSpinBox(self.tab_adv)
         self.spinBox_starting_x1_factor.setMaximum(100)
         self.spinBox_starting_x1_factor.setObjectName(_fromUtf8("spinBox_starting_x_start"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_x1_factor, 0, 1, 1, 1)
+        # spinbox starting_x end
+        self.spinBox_starting_x2_factor = QtGui.QSpinBox(self.tab_adv)
+        self.spinBox_starting_x2_factor.setMaximum(100)
+        self.spinBox_starting_x2_factor.setObjectName(_fromUtf8("spinBox_starting_x_end"))
+        self.gridLO_start_area.addWidget(self.spinBox_starting_x2_factor, 0, 3, 1, 1)
+        # spinbox starting_y start
+        self.spinBox_starting_y1_factor = QtGui.QSpinBox(self.tab_adv)
+        self.spinBox_starting_y1_factor.setMaximum(100)
+        self.spinBox_starting_y1_factor.setObjectName(_fromUtf8("spinBox_starting_y_start"))
+        self.gridLO_start_area.addWidget(self.spinBox_starting_y1_factor, 1, 1, 1, 1)
+        # spinbox starting_y end
+        self.spinBox_starting_y2_factor = QtGui.QSpinBox(self.tab_adv)
+        self.spinBox_starting_y2_factor.setMaximum(100)
+        self.spinBox_starting_y2_factor.setObjectName(_fromUtf8("spinBox_starting_y_end"))
+        self.gridLO_start_area.addWidget(self.spinBox_starting_y2_factor, 1, 3, 1, 1)
+        # label starting_x start
+        self.lbl_start_x_start = QtGui.QLabel(self.tab_adv)
+        self.lbl_start_x_start.setObjectName(_fromUtf8("lbl_start_x_start"))
+        self.gridLO_start_area.addWidget(self.lbl_start_x_start, 0, 0, 1, 1)
         # label starting_x end
         self.lbl_start_x_end = QtGui.QLabel(self.tab_adv)
         self.lbl_start_x_end.setObjectName(_fromUtf8("lbl_start_x_end"))
@@ -302,20 +316,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_start_y_end = QtGui.QLabel(self.tab_adv)
         self.lbl_start_y_end.setObjectName(_fromUtf8("lbl_start_y_end"))
         self.gridLO_start_area.addWidget(self.lbl_start_y_end, 1, 2, 1, 1)
-        # spinbox starting_y end
-        self.spinBox_starting_y2_factor = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_y2_factor.setMaximum(100)
-        self.spinBox_starting_y2_factor.setObjectName(_fromUtf8("spinBox_starting_y_end"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_y2_factor, 1, 3, 1, 1)
-        # spinbox starting_y start
-        self.spinBox_starting_y1_factor = QtGui.QSpinBox(self.tab_adv)
-        self.spinBox_starting_y1_factor.setMaximum(100)
-        self.spinBox_starting_y1_factor.setObjectName(_fromUtf8("spinBox_starting_y_start"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_y1_factor, 1, 1, 1, 1)
-        # label starting_x start
-        self.lbl_start_x_start = QtGui.QLabel(self.tab_adv)
-        self.lbl_start_x_start.setObjectName(_fromUtf8("lbl_start_x_start"))
-        self.gridLO_start_area.addWidget(self.lbl_start_x_start, 0, 0, 1, 1)
         # add starting are selection grid layout to tab layout
         self.vertLO_tab_adv.addLayout(self.gridLO_start_area)
         # line
@@ -416,16 +416,16 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_dilation = QtGui.QLabel(self.tab_visual)
         self.lbl_dilation.setObjectName(_fromUtf8("lbl_dilation"))
         self.gridLO_img_morphing.addWidget(self.lbl_dilation, 4, 1, 1, 1)
-        # spinbox set dilation factor
-        self.spinBox_dilation = QtGui.QSpinBox(self.tab_visual)
-        self.spinBox_dilation.setMinimum(0)
-        self.spinBox_dilation.setObjectName(_fromUtf8("spinBox_dilation"))
-        self.gridLO_img_morphing.addWidget(self.spinBox_dilation, 4, 2, 1, 1)
         # spinbox set erosion factor
         self.spinBox_erosion = QtGui.QSpinBox(self.tab_visual)
         self.spinBox_erosion.setMinimum(0)
         self.spinBox_erosion.setObjectName(_fromUtf8("spinBox_erosion"))
         self.gridLO_img_morphing.addWidget(self.spinBox_erosion, 1, 2, 1, 1)
+        # spinbox set dilation factor
+        self.spinBox_dilation = QtGui.QSpinBox(self.tab_visual)
+        self.spinBox_dilation.setMinimum(0)
+        self.spinBox_dilation.setObjectName(_fromUtf8("spinBox_dilation"))
+        self.gridLO_img_morphing.addWidget(self.spinBox_dilation, 4, 2, 1, 1)
         # add grid layout image morphing
         self.vertLO_tab_visual.addLayout(self.gridLO_img_morphing)
         # line
@@ -482,16 +482,26 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         # label data visualisation
         self.gridLO_data_visual = QtGui.QGridLayout()
         self.gridLO_data_visual.setObjectName(_fromUtf8("gridLO_data_visual"))
-        # button set circle color
-        self.btn_set_circle_color = QtGui.QPushButton(self.tab_visual)
-        self.btn_set_circle_color.setObjectName(_fromUtf8("btn_set_circle_color"))
-        self.gridLO_data_visual.addWidget(self.btn_set_circle_color, 4, 1, 1, 1)
+        # spinbox linend offset
+        self.spinBox_lineend_offset = QtGui.QSpinBox(self.tab_visual)
+        self.spinBox_lineend_offset.setMinimum(1)
+        self.spinBox_lineend_offset.setMaximum(20)
+        self.spinBox_lineend_offset.setObjectName(_fromUtf8("spinBox_lineend_offset"))
+        self.gridLO_data_visual.addWidget(self.spinBox_lineend_offset, 1, 1, 1, 1)
         # spinbox
         self.spinBox_circle_size = QtGui.QSpinBox(self.tab_visual)
         self.spinBox_circle_size.setMinimum(1)
         self.spinBox_circle_size.setMaximum(10)
         self.spinBox_circle_size.setObjectName(_fromUtf8("spinBox_circle_size"))
         self.gridLO_data_visual.addWidget(self.spinBox_circle_size, 2, 1, 1, 1)
+        # button set line color
+        self.btn_set_line_color = QtGui.QPushButton(self.tab_visual)
+        self.btn_set_line_color.setObjectName(_fromUtf8("btn_set_line_color"))
+        self.gridLO_data_visual.addWidget(self.btn_set_line_color, 3, 1, 1, 1)
+        # button set circle color
+        self.btn_set_circle_color = QtGui.QPushButton(self.tab_visual)
+        self.btn_set_circle_color.setObjectName(_fromUtf8("btn_set_circle_color"))
+        self.gridLO_data_visual.addWidget(self.btn_set_circle_color, 4, 1, 1, 1)
         # label circle color
         self.lbl_circ_color = QtGui.QLabel(self.tab_visual)
         self.lbl_circ_color.setObjectName(_fromUtf8("lbl_circ_color"))
@@ -504,16 +514,6 @@ class Ui_tracker_main_widget(QtGui.QWidget):
         self.lbl_line_offset = QtGui.QLabel(self.tab_visual)
         self.lbl_line_offset.setObjectName(_fromUtf8("lbl_line_offset"))
         self.gridLO_data_visual.addWidget(self.lbl_line_offset, 1, 0, 1, 1)
-        # button set line color
-        self.btn_set_line_color = QtGui.QPushButton(self.tab_visual)
-        self.btn_set_line_color.setObjectName(_fromUtf8("btn_set_line_color"))
-        self.gridLO_data_visual.addWidget(self.btn_set_line_color, 3, 1, 1, 1)
-        # spinbox linend offset
-        self.spinBox_lineend_offset = QtGui.QSpinBox(self.tab_visual)
-        self.spinBox_lineend_offset.setMinimum(1)
-        self.spinBox_lineend_offset.setMaximum(20)
-        self.spinBox_lineend_offset.setObjectName(_fromUtf8("spinBox_lineend_offset"))
-        self.gridLO_data_visual.addWidget(self.spinBox_lineend_offset, 1, 1, 1, 1)
         # label line color
         self.lbl_ln_color = QtGui.QLabel(self.tab_visual)
         self.lbl_ln_color.setObjectName(_fromUtf8("lbl_ln_color"))
