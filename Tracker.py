@@ -208,7 +208,7 @@ class Tracker(object):
     def draw_ellipse(self):
         return self._draw_ellipse
 
-    @draw_contour.setter
+    @draw_ellipse.setter
     def draw_ellipse(self, bool):
         self._draw_ellipse = bool
 
