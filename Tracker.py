@@ -94,7 +94,7 @@ class Tracker(object):
 
         # img output
         self._draw_contour = False
-        self.draw_ellipse = True
+        self._draw_ellipse = True
         self.draw_line = True
         self.draw_travel_orientation = True
         self.draw_travel_route = True
@@ -204,6 +204,14 @@ class Tracker(object):
     def draw_contour(self, bool):
         self._draw_contour = bool
 
+    @property
+    def draw_ellipse(self):
+        return self._draw_ellipse
+
+    @draw_contour.setter
+    def draw_ellipse(self, bool):
+        self._draw_ellipse = bool
+
 
 
     def import_config_values(self):
@@ -238,7 +246,7 @@ class Tracker(object):
         self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
         self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
         self._draw_contour = cfg.getboolean('image_processing', 'draw_contour')
-        self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
+        self._draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
         self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
         self.circle_size = cfg.getint('visualization', 'circle_size')
@@ -707,7 +715,7 @@ class Tracker(object):
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
             # draw ellipse
-            if self.draw_ellipse and self.ellipse is not None and self.fish_started:
+            if self._draw_ellipse and self.ellipse is not None and self.fish_started:
                 cv2.ellipse(roi, self.ellipse, (0, 0, 255), 2)
 
             # get line from ellipse
