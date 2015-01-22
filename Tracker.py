@@ -93,7 +93,7 @@ class Tracker(object):
         self.last_frame_OV_output = None
 
         # img output
-        self.draw_contour = False
+        self._draw_contour = False
         self.draw_ellipse = True
         self.draw_line = True
         self.draw_travel_orientation = True
@@ -196,6 +196,14 @@ class Tracker(object):
     def start_ori(self, value):
         self._start_ori = value
 
+    @property
+    def draw_contour(self):
+        return self._draw_contour
+
+    @draw_contour.setter
+    def draw_contour(self, bool):
+        self._draw_contour = bool
+
 
 
     def import_config_values(self):
@@ -229,7 +237,7 @@ class Tracker(object):
 
         self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
         self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
-        self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
+        self._draw_contour = cfg.getboolean('image_processing', 'draw_contour')
         self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
         self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
@@ -693,7 +701,7 @@ class Tracker(object):
                 self.keep_nearest_contour()
 
             # draw countours to ROI img and show img
-            if self.draw_contour:
+            if self._draw_contour:
                 cv2.drawContours(roi, self.contour_list, -1, (0, 255, 0), 3)
 
             # fit ellipse on contour
