@@ -1,3 +1,7 @@
+import collections
+import numpy as np
+
+
 class DataWriter(object):
 
     @staticmethod
