@@ -534,6 +534,15 @@ class Tracker(object):
                 cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self.circle_size, (0, 0, 255))
                 cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self.circle_size, (0, 0, 255))
 
+    def copy_original_to_est_data(self):
+        for i in range(0, self.frame_counter):
+            if self.all_pos_roi[i] is not None:
+                self.estimated_pos_roi[i] = self.all_pos_roi[i]
+            if self.all_pos_original[i] is not None:
+                self.estimated_pos_original[i] = self.all_pos_original[i]
+            if self.all_oris[i] is not None:
+                self.estimated_oris[i] = self.all_oris[i]
+
     def extract_data(self):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG2()
@@ -729,6 +738,8 @@ class Tracker(object):
         self.estimate_missing_pos()
         self.estimate_missing_ori()
         self.draw_estimated_data()
+
+        self.copy_original_to_est_data()
 
         # self.print_data()
         self.check_frames_missing_fish()
