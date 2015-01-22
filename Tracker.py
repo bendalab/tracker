@@ -67,7 +67,7 @@ class Tracker(object):
         self.all_pos_original = []
 
         self.last_ori = None
-        self.start_ori = 270
+        self._start_ori = 270
         self.all_oris = []
 
         self.fish_not_detected_count = 0
@@ -188,6 +188,14 @@ class Tracker(object):
     def starting_area_y2_factor(self, value):
         self._starting_area_y2_factor = value
 
+    @property
+    def start_ori(self):
+        return self.start_ori
+
+    @start_ori.setter
+    def start_ori(self, value):
+        self._start_ori = value
+
 
 
     def import_config_values(self):
@@ -209,7 +217,7 @@ class Tracker(object):
         self._roi.y1 = cfg.getint('roi', 'y1')
         self._roi.y2 = cfg.getint('roi', 'y2')
 
-        self.start_ori = cfg.getint('detection_values', 'start_orientation')
+        self._start_ori = cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
         self._fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
         self._enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
@@ -458,7 +466,7 @@ class Tracker(object):
             return
 
         if self.last_ori is None:
-            self.last_ori = self.start_ori
+            self.last_ori = self._start_ori
 
         if self.ellipse is None:
             return
@@ -826,7 +834,7 @@ class Tracker(object):
 
         params = {}
         params['fish size'] = self._fish_size_threshold
-        params['start ori'] = self.start_ori
+        params['start ori'] = self._start_ori
         params['starting area x1'] = self._starting_area_x1_factor
         params['starting area x2'] = self._starting_area_x2_factor
         params['starting area y1'] = self._starting_area_y1_factor
