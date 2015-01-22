@@ -52,7 +52,7 @@ class Tracker(object):
         self.contour_list = None
 
         # fish size thresholds
-        self.fish_size_threshold = 700
+        self._fish_size_threshold = 700
         self.fish_max_size_threshold = 4000
         self.enable_max_size_threshold = False
 
@@ -132,6 +132,13 @@ class Tracker(object):
     def dilation_iterations(self, value):
         self._dilation_iterations = value
 
+    @property
+    def fish_size_threshold(self):
+        return self._fish_size_threshold
+
+    @fish_size_threshold.setter
+    def fish_size_threshold(self, value):
+        self._fish_size_threshold = value
 
 
 
@@ -155,7 +162,7 @@ class Tracker(object):
         self._roi.y2 = cfg.getint('roi', 'y2')
 
         self.start_ori = cfg.getint('detection_values', 'start_orientation')
-        self.fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
+        self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
         self.fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
         self.enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
 
@@ -238,7 +245,7 @@ class Tracker(object):
 
     # # set a threshold for area. all contours with smaller area get deleted
     def del_small_contours(self):
-        area_threshold = self.fish_size_threshold
+        area_threshold = self._fish_size_threshold
         if self.contour_list is not None and len(self.contour_list) > 0:
 
             counter = 0
@@ -770,7 +777,7 @@ class Tracker(object):
         output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
 
         params = {}
-        params['fish size'] = self.fish_size_threshold
+        params['fish size'] = self._fish_size_threshold
         params['start ori'] = self.start_ori
         params['starting area x1'] = self.starting_area_x1_factor
         params['starting area x2'] = self.starting_area_x2_factor
