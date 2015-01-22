@@ -57,10 +57,10 @@ class Tracker(object):
         self._enable_max_size_threshold = False
 
         self.fish_started = False
-        self.starting_area_x1_factor = 0.85
-        self.starting_area_x2_factor = 1.00
-        self.starting_area_y1_factor = 0.30
-        self.starting_area_y2_factor = 0.70
+        self._starting_area_x1_factor = 0.85
+        self._starting_area_x2_factor = 1.00
+        self._starting_area_y1_factor = 0.30
+        self._starting_area_y2_factor = 0.70
 
         self.last_pos = None
         self.all_pos_roi = []
@@ -155,6 +155,38 @@ class Tracker(object):
     @enable_max_size_threshold.setter
     def enable_max_size_threshold(self, bool):
         self._enable_max_size_threshold = bool
+
+    @property
+    def starting_area_x1_factor(self):
+        return self._starting_area_x1_factor
+
+    @starting_area_x1_factor.setter
+    def starting_area_x1_factor(self, value):
+        self._starting_area_x1_factor = value
+
+    @property
+    def starting_area_x2_factor(self):
+        return self._starting_area_x2_factor
+
+    @starting_area_x2_factor.setter
+    def starting_area_x2_factor(self, value):
+        self._starting_area_x2_factor = value
+
+    @property
+    def starting_area_y1_factor(self):
+        return self._starting_area_y1_factor
+
+    @starting_area_y1_factor.setter
+    def starting_area_y1_factor(self, value):
+        self._starting_area_y1_factor = value
+
+    @property
+    def starting_area_y2_factor(self):
+        return self._starting_area_y2_factor
+
+    @starting_area_y2_factor.setter
+    def starting_area_y2_factor(self, value):
+        self._starting_area_y2_factor = value
 
 
 
@@ -352,10 +384,10 @@ class Tracker(object):
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
         height, width, depth = roi.shape
-        non_starting_area_x1 = int(self.starting_area_x1_factor * width)
-        non_starting_area_x2 = int(self.starting_area_x2_factor * width)
-        non_starting_area_y1 = int(self.starting_area_y1_factor * height)
-        non_starting_area_y2 = int(self.starting_area_y2_factor * height)
+        non_starting_area_x1 = int(self._starting_area_x1_factor * width)
+        non_starting_area_x2 = int(self._starting_area_x2_factor * width)
+        non_starting_area_y1 = int(self._starting_area_y1_factor * height)
+        non_starting_area_y2 = int(self._starting_area_y2_factor * height)
 
         if self.contour_list is not None:
             for i in range(0, len(self.contour_list)):
@@ -795,10 +827,10 @@ class Tracker(object):
         params = {}
         params['fish size'] = self._fish_size_threshold
         params['start ori'] = self.start_ori
-        params['starting area x1'] = self.starting_area_x1_factor
-        params['starting area x2'] = self.starting_area_x2_factor
-        params['starting area y1'] = self.starting_area_y1_factor
-        params['starting area y2'] = self.starting_area_y2_factor
+        params['starting area x1'] = self._starting_area_x1_factor
+        params['starting area x2'] = self._starting_area_x2_factor
+        params['starting area y1'] = self._starting_area_y1_factor
+        params['starting area y2'] = self._starting_area_y2_factor
         params['source file'] = self.video_file
 
         if not os.path.exists(out_dir):
