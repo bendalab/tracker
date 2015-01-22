@@ -200,6 +200,10 @@ class Tracker(object):
     def lineend_offset(self):
         return self._lineend_offset
 
+    @lineend_offset.setter
+    def lineend_offset(self, value):
+        self._lineend_offset = value
+
     @property
     def circle_size(self):
         return self._circle_size
@@ -207,10 +211,6 @@ class Tracker(object):
     @circle_size.setter
     def circle_size(self, value):
         self._circle_size = value
-
-    @lineend_offset.setter
-    def lineend_offset(self, value):
-        self._lineend_offset = value
 
     @property
     def draw_contour(self):
