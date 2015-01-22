@@ -42,11 +42,11 @@ class Tracker(object):
         self.frame_counter = 0
 
         # self.__roi = ROI(15, 695, 80, 515) # Eileen setup
-        self.__roi = ROI(160, 80, 700, 525) # Isabell setup
+        self._roi = ROI(160, 80, 700, 525) # Isabell setup
 
         # image morphing data
-        self.erosion_iterations = 1
-        self.dilation_iterations = 4
+        self._erosion_iterations = 1
+        self._dilation_iterations = 4
 
         # tracking data
         self.contour_list = None
@@ -114,7 +114,26 @@ class Tracker(object):
 
     @property
     def roi(self):
-        return self.__roi
+        return self._roi
+
+    @property
+    def erosion_iterations(self):
+        return self._erosion_iterations
+
+    @erosion_iterations.setter
+    def erosion_iterations(self, value):
+        self._erosion_iterations = value
+
+    @property
+    def dilation_iterations(self):
+        return self._dilation_iterations
+
+    @dilation_iterations.setter
+    def dilation_iterations(self, value):
+        self._dilation_iterations = value
+
+
+
 
     def import_config_values(self):
         if not self.will_import_config_values:
@@ -127,13 +146,13 @@ class Tracker(object):
         cfg_file = open('tracker.cnf')
         cfg.readfp(cfg_file)
 
-        self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
-        self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
+        self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
+        self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
         # roi
-        self.__roi.x1 = cfg.getint('roi', 'x1')
-        self.__roi.x2 = cfg.getint('roi', 'x2')
-        self.__roi.y1 = cfg.getint('roi', 'y1')
-        self.__roi.y2 = cfg.getint('roi', 'y2')
+        self._roi.x1 = cfg.getint('roi', 'x1')
+        self._roi.x2 = cfg.getint('roi', 'x2')
+        self._roi.y1 = cfg.getint('roi', 'y1')
+        self._roi.y2 = cfg.getint('roi', 'y2')
 
         self.start_ori = cfg.getint('detection_values', 'start_orientation')
         self.fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
@@ -142,8 +161,8 @@ class Tracker(object):
 
         self.frame_waittime = cfg.getint('system', 'frame_waittime')
 
-        self.erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
-        self.dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
+        self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
+        self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
         self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
         self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
@@ -189,7 +208,6 @@ class Tracker(object):
             path += '/'
         return filename, path
 
-    # TODO make it work
     def get_output_file_and_dir(self, file_name, file_directory):
         if not self.output_path_isset:
             output_file_name = file_directory + file_name + "/" + file_name
@@ -209,10 +227,10 @@ class Tracker(object):
     def morph_img(self, img):
         # erode img
         er_kernel = np.ones((4, 4), np.uint8)
-        er_img = cv2.erode(img, er_kernel, iterations=self.erosion_iterations)
+        er_img = cv2.erode(img, er_kernel, iterations=self._erosion_iterations)
         # dilate img
         di_kernel = np.ones((4, 4), np.uint8)
-        di_img = cv2.dilate(er_img, di_kernel, iterations=self.dilation_iterations)
+        di_img = cv2.dilate(er_img, di_kernel, iterations=self._dilation_iterations)
         # thresholding to black-white
         ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
         # ret, morphed_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
