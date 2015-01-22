@@ -53,8 +53,8 @@ class Tracker(object):
 
         # fish size thresholds
         self._fish_size_threshold = 700
-        self.fish_max_size_threshold = 4000
-        self.enable_max_size_threshold = False
+        self._fish_max_size_threshold = 4000
+        self._enable_max_size_threshold = False
 
         self.fish_started = False
         self.starting_area_x1_factor = 0.85
@@ -140,6 +140,22 @@ class Tracker(object):
     def fish_size_threshold(self, value):
         self._fish_size_threshold = value
 
+    @property
+    def fish_max_size_threshold(self):
+        return self._fish_max_size_threshold
+
+    @fish_max_size_threshold.setter
+    def fish_max_size_threshold(self, value):
+        self._fish_max_size_threshold = value
+
+    @property
+    def enable_max_size_threshold(self):
+        return self._enable_max_size_threshold
+
+    @enable_max_size_threshold.setter
+    def enable_max_size_threshold(self, bool):
+        self._enable_max_size_threshold = bool
+
 
 
     def import_config_values(self):
@@ -163,8 +179,8 @@ class Tracker(object):
 
         self.start_ori = cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
-        self.fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
-        self.enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
+        self._fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
+        self._enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
 
         self.frame_waittime = cfg.getint('system', 'frame_waittime')
 
@@ -260,7 +276,7 @@ class Tracker(object):
                     counter += 1
 
     def del_oversized_contours(self):
-        area_threshold = self.fish_max_size_threshold
+        area_threshold = self._fish_max_size_threshold
         if self.contour_list is not None and len(self.contour_list) > 0:
 
             counter = 0
@@ -615,7 +631,7 @@ class Tracker(object):
             self.del_small_contours()
 
             # everything above fish_size_max_threshold is being ignored
-            if self.enable_max_size_threshold:
+            if self._enable_max_size_threshold:
                 self.del_oversized_contours()
 
             # save number of remaining contours
