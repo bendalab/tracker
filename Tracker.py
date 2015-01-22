@@ -76,7 +76,7 @@ class Tracker(object):
 
         self.ellipse = None
         self.line = None
-        self.lineend_offset = 5
+        self._lineend_offset = 5
         self.circle_size = 2
         self.lx1 = 0
         self.ly1 = 0
@@ -99,8 +99,8 @@ class Tracker(object):
         self.draw_travel_orientation = True
         self.draw_travel_route = True
         self.draw_original_output = True
-        self.show_bg_sub_img = False
-        self.show_morphed_img = False
+        self._show_bg_sub_img = False
+        self._show_morphed_img = False
 
         self.estimate_missing_data = True
         self.estimated_pos_roi = []
@@ -197,21 +197,44 @@ class Tracker(object):
         self._start_ori = value
 
     @property
+    def lineend_offset(self):
+        return self._lineend_offset
+
+    @lineend_offset.setter
+    def lineend_offset(self, value):
+        self._lineend_offset = value
+
+    @property
     def draw_contour(self):
         return self._draw_contour
 
     @draw_contour.setter
-    def draw_contour(self, bool):
-        self._draw_contour = bool
+    def draw_contour(self, boo):
+        self._draw_contour = boo
 
     @property
     def draw_ellipse(self):
         return self._draw_ellipse
 
     @draw_ellipse.setter
-    def draw_ellipse(self, bool):
-        self._draw_ellipse = bool
+    def draw_ellipse(self, boo):
+        self._draw_ellipse = boo
 
+    @property
+    def show_bg_sub_img(self):
+        return self._show_bg_sub_img
+
+    @show_bg_sub_img.setter
+    def show_bg_sub_img(self, boo):
+        self._show_bg_sub_img = boo
+
+    @property
+    def show_morphed_img(self):
+        return self._show_bg_sub_img
+
+    @show_morphed_img.setter
+    def show_morphed_img(self, boo):
+        self._show_morphed_img = boo
 
 
     def import_config_values(self):
@@ -243,20 +266,20 @@ class Tracker(object):
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
-        self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
-        self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
+        self._show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
+        self._show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
         self._draw_contour = cfg.getboolean('image_processing', 'draw_contour')
         self._draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
-        self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
+        self._lineend_offset = cfg.getint('visualization', 'lineend_offset')
         self.circle_size = cfg.getint('visualization', 'circle_size')
         return
 
     # @staticmethod
     def show_imgs(self, img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
-        if self.show_bg_sub_img:
+        if self._show_bg_sub_img:
             cv2.imshow("bgsub", roi_bg_sub)
-        if self.show_morphed_img:
+        if self._show_morphed_img:
             cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
@@ -443,10 +466,10 @@ class Tracker(object):
         x_dif = math.sin(angle)
         y_dif = math.cos(angle)
 
-        x1 = int(round(center_x - self.lineend_offset*x_dif))
-        y1 = int(round(center_y - self.lineend_offset*y_dif))
-        x2 = int(round(center_x + self.lineend_offset*x_dif))
-        y2 = int(round(center_y + self.lineend_offset*y_dif))
+        x1 = int(round(center_x - self._lineend_offset*x_dif))
+        y1 = int(round(center_y - self._lineend_offset*y_dif))
+        x2 = int(round(center_x + self._lineend_offset*x_dif))
+        y2 = int(round(center_y + self._lineend_offset*y_dif))
 
         return x1, y1, x2, y2
 
