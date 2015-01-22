@@ -190,7 +190,7 @@ class Tracker(object):
 
     @property
     def start_ori(self):
-        return self.start_ori
+        return self._start_ori
 
     @start_ori.setter
     def start_ori(self, value):
