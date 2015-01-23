@@ -50,14 +50,16 @@ class Tracker(object):
         self._erosion_iterations = 1
         self._dilation_iterations = 4
 
-        # tracking data
-        # TODO create ContourManager instance and change all methods to using that
-        self.contour_list = None
 
         # fish size thresholds
         self._fish_size_threshold = 700
         self._fish_max_size_threshold = 4000
         self._enable_max_size_threshold = False
+
+        # tracking data
+        # TODO create ContourManager instance and change all methods to using that
+        # self.contour_list = None
+        self.cm = ContourManager(self.fish_size_threshold, self.fish_max_size_threshold)
 
         self.fish_started = False
         self._starting_area_x1_factor = 0.85
@@ -348,89 +350,6 @@ class Tracker(object):
         # ret, morphed_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
         return ret, morphed_img
 
-    # # set a threshold for area. all contours with smaller area get deleted
-    def del_small_contours(self):
-        area_threshold = self._fish_size_threshold
-        if self.contour_list is not None and len(self.contour_list) > 0:
-
-            counter = 0
-            while counter < len(self.contour_list):
-
-                popped = False
-
-                if cv2.contourArea(self.contour_list[counter]) < area_threshold:
-                    self.contour_list.pop(counter)
-                    popped = True
-                if not popped:
-                    counter += 1
-
-    def del_oversized_contours(self):
-        area_threshold = self._fish_max_size_threshold
-        if self.contour_list is not None and len(self.contour_list) > 0:
-
-            counter = 0
-            while counter < len(self.contour_list):
-
-                popped = False
-
-                if cv2.contourArea(self.contour_list[counter]) > area_threshold:
-                    self.contour_list.pop(counter)
-                    popped = True
-                if not popped:
-                    counter += 1
-
-    # # only keep biggest-area object in contour list
-    def keep_biggest_contours(self):
-        if self.contour_list is None or len(self.contour_list) == 0:
-            return
-
-        biggest = cv2.contourArea(self.contour_list[0])
-
-        counter = 1
-        while counter < len(self.contour_list):
-            next_size = cv2.contourArea(self.contour_list[counter])
-            if next_size < biggest:
-                self.contour_list.pop(counter)
-            elif next_size > biggest:
-                biggest = next_size
-                self.contour_list.pop(counter-1)
-            else:
-                counter += 1
-
-    # calculates distance of two given points (tuples)
-    @staticmethod
-    def calculate_distance(p1, p2):
-        x_diff = p2[0] - p1[0]
-        y_diff = p2[1] - p1[1]
-        dist = math.sqrt(x_diff*x_diff + y_diff*y_diff)
-        return dist
-
-    # get center of contour based on fitting ellipse
-    @staticmethod
-    def get_center(cnt):
-        ellipse = cv2.fitEllipse(cnt)
-        return ellipse[0]
-
-    # if two or more contours (of same size) in contour_list delete which is farthest away from last pos fish was
-    def keep_nearest_contour(self):
-        if self.last_pos is None:
-            self.last_pos = (self.roi.y2 - self.roi.y1, int((self.roi.x2 - self.roi.x1) / 2))
-
-        cnt_center = self.get_center(self.ellipse[0])
-        biggest_dist = self.calculate_distance(cnt_center, self.last_pos)
-
-        counter = 1
-        while counter < len(self.contour_list):
-            next_center = self.get_center(self.ellipse[counter])
-            next_dist = self.calculate_distance(next_center, self.last_pos)
-            if next_dist < biggest_dist:
-                self.contour_list.pop(counter)
-            elif next_dist > biggest_dist:
-                biggest_dist = next_dist
-                self.contour_list.pop(counter-1)
-            else:
-                counter += 1
-
     @staticmethod
     def save_number_of_contours(cnt_list, number_cnt_list):
         if cnt_list is None:
@@ -446,20 +365,20 @@ class Tracker(object):
         non_starting_area_y1 = int(self._starting_area_y1_factor * height)
         non_starting_area_y2 = int(self._starting_area_y2_factor * height)
 
-        if self.contour_list is not None:
-            for i in range(0, len(self.contour_list)):
-                cnt = self.contour_list[i]
+        if self.cm.contour_list is not None:
+            for i in range(0, len(self.cm.contour_list)):
+                cnt = self.cm.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
                 if ellipse[0][0] > non_starting_area_x1 and ellipse[0][0] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
                     self.fish_started = True
 
     # fitting ellipse onto contour
     def fit_ellipse_on_contour(self):
-        if self.contour_list is None or len(self.contour_list) == 0:
+        if self.cm.contour_list is None or len(self.cm.contour_list) == 0:
             self.ellipse = None
-        elif self.contour_list is not None and len(self.contour_list) > 0:
-            if len(self.contour_list) > 0:
-                cnt = self.contour_list[0]
+        elif self.cm.contour_list is not None and len(self.cm.contour_list) > 0:
+            if len(self.cm.contour_list) > 0:
+                cnt = self.cm.contour_list[0]
                 self.ellipse = cv2.fitEllipse(cnt)
                 ## center: ellipse[0]
                 ## size  : ellipse[1]
@@ -707,24 +626,24 @@ class Tracker(object):
 
             # getting contours (of the morphed img)
             ret,thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
-            self.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-            # TODO
+            # not a to do right now
             # merge biggest contour with nearest
             # contour_list = merge_biggest_contour_with_nearest(contour_list)
 
             # save amount of contours
-            self.save_number_of_contours(self.contour_list, self.number_contours_per_frame)
+            self.save_number_of_contours(self.cm.contour_list, self.number_contours_per_frame)
 
             # everything below fish_size_threshold is being ignored
-            self.del_small_contours()
+            self.cm.del_small_contours()
 
             # everything above fish_size_max_threshold is being ignored
             if self._enable_max_size_threshold:
-                self.del_oversized_contours()
+                self.cm.del_oversized_contours()
 
             # save number of remaining contours
-            self.save_number_of_contours(self.contour_list, self.number_relevant_contours_per_frame)
+            self.save_number_of_contours(self.cm.contour_list, self.number_relevant_contours_per_frame)
 
             # check if fish started
             if not self.fish_started:
@@ -732,18 +651,18 @@ class Tracker(object):
 
             # if fish hasn't started yet, delete all contours
             if not self.fish_started:
-                self.contour_list = []
+                self.cm.contour_list = []
 
             # keep only biggest contours
-            self.keep_biggest_contours()
+            self.cm.keep_biggest_contours()
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
-            if self.fish_started and self.contour_list is not None and len(self.contour_list) > 1:
-                self.keep_nearest_contour()
+            if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
+                self.cm.keep_nearest_contour()
 
             # draw countours to ROI img and show img
             if self._draw_contour:
-                cv2.drawContours(roi, self.contour_list, -1, (0, 255, 0), 3)
+                cv2.drawContours(roi, self.cm.contour_list, -1, (0, 255, 0), 3)
 
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
