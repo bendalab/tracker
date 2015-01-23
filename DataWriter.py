@@ -136,7 +136,6 @@ class DataWriter(object):
             array.label = label
             if unit is not None:
                 array.unit = unit
-            print len(stamps)
             dim = array.append_range_dimension(stamps)
             dim.label = 'time'
             dim.unit = 's'
