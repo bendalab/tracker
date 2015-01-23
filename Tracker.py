@@ -57,8 +57,6 @@ class Tracker(object):
         self._enable_max_size_threshold = False
 
         # tracking data
-        # TODO create ContourManager instance and change all methods to using that
-        # self.contour_list = None
         self.cm = ContourManager(self.fish_size_threshold, self.fish_max_size_threshold)
 
         self.fish_started = False
@@ -144,6 +142,7 @@ class Tracker(object):
     @fish_size_threshold.setter
     def fish_size_threshold(self, value):
         self._fish_size_threshold = value
+        self.cm.fish_max_size_threshold = self.fish_size_threshold
 
     @property
     def fish_max_size_threshold(self):
@@ -152,6 +151,7 @@ class Tracker(object):
     @fish_max_size_threshold.setter
     def fish_max_size_threshold(self, value):
         self._fish_max_size_threshold = value
+        self.cm.fish_max_size_threshold = self.fish_max_size_threshold
 
     @property
     def enable_max_size_threshold(self):
@@ -636,11 +636,11 @@ class Tracker(object):
             self.save_number_of_contours(self.cm.contour_list, self.number_contours_per_frame)
 
             # everything below fish_size_threshold is being ignored
-            self.cm.del_small_contours()
+            self.cm.del_small_contours(self.fish_size_threshold)
 
             # everything above fish_size_max_threshold is being ignored
             if self._enable_max_size_threshold:
-                self.cm.del_oversized_contours()
+                self.cm.del_oversized_contours(self.fish_max_size_threshold)
 
             # save number of remaining contours
             self.save_number_of_contours(self.cm.contour_list, self.number_relevant_contours_per_frame)

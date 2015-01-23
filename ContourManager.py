@@ -12,10 +12,6 @@ class ContourManager(object):
         self._contour_list = []
         self.ellipse = None
 
-        self._fish_size_threshold = fish_size_threshold
-        self._fish_max_size_threshold = fish_max_size_threshold
-
-
     @property
     def contour_list(self):
         return self._contour_list
@@ -31,16 +27,9 @@ class ContourManager(object):
     def fish_size_threshold(self, value):
         self._fish_size_threshold = value
 
-    @property
-    def fish_max_size_threshold(self):
-        return self.fish_max_size_threshold
-    @fish_max_size_threshold.setter
-    def fish_max_size_threshold(self, value):
-        self._fish_max_size_threshold = value
-
     # # set a threshold for area. all contours with smaller area get deleted
-    def del_small_contours(self):
-        area_threshold = self._fish_size_threshold
+    def del_small_contours(self, fish_size_threshold):
+        area_threshold = fish_size_threshold
         if self._contour_list is not None and len(self._contour_list) > 0:
 
             counter = 0
@@ -54,8 +43,8 @@ class ContourManager(object):
                 if not popped:
                     counter += 1
 
-    def del_oversized_contours(self):
-        area_threshold = self._fish_max_size_threshold
+    def del_oversized_contours(self, fish_max_size_threshold):
+        area_threshold = fish_max_size_threshold
         if self._contour_list is not None and len(self._contour_list) > 0:
 
             counter = 0
