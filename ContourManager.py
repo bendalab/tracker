@@ -10,7 +10,6 @@ class ContourManager(object):
 
     def __init__(self, fish_size_threshold, fish_max_size_threshold):
         self._contour_list = []
-        self.ellipse = None
 
     @property
     def contour_list(self):
@@ -91,17 +90,17 @@ class ContourManager(object):
         return ellipse[0]
 
     # if two or more contours (of same size) in contour_list delete which is farthest away from last pos fish was
-    def keep_nearest_contour(self):
-        if self.last_pos is None:
-            self.last_pos = (self.roi.y2 - self.roi.y1, int((self.roi.x2 - self.roi.x1) / 2))
+    def keep_nearest_contour(self, last_pos, ellipse, roi):
+        if last_pos is None:
+            last_pos = (roi.y2 - roi.y1, int((roi.x2 - roi.x1) / 2))
 
-        cnt_center = self.get_center(self.ellipse[0])
-        biggest_dist = self.calculate_distance(cnt_center, self.last_pos)
+        cnt_center = self.get_center(ellipse[0])
+        biggest_dist = self.calculate_distance(cnt_center, last_pos)
 
         counter = 1
         while counter < len(self._contour_list):
-            next_center = self.get_center(self.ellipse[counter])
-            next_dist = self.calculate_distance(next_center, self.last_pos)
+            next_center = self.get_center(ellipse[counter])
+            next_dist = self.calculate_distance(next_center, last_pos)
             if next_dist < biggest_dist:
                 self._contour_list.pop(counter)
             elif next_dist > biggest_dist:

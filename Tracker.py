@@ -658,7 +658,7 @@ class Tracker(object):
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
-                self.cm.keep_nearest_contour()
+                self.cm.keep_nearest_contour(self.last_pos, self.ellipse, self.roi)
 
             # draw countours to ROI img and show img
             if self._draw_contour:
