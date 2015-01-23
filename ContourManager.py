@@ -19,13 +19,6 @@ class ContourManager(object):
     def contour_list(self, cnt_list):
         self._contour_list = cnt_list
 
-    @property
-    def fish_size_threshold(self):
-        return self.fish_size_threshold
-    @fish_size_threshold.setter
-    def fish_size_threshold(self, value):
-        self._fish_size_threshold = value
-
     # # set a threshold for area. all contours with smaller area get deleted
     def del_small_contours(self, fish_size_threshold):
         area_threshold = fish_size_threshold
