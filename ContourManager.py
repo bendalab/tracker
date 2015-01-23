@@ -8,7 +8,7 @@ import math
 
 class ContourManager(object):
 
-    def __init__(self, fish_size_threshold, fish_max_size_threshold):
+    def __init__(self):
         self._contour_list = []
 
     @property

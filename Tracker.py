@@ -57,7 +57,7 @@ class Tracker(object):
         self._enable_max_size_threshold = False
 
         # tracking data
-        self.cm = ContourManager(self.fish_size_threshold, self.fish_max_size_threshold)
+        self.cm = ContourManager()
 
         self.fish_started = False
         self._starting_area_x1_factor = 0.85
@@ -623,14 +623,9 @@ class Tracker(object):
             # detect edges of morphed img (not displayed)
             mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
 
-
             # getting contours (of the morphed img)
-            ret,thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
+            ret, thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
             self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-            # not a to do right now
-            # merge biggest contour with nearest
-            # contour_list = merge_biggest_contour_with_nearest(contour_list)
 
             # save amount of contours
             self.save_number_of_contours(self.cm.contour_list, self.number_contours_per_frame)
@@ -661,7 +656,7 @@ class Tracker(object):
                 self.cm.keep_nearest_contour(self.last_pos, self.ellipse, self.roi)
 
             # draw countours to ROI img and show img
-            if self._draw_contour:
+            if self.draw_contour:
                 cv2.drawContours(roi, self.cm.contour_list, -1, (0, 255, 0), 3)
 
             # fit ellipse on contour
