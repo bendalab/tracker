@@ -486,7 +486,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.gridLO_data_visual.setObjectName(_fromUtf8("gridLO_data_visual"))
         # spinbox linend offset
         self.spinBox_lineend_offset = QtGui.QSpinBox(self.tab_visual)
-        self.spinBox_lineend_offset.setMinimum(1)
+        self.spinBox_lineend_offset.setMinimum(0)
         self.spinBox_lineend_offset.setMaximum(20)
         self.spinBox_lineend_offset.setObjectName(_fromUtf8("spinBox_lineend_offset"))
         self.gridLO_data_visual.addWidget(self.spinBox_lineend_offset, 1, 1, 1, 1)
