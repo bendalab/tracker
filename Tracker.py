@@ -78,27 +78,8 @@ class Tracker(object):
         self.line = None
         self._lineend_offset = 5
         self._circle_size = 2
-        self.lx1 = 0
-        self.ly1 = 0
-        self.lx2 = 0
-        self.ly2 = 0
 
-        # self.img_travel_orientation = []
-        # self.img_travel_route = []
-
-        # self.last_frame = None
-        # self.last_frame_OV_output = None
-
-        # # img output
-        # self._draw_contour = False
-        # self._draw_ellipse = True
-        # self.draw_line = True
-        # self.draw_travel_orientation = True
-        # self.draw_travel_route = True
-        # self.draw_original_output = True
-        # self._show_bg_sub_img = False
-        # self._show_morphed_img = False
-
+        #TODO remove this!
         self.estimate_missing_data = True
 
         # import config file values
@@ -258,27 +239,6 @@ class Tracker(object):
 
         return x1, y1, x2, y2
 
-    # def append_to_travel_orientation(self):
-    #     coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
-    #     self.img_travel_orientation.append(coordinates)
-    #
-    # # #dm
-    # def append_to_travel_route(self):
-    #     if self.ellipse is not None:
-    #         ellipse_x = int(round(self.ellipse[0][0]))
-    #         ellipse_y = int(round(self.ellipse[0][1]))
-    #         point = (ellipse_x, ellipse_y)
-    #         self.img_travel_route.append(point)
-    #
-    # def draw_estimated_data(self):
-    #     if not self.estimate_missing_data:
-    #         return
-    #
-    #     for c in self.dm.estimated_pos_roi:
-    #         if c is not None:
-    #             cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self._circle_size, (0, 0, 255))
-    #             cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self._circle_size, (0, 0, 255))
-
     def extract_data(self):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG2()
@@ -354,14 +314,14 @@ class Tracker(object):
 
             # get line from ellipse
             if self.fish_started and self.ellipse is not None:
-                self.lx1, self.ly1, self.lx2, self.ly2 = self.get_line_from_ellipse()
+                self.im.lx1, self.im.ly1, self.im.lx2, self.im.ly2 = self.get_line_from_ellipse()
             # draw line  #im!!!!!
-            if self.draw_line and self.ellipse is not None:
-                cv2.line(roi, (self.lx1, self.ly1), (self.lx2, self.ly2), (0, 0, 255), 1)
+            if self.im.draw_line and self.ellipse is not None:
+                cv2.line(roi, (self.im.lx1, self.im.ly1), (self.im.lx2, self.im.ly2), (0, 0, 255), 1)
 
             # append ellipse center to travel route
-            if self.draw_travel_route:
-                self.append_to_travel_route()
+            if self.im.draw_travel_route:
+                self.im.append_to_travel_route(self.ellipse)
 
             # set last_pos to ellipse center
             self.dm.set_last_pos(self.ellipse)
@@ -376,22 +336,22 @@ class Tracker(object):
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)
 
             # append coordinates to travel_orientation
-            if self.draw_travel_orientation and self.fish_started:
-                self.append_to_travel_orientation()
+            if self.im.draw_travel_orientation and self.fish_started:
+                self.im.append_to_travel_orientation()
 
 
             # draw travel route
-            if self.draw_travel_orientation:
-                for coordinates in self.img_travel_orientation:
+            if self.im.draw_travel_orientation:
+                for coordinates in self.im.img_travel_orientation:
                     cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
 
             # draw travel orientation
-            if self.draw_travel_route:
-                for point in self.img_travel_route:
+            if self.im.draw_travel_route:
+                for point in self.im.img_travel_route:
                     cv2.circle(roi, point, self._circle_size, (255, 0, 0))
 
-            if self.draw_original_output:
-                for coordinates in self.img_travel_orientation:
+            if self.im.draw_original_output:
+                for coordinates in self.im.img_travel_orientation:
                     cv2.line(frame_output, (coordinates[0] + self.roi.x1, coordinates[1] + self.roi.y1), 
                              (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
                 for point in self.dm.all_pos_original:
@@ -399,7 +359,7 @@ class Tracker(object):
                         cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
             # show all imgs
-            if self.draw_original_output:
+            if self.im.draw_original_output:
                 self.show_imgs(frame_output, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
             else:
                 self.show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
@@ -440,7 +400,7 @@ class Tracker(object):
         if self.estimate_missing_data:
             self.dm.estimate_missing_pos(self.roi)
             self.dm.estimate_missing_ori()
-        self.draw_estimated_data()
+        self.im.draw_estimated_data(self.estimate_missing_data, self.dm.estimated_pos_roi, self.roi, self.circle_size)
 
         self.dm.copy_original_to_est_data()
 
