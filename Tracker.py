@@ -12,6 +12,7 @@ from ROI import ROI
 from DataWriter import DataWriter
 from ContourManager import ContourManager
 from DataManager import DataManager
+from ImageManager import ImageManager
 from IPython import embed
 
 class Tracker(object):
@@ -60,6 +61,7 @@ class Tracker(object):
         # tracking data
         self.cm = ContourManager()
         self.dm = DataManager()
+        self.im = ImageManager()
 
         self.fish_started = False
         self._starting_area_x1_factor = 0.85
@@ -81,21 +83,21 @@ class Tracker(object):
         self.lx2 = 0
         self.ly2 = 0
 
-        self.img_travel_orientation = []
-        self.img_travel_route = []
+        # self.img_travel_orientation = []
+        # self.img_travel_route = []
 
-        self.last_frame = None
-        self.last_frame_OV_output = None
+        # self.last_frame = None
+        # self.last_frame_OV_output = None
 
-        # img output
-        self._draw_contour = False
-        self._draw_ellipse = True
-        self.draw_line = True
-        self.draw_travel_orientation = True
-        self.draw_travel_route = True
-        self.draw_original_output = True
-        self._show_bg_sub_img = False
-        self._show_morphed_img = False
+        # # img output
+        # self._draw_contour = False
+        # self._draw_ellipse = True
+        # self.draw_line = True
+        # self.draw_travel_orientation = True
+        # self.draw_travel_route = True
+        # self.draw_original_output = True
+        # self._show_bg_sub_img = False
+        # self._show_morphed_img = False
 
         self.estimate_missing_data = True
 
@@ -256,26 +258,26 @@ class Tracker(object):
 
         return x1, y1, x2, y2
 
-    def append_to_travel_orientation(self):
-        coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
-        self.img_travel_orientation.append(coordinates)
-
-    # #dm
-    def append_to_travel_route(self):
-        if self.ellipse is not None:
-            ellipse_x = int(round(self.ellipse[0][0]))
-            ellipse_y = int(round(self.ellipse[0][1]))
-            point = (ellipse_x, ellipse_y)
-            self.img_travel_route.append(point)
-
-    def draw_estimated_data(self):
-        if not self.estimate_missing_data:
-            return
-
-        for c in self.dm.estimated_pos_roi:
-            if c is not None:
-                cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self._circle_size, (0, 0, 255))
-                cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self._circle_size, (0, 0, 255))
+    # def append_to_travel_orientation(self):
+    #     coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
+    #     self.img_travel_orientation.append(coordinates)
+    #
+    # # #dm
+    # def append_to_travel_route(self):
+    #     if self.ellipse is not None:
+    #         ellipse_x = int(round(self.ellipse[0][0]))
+    #         ellipse_y = int(round(self.ellipse[0][1]))
+    #         point = (ellipse_x, ellipse_y)
+    #         self.img_travel_route.append(point)
+    #
+    # def draw_estimated_data(self):
+    #     if not self.estimate_missing_data:
+    #         return
+    #
+    #     for c in self.dm.estimated_pos_roi:
+    #         if c is not None:
+    #             cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self._circle_size, (0, 0, 255))
+    #             cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self._circle_size, (0, 0, 255))
 
     def extract_data(self):
         # create BG subtractor
@@ -353,7 +355,7 @@ class Tracker(object):
             # get line from ellipse
             if self.fish_started and self.ellipse is not None:
                 self.lx1, self.ly1, self.lx2, self.ly2 = self.get_line_from_ellipse()
-            # draw line
+            # draw line  #im!!!!!
             if self.draw_line and self.ellipse is not None:
                 cv2.line(roi, (self.lx1, self.ly1), (self.lx2, self.ly2), (0, 0, 255), 1)
 
