@@ -12,7 +12,6 @@ import sys
 import numpy
 import cv2
 import copy
-# TODO config file, save after value alteration
 import ConfigParser
 
 try:
