@@ -11,6 +11,7 @@ import ConfigParser
 from ROI import ROI
 from DataWriter import DataWriter
 from ContourManager import ContourManager
+from DataManager import DataManager
 from IPython import embed
 
 class Tracker(object):
@@ -41,10 +42,10 @@ class Tracker(object):
         else:
             self.frame_waittime = 50
 
-        self.frame_counter = 0
+        # self.frame_counter = 0
 
-        # self.__roi = ROI(15, 695, 80, 515) # Eileen setup
-        self._roi = ROI(160, 80, 700, 525) # Isabel setup
+        # self.__roi = ROI(15, 695, 80, 515)  # Eileen setup
+        self._roi = ROI(160, 80, 700, 525)  # Isabel setup
 
         # image morphing data
         self._erosion_iterations = 1
@@ -58,6 +59,7 @@ class Tracker(object):
 
         # tracking data
         self.cm = ContourManager()
+        self.dm = DataManager()
 
         self.fish_started = False
         self._starting_area_x1_factor = 0.85
@@ -65,15 +67,8 @@ class Tracker(object):
         self._starting_area_y1_factor = 0.30
         self._starting_area_y2_factor = 0.70
 
-        self.last_pos = None
-        self.all_pos_roi = []
-        self.all_pos_original = []
-
-        self.last_ori = None
         self._start_ori = 270
-        self.all_oris = []
 
-        self.fish_not_detected_count = 0
         self.fish_not_detected_threshold = 50
         self.fish_not_detected_threshold_reached = False
 
@@ -89,9 +84,6 @@ class Tracker(object):
         self.img_travel_orientation = []
         self.img_travel_route = []
 
-        self.number_contours_per_frame = []
-        self.number_relevant_contours_per_frame = []
-
         self.last_frame = None
         self.last_frame_OV_output = None
 
@@ -106,9 +98,6 @@ class Tracker(object):
         self._show_morphed_img = False
 
         self.estimate_missing_data = True
-        self.estimated_pos_roi = []
-        self.estimated_pos_original = []
-        self.estimated_oris = []
 
         # import config file values
         self.will_import_config_values = True
@@ -356,12 +345,6 @@ class Tracker(object):
         # ret, morphed_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
         return ret, morphed_img
 
-    @staticmethod
-    def save_number_of_contours(cnt_list, number_cnt_list):
-        if cnt_list is None:
-            number_cnt_list.append(0)
-        else:
-            number_cnt_list.append(len(cnt_list))
 
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
@@ -412,6 +395,7 @@ class Tracker(object):
         coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
         self.img_travel_orientation.append(coordinates)
 
+    # #dm
     def append_to_travel_route(self):
         if self.ellipse is not None:
             ellipse_x = int(round(self.ellipse[0][0]))
@@ -419,184 +403,14 @@ class Tracker(object):
             point = (ellipse_x, ellipse_y)
             self.img_travel_route.append(point)
 
-    def set_last_pos(self):
-        if self.ellipse is None:
-            self.last_pos = None
-            return
-        else:
-            self.last_pos = self.ellipse[0]
-
-    def save_fish_positions(self):
-        self.all_pos_roi.append(self.last_pos)
-        if self.last_pos is None:
-            self.all_pos_original.append(self.last_pos)
-        else:
-            original_x = self.last_pos[0] + self.roi.x1
-            original_y = self.last_pos[1] + self.roi.y1
-            self.all_pos_original.append((original_x, original_y))
-
-    def set_last_orientation(self):
-        if not self.fish_started or self.ellipse is None:
-            return
-
-        if self.last_ori is None:
-            self.last_ori = self._start_ori
-
-        if self.ellipse is None:
-            return
-
-        ell_ori = self.ellipse[2]
-        if self.last_ori > ell_ori:
-            ori_diff = self.last_ori - ell_ori
-            if ori_diff > 270:
-                self.last_ori = ell_ori
-            elif ori_diff < 90:
-                self.last_ori = ell_ori
-            else:
-                self.last_ori = (ell_ori + 180) % 360
-        if self.last_ori < ell_ori:
-            ori_diff = ell_ori - self.last_ori
-            if ori_diff < 90:
-                self.last_ori = ell_ori
-            else:
-                self.last_ori = (ell_ori + 180) % 360
-
-    def save_fish_orientations(self):
-        if not self.fish_started:
-            self.all_oris.append(None)
-            return
-
-        if self.ellipse is None:
-            self.all_oris.append(None)
-            return
-
-        self.all_oris.append(self.last_ori)
-
-    def estimate_missing_pos(self):
-        if not self.estimate_missing_data:
-            return
-
-        global frame_counter
-        global all_pos_roi
-        global estimated_pos_roi
-        global estimated_pos_original
-        global ROI_X1
-        global ROI_Y1
-
-        # init length of estimated-lists to amount of frames
-        for x in range(0, self.frame_counter):
-            self.estimated_pos_roi.append(None)
-            self.estimated_pos_original.append(None)
-
-        # set pointer to start of data
-        pointer = 0
-        while pointer < self.frame_counter and self.all_pos_roi[pointer] is None:
-            pointer += 1
-
-        while pointer < self.frame_counter:
-            while self.all_pos_roi[pointer] is not None:
-                pointer += 1
-                if pointer >= self.frame_counter-1:
-                    return
-
-            gap_start_pointer = pointer
-            gap_end_pointer = pointer
-            while gap_end_pointer < self.frame_counter-1 and self.all_pos_roi[gap_end_pointer] is None:
-                gap_end_pointer += 1
-
-            if gap_end_pointer == self.frame_counter-1:
-                break
-
-            start_value_x = self.all_pos_roi[gap_start_pointer-1][0]
-            start_value_y = self.all_pos_roi[gap_start_pointer-1][1]
-            end_value_x = self.all_pos_roi[gap_end_pointer][0]
-            end_value_y = self.all_pos_roi[gap_end_pointer][1]
-
-            pointer_diff = gap_end_pointer - (gap_start_pointer-1)
-            value_diff_x = end_value_x - start_value_x
-            value_diff_y = end_value_y - start_value_y
-            value_diff_x_part = value_diff_x/pointer_diff
-            value_diff_y_part = value_diff_y/pointer_diff
-
-
-            # print "pointer diff = " + str(pointer_diff)
-            first_pos_estimated = False
-            while pointer < gap_end_pointer:
-                if not first_pos_estimated:
-                    self.estimated_pos_roi[pointer] = ((self.all_pos_roi[pointer-1][0] + value_diff_x_part), (self.all_pos_roi[pointer-1][1] + value_diff_y_part))
-                    self.estimated_pos_original[pointer] = (self.estimated_pos_roi[pointer][0] + self.roi.x1, self.estimated_pos_roi[pointer][1] + self.roi.y1)
-                    first_pos_estimated = True
-                else:
-                    self.estimated_pos_roi[pointer] = ((self.estimated_pos_roi[pointer-1][0] + value_diff_x_part), (self.estimated_pos_roi[pointer-1][1] + value_diff_y_part))
-                    self.estimated_pos_original[pointer] = (self.estimated_pos_roi[pointer][0] + self.roi.x1, self.estimated_pos_roi[pointer][1] + self.roi.y1)
-                pointer += 1
-
-    def estimate_missing_ori(self):
-        if self.frame_counter < 1:
-            return
-
-        # init length of estimated-list to amount of frames
-        for x in range(0, self.frame_counter):
-            self.estimated_oris.append(None)
-
-        pointer = 0
-        # set pointer to start of data
-        while self.all_oris[pointer] is None:
-            pointer += 1
-            if pointer >= self.frame_counter-1:
-                    return
-
-        while pointer < self.frame_counter:
-            while self.all_oris[pointer] is not None:
-                pointer += 1
-                if pointer >= self.frame_counter-1:
-                    return
-
-            gap_start_pointer = pointer
-            gap_end_pointer = pointer
-            while gap_end_pointer < self.frame_counter-1 and self.all_oris[gap_end_pointer] is None:
-                gap_end_pointer += 1
-
-            if gap_end_pointer == self.frame_counter-1:
-                break
-
-            start_value = self.all_oris[gap_start_pointer-1]
-            end_value = self.all_oris[gap_end_pointer]
-
-            pointer_diff = gap_end_pointer - (gap_start_pointer-1)
-            value_diff = end_value - start_value
-            if start_value > end_value and abs(value_diff) > 180:
-                value_diff = (end_value + 360) - start_value
-            elif start_value < end_value and abs(value_diff) > 180:
-                value_diff = (end_value - 360) - start_value
-            value_diff_part = value_diff/pointer_diff
-
-            first_pos_estimated = False
-            while pointer < gap_end_pointer:
-                if not first_pos_estimated:
-                    self.estimated_oris[pointer] = (self.all_oris[pointer-1] + value_diff_part) % 360
-                    first_pos_estimated = True
-                else:
-                    self.estimated_oris[pointer] = (self.estimated_oris[pointer-1] + value_diff_part) % 360
-                pointer += 1
-
     def draw_estimated_data(self):
         if not self.estimate_missing_data:
             return
 
-        for c in self.estimated_pos_roi:
+        for c in self.dm.estimated_pos_roi:
             if c is not None:
                 cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), self._circle_size, (0, 0, 255))
                 cv2.circle(self.last_frame_OV_output, (int(round(c[0])) + self.roi.x1, int(round(c[1]) + self.roi.y1)), self._circle_size, (0, 0, 255))
-
-    def copy_original_to_est_data(self):
-        for i in range(0, self.frame_counter):
-            if self.all_pos_roi[i] is not None:
-                self.estimated_pos_roi[i] = self.all_pos_roi[i]
-            if self.all_pos_original[i] is not None:
-                self.estimated_pos_original[i] = self.all_pos_original[i]
-            if self.all_oris[i] is not None:
-                self.estimated_oris[i] = self.all_oris[i]
 
     def extract_data(self):
         # create BG subtractor
@@ -609,7 +423,7 @@ class Tracker(object):
             if frame is None:
                 break
 
-            self.frame_counter += 1
+            self.dm.frame_counter += 1
 
             # set region of interest ROI
             roi = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
@@ -634,7 +448,7 @@ class Tracker(object):
             self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
             # save amount of contours
-            self.save_number_of_contours(self.cm.contour_list, self.number_contours_per_frame)
+            self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_contours_per_frame)
 
             # everything below fish_size_threshold is being ignored
             self.cm.del_small_contours(self.fish_size_threshold)
@@ -644,7 +458,7 @@ class Tracker(object):
                 self.cm.del_oversized_contours(self.fish_max_size_threshold)
 
             # save number of remaining contours
-            self.save_number_of_contours(self.cm.contour_list, self.number_relevant_contours_per_frame)
+            self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_relevant_contours_per_frame)
 
             # check if fish started
             if not self.fish_started:
@@ -659,7 +473,7 @@ class Tracker(object):
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
-                self.cm.keep_nearest_contour(self.last_pos, self.ellipse, self.roi)
+                self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roi)
 
             # draw countours to ROI img and show img
             if self.draw_contour:
@@ -683,16 +497,16 @@ class Tracker(object):
                 self.append_to_travel_route()
 
             # set last_pos to ellipse center
-            self.set_last_pos()
+            self.dm.set_last_pos(self.ellipse)
 
             # save fish positions
-            self.save_fish_positions()
+            self.dm.save_fish_positions(self.roi)
 
             # set last orientation
-            self.set_last_orientation()
+            self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
 
             # save orientations
-            self.save_fish_orientations()
+            self.dm.save_fish_orientations(self.ellipse, self.fish_started)
 
             # append coordinates to travel_orientation
             if self.draw_travel_orientation and self.fish_started:
@@ -713,7 +527,7 @@ class Tracker(object):
                 for coordinates in self.img_travel_orientation:
                     cv2.line(frame_output, (coordinates[0] + self.roi.x1, coordinates[1] + self.roi.y1), 
                              (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
-                for point in self.all_pos_original:
+                for point in self.dm.all_pos_original:
                     if point is not None:
                         cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
@@ -739,35 +553,6 @@ class Tracker(object):
         self.cap.release()
         cv2.destroyAllWindows()
 
-    def print_data(self):
-        print "positions region of interest: " + str(self.all_pos_roi)
-        print "estimated positions roi:      " + str(self.estimated_pos_roi)
-        print "positions original recording: " + str(self.all_pos_original)
-        print "estimated positions original: " + str(self.estimated_pos_original)
-        print "all orientations:             " + str(self.all_oris)
-        print "estimated orientations:       " + str(self.estimated_oris)
-        print "number of contours in frames: " + str(self.number_contours_per_frame)
-        print "number of fish-size contours: " + str(self.number_relevant_contours_per_frame)
-
-    def check_data_integrity(self):
-        if not len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == self.frame_counter:
-            print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
-
-        print "All lists consistent with frame count: " + str(len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == len(self.number_contours_per_frame) == len(self.number_relevant_contours_per_frame) == self.frame_counter)
-
-    def check_frames_missing_fish(self):
-        startPos = 0
-        for entry in self.all_oris:
-            if entry is None:
-                startPos += 1
-
-        for i in range(startPos, len(self.all_oris), 1):
-            if self.all_oris[i] is None:
-                self.fish_not_detected_count += 1
-
-        if self.fish_not_detected_count > self.fish_not_detected_threshold:
-            self.fish_not_detected_threshold_reached = True
-
     def load_frame_times(self, file_name):
         times_file = None
         if not os.path.exists(file_name):
@@ -785,14 +570,15 @@ class Tracker(object):
         self.set_video_capture()
 
         self.extract_data()
-        self.estimate_missing_pos()
-        self.estimate_missing_ori()
+        if self.estimate_missing_data:
+            self.dm.estimate_missing_pos(self.roi)
+            self.dm.estimate_missing_ori()
         self.draw_estimated_data()
 
-        self.copy_original_to_est_data()
+        self.dm.copy_original_to_est_data()
 
         # self.print_data()
-        self.check_frames_missing_fish()
+        self.dm.check_frames_missing_fish(self.fish_not_detected_threshold)
 
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
@@ -814,16 +600,16 @@ class Tracker(object):
             os.makedirs(out_dir)
 
         if not self.nix_io:
-            DataWriter.write_ascii(output_file_name + ".txt", times, self.all_pos_original, self.all_oris,
-                                   self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
-                                   self.number_relevant_contours_per_frame, self.roi, self.frame_counter, params)
+            DataWriter.write_ascii(output_file_name + ".txt", times, self.dm.all_pos_original, self.dm.all_oris,
+                                   self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
+                                   self.dm.number_relevant_contours_per_frame, self.roi, self.dm.frame_counter, params)
         else:
-            DataWriter.write_nix(output_file_name + ".h5", times, self.all_pos_original, self.all_oris, 
-                                 self.estimated_pos_original, self.estimated_oris, self.number_contours_per_frame, 
-                                 self.number_relevant_contours_per_frame, self.roi, params)
+            DataWriter.write_nix(output_file_name + ".h5", times, self.dm.all_pos_original, self.dm.all_oris,
+                                 self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
+                                 self.dm.number_relevant_contours_per_frame, self.roi, params)
         cv2.imwrite(output_file_name + "_OV_path.png", self.last_frame_OV_output)
 
-        self.check_data_integrity()
+        self.dm.check_data_integrity()
 
         # if self.draw_original_output:
         #     cv2.namedWindow("result_ov")
