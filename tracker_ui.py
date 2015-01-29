@@ -23,13 +23,15 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_tracker_main_widget(QtGui.QWidget):
+
+class TrackerUserInterface(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         self.setupUi(self)
@@ -952,7 +954,7 @@ class Ui_tracker_main_widget(QtGui.QWidget):
 if __name__ == "__main__":
     print "ignore Gtk-warning..."
     qApp = QtGui.QApplication(sys.argv)
-    ui_tr = Ui_tracker_main_widget()
+    ui_tr = TrackerUserInterface()
     ui_tr.center_ui()
     ui_tr.show()
     sys.exit(qApp.exec_())

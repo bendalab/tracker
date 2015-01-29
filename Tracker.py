@@ -8,7 +8,9 @@ import copy
 import os
 import argparse
 import ConfigParser
-import collections
+from ROI import ROI
+from DataWriter import DataWriter
+from ContourManager import ContourManager
 from IPython import embed
 
 class Tracker(object):
@@ -48,13 +50,14 @@ class Tracker(object):
         self._erosion_iterations = 1
         self._dilation_iterations = 4
 
-        # tracking data
-        self.contour_list = None
 
         # fish size thresholds
         self._fish_size_threshold = 700
         self._fish_max_size_threshold = 4000
         self._enable_max_size_threshold = False
+
+        # tracking data
+        self.cm = ContourManager()
 
         self.fish_started = False
         self._starting_area_x1_factor = 0.85
@@ -139,6 +142,7 @@ class Tracker(object):
     @fish_size_threshold.setter
     def fish_size_threshold(self, value):
         self._fish_size_threshold = value
+        self.cm.fish_max_size_threshold = self.fish_size_threshold
 
     @property
     def fish_max_size_threshold(self):
@@ -147,6 +151,7 @@ class Tracker(object):
     @fish_max_size_threshold.setter
     def fish_max_size_threshold(self, value):
         self._fish_max_size_threshold = value
+        self.cm.fish_max_size_threshold = self.fish_max_size_threshold
 
     @property
     def enable_max_size_threshold(self):
@@ -283,7 +288,6 @@ class Tracker(object):
         self._circle_size = cfg.getint('visualization', 'circle_size')
         return
 
-    # @staticmethod
     def show_imgs(self, img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
         if self._show_bg_sub_img:
             cv2.imshow("bgsub", roi_bg_sub)
@@ -346,89 +350,6 @@ class Tracker(object):
         # ret, morphed_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
         return ret, morphed_img
 
-    # # set a threshold for area. all contours with smaller area get deleted
-    def del_small_contours(self):
-        area_threshold = self._fish_size_threshold
-        if self.contour_list is not None and len(self.contour_list) > 0:
-
-            counter = 0
-            while counter < len(self.contour_list):
-
-                popped = False
-
-                if cv2.contourArea(self.contour_list[counter]) < area_threshold:
-                    self.contour_list.pop(counter)
-                    popped = True
-                if not popped:
-                    counter += 1
-
-    def del_oversized_contours(self):
-        area_threshold = self._fish_max_size_threshold
-        if self.contour_list is not None and len(self.contour_list) > 0:
-
-            counter = 0
-            while counter < len(self.contour_list):
-
-                popped = False
-
-                if cv2.contourArea(self.contour_list[counter]) > area_threshold:
-                    self.contour_list.pop(counter)
-                    popped = True
-                if not popped:
-                    counter += 1
-
-    # # only keep biggest-area object in contour list
-    def keep_biggest_contours(self):
-        if self.contour_list is None or len(self.contour_list) == 0:
-            return
-
-        biggest = cv2.contourArea(self.contour_list[0])
-
-        counter = 1
-        while counter < len(self.contour_list):
-            next_size = cv2.contourArea(self.contour_list[counter])
-            if next_size < biggest:
-                self.contour_list.pop(counter)
-            elif next_size > biggest:
-                biggest = next_size
-                self.contour_list.pop(counter-1)
-            else:
-                counter += 1
-
-    # calculates distance of two given points (tuples)
-    @staticmethod
-    def calculate_distance(p1, p2):
-        x_diff = p2[0] - p1[0]
-        y_diff = p2[1] - p1[1]
-        dist = math.sqrt(x_diff*x_diff + y_diff*y_diff)
-        return dist
-
-    # get center of contour based on fitting ellipse
-    @staticmethod
-    def get_center(cnt):
-        ellipse = cv2.fitEllipse(cnt)
-        return ellipse[0]
-
-    # if two or more contours (of same size) in contour_list delete which is farthest away from last pos fish was
-    def keep_nearest_contour(self):
-        if self.last_pos is None:
-            self.last_pos = (self.roi.y2 - self.roi.y1, int((self.roi.x2 - self.roi.x1) / 2))
-
-        cnt_center = self.get_center(self.ellipse[0])
-        biggest_dist = self.calculate_distance(cnt_center, self.last_pos)
-
-        counter = 1
-        while counter < len(self.contour_list):
-            next_center = self.get_center(self.ellipse[counter])
-            next_dist = self.calculate_distance(next_center, self.last_pos)
-            if next_dist < biggest_dist:
-                self.contour_list.pop(counter)
-            elif next_dist > biggest_dist:
-                biggest_dist = next_dist
-                self.contour_list.pop(counter-1)
-            else:
-                counter += 1
-
     @staticmethod
     def save_number_of_contours(cnt_list, number_cnt_list):
         if cnt_list is None:
@@ -444,20 +365,20 @@ class Tracker(object):
         non_starting_area_y1 = int(self._starting_area_y1_factor * height)
         non_starting_area_y2 = int(self._starting_area_y2_factor * height)
 
-        if self.contour_list is not None:
-            for i in range(0, len(self.contour_list)):
-                cnt = self.contour_list[i]
+        if self.cm.contour_list is not None:
+            for i in range(0, len(self.cm.contour_list)):
+                cnt = self.cm.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
                 if ellipse[0][0] > non_starting_area_x1 and ellipse[0][0] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
                     self.fish_started = True
 
     # fitting ellipse onto contour
     def fit_ellipse_on_contour(self):
-        if self.contour_list is None or len(self.contour_list) == 0:
+        if self.cm.contour_list is None or len(self.cm.contour_list) == 0:
             self.ellipse = None
-        elif self.contour_list is not None and len(self.contour_list) > 0:
-            if len(self.contour_list) > 0:
-                cnt = self.contour_list[0]
+        elif self.cm.contour_list is not None and len(self.cm.contour_list) > 0:
+            if len(self.cm.contour_list) > 0:
+                cnt = self.cm.contour_list[0]
                 self.ellipse = cv2.fitEllipse(cnt)
                 ## center: ellipse[0]
                 ## size  : ellipse[1]
@@ -702,27 +623,22 @@ class Tracker(object):
             # detect edges of morphed img (not displayed)
             mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
 
-
             # getting contours (of the morphed img)
-            ret,thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
-            self.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-            # TODO
-            # merge biggest contour with nearest
-            # contour_list = merge_biggest_contour_with_nearest(contour_list)
+            ret, thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
+            self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
             # save amount of contours
-            self.save_number_of_contours(self.contour_list, self.number_contours_per_frame)
+            self.save_number_of_contours(self.cm.contour_list, self.number_contours_per_frame)
 
             # everything below fish_size_threshold is being ignored
-            self.del_small_contours()
+            self.cm.del_small_contours(self.fish_size_threshold)
 
             # everything above fish_size_max_threshold is being ignored
             if self._enable_max_size_threshold:
-                self.del_oversized_contours()
+                self.cm.del_oversized_contours(self.fish_max_size_threshold)
 
             # save number of remaining contours
-            self.save_number_of_contours(self.contour_list, self.number_relevant_contours_per_frame)
+            self.save_number_of_contours(self.cm.contour_list, self.number_relevant_contours_per_frame)
 
             # check if fish started
             if not self.fish_started:
@@ -730,18 +646,18 @@ class Tracker(object):
 
             # if fish hasn't started yet, delete all contours
             if not self.fish_started:
-                self.contour_list = []
+                self.cm.contour_list = []
 
             # keep only biggest contours
-            self.keep_biggest_contours()
+            self.cm.keep_biggest_contours()
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
-            if self.fish_started and self.contour_list is not None and len(self.contour_list) > 1:
-                self.keep_nearest_contour()
+            if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
+                self.cm.keep_nearest_contour(self.last_pos, self.ellipse, self.roi)
 
             # draw countours to ROI img and show img
-            if self._draw_contour:
-                cv2.drawContours(roi, self.contour_list, -1, (0, 255, 0), 3)
+            if self.draw_contour:
+                cv2.drawContours(roi, self.cm.contour_list, -1, (0, 255, 0), 3)
 
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
@@ -909,257 +825,6 @@ class Tracker(object):
         #     cv2.imshow("result_ov", self.last_frame_OV_output)
         #
         # cv2.waitKey(0)
-
-class ROI(object):
-    def __init__(self, x_1, y_1, x_2, y_2):
-        self.__x_1 = x_1
-        self.__y_1 = y_1
-        self.__x_2 = x_2
-        self.__y_2 = y_2
-
-    @property
-    def x1(self):
-        return self.__x_1
-    
-    @x1.setter
-    def x1(self, x):
-        self.__x_1 = x
-
-    @property
-    def y1(self):
-        return self.__y_1
-
-    @y1.setter
-    def y1(self, x):
-        self.__y_1 = x
-    
-    @property
-    def x2(self):
-        return self.__x_2
-
-    @x2.setter
-    def x2(self, x):
-        self.__x_2 = x
-    
-    @property
-    def y2(self):
-        return self.__y_2
-
-    @y2.setter
-    def y2(self, x):
-        self.__y_2 = x
-
-
-class DataWriter(object):
-
-    @staticmethod
-    def fill_spaces(file, string):
-        file.write(" " * (20 - len(string)))
-
-    @staticmethod
-    def print_none_to_file(file):
-        file.write(" " * 16)
-        file.write("None")
-
-    @staticmethod
-    def write_position(p, out_file, spacing):
-        if p is None:
-            DataWriter.print_none_to_file(out_file)
-            out_file.write(" " * spacing)
-        else:
-            p = str(round(p, 2))
-            DataWriter.fill_spaces(out_file, p)
-            out_file.write(p)
-            out_file.write(" " * spacing)
-
-    @staticmethod
-    def write_ascii(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, frame_count, parameters):
-        """
-         save data to text file
-        """
-        spacing = 4
-        # out_dir = '/'.join(file_name.split('/')[:-1])
-        # if not os.path.exists(out_dir):
-        #     os.makedirs(out_dir)
-        
-        none_count = 0
-        for p in position:
-            if p is None:
-                none_count += 1
-
-        output_file = open(file_name, 'w')
-        output_file.write("# Tracking parameters:\n")
-        output_file.write("#     Region of Interest X-Axis         : [" + str(roi.x1) + "," + str(roi.x2) + "]\n")
-        output_file.write("#     Region of Interest Y-Axis         : [" + str(roi.y1) + "," + str(roi.y2) + "]\n")
-        output_file.write("#     Fish size threshold               : " + str(parameters['fish size']) + "\n")
-        output_file.write("#     Start orientation                 : " + str(parameters['start ori']) + "\n")
-        output_file.write("#     Fish starting area X-Axis factor1 : " + str(parameters['starting area x1']) + "\n")
-        output_file.write("#     Fish starting area X-Axis factor2 : " + str(parameters['starting area x2']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor1 : " + str(parameters['starting area y1']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor2 : " + str(parameters['starting area y2']) + "\n")
-        output_file.write("#\n")
-        output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
-        if none_count > 0:
-            output_file.write("#\n")
-            output_file.write("#     WARNING: Fish was not detected in " + str(none_count) + " of " + str(len(times)) + " frames. Orientation data may be incorrect.\n")
-
-        output_file.write("\n#Key\n")
-        output_file.write("#           frame_time               pos_roi_x               pos_roi_y           est_pos_roi_x           est_pos_roi_y          pos_original_x          pos_original_y      est_pos_original_x      est_pos_original_y            orientations        est_orientations           obj_per_frame       fishobj_per_frame\n")
-
-        for i, t in enumerate(times):
-            output_file.write("  ")
-            DataWriter.fill_spaces(output_file, t)
-            output_file.write(t)
-            output_file.write(" " * spacing)
-
-            if i >= frame_count:
-                return
-            DataWriter.write_position(position[i][0] - roi.x1 if position[i] is not None else None, output_file, spacing) # x position roi
-            DataWriter.write_position(position[i][1] - roi.y1 if position[i] is not None else None, output_file, spacing) # y position roi
-            DataWriter.write_position(est_position[i][0] - roi.x1 if est_position[i] is not None else None, output_file, spacing) # estimated x position roi
-            DataWriter.write_position(est_position[i][1] - roi.y1 if est_position[i] is not None else None, output_file, spacing) # estimated y position roi
-            
-            DataWriter.write_position(position[i][0] if position[i] is not None else None, output_file, spacing) # x position
-            DataWriter.write_position(position[i][1] if position[i] is not None else None, output_file, spacing) # y position
-            DataWriter.write_position(est_position[i][0] if est_position[i] is not None else None, output_file, spacing) # estimated x position
-            DataWriter.write_position(est_position[i][1] if est_position[i] is not None else None, output_file, spacing) # estimated y position
-
-            DataWriter.write_position(orientation[i], output_file, spacing) # orientation
-            DataWriter.write_position(est_orientation[i], output_file, spacing) # estimated orientation
-            
-
-            cnt_of_frame = str(object_count[i])
-            DataWriter.fill_spaces(output_file, cnt_of_frame)
-            output_file.write(cnt_of_frame)
-            output_file.write(" " * spacing)
-
-            rel_cnt_of_frame = str(fish_object_count[i])
-            DataWriter.fill_spaces(output_file, rel_cnt_of_frame)
-            output_file.write(rel_cnt_of_frame)
-
-            output_file.write("\n")
-        output_file.close()
-
-    @staticmethod
-    def time_to_seconds(time):
-        if isinstance(time, collections.Iterable) and not isinstance(time, str):
-            return map(DataWriter.time_to_seconds, time)
-        else:
-            ts = time.split(':')
-            seconds = 0.
-            seconds += float(ts[0]) * 3600
-            seconds += float(ts[1]) * 60
-            seconds += float(ts[-1])
-        return seconds
-
-    @staticmethod
-    def save_trace(time, data, nix_block, name, nix_type, label, unit=None):
-        # get only those that are valid
-        valid = []
-        stamps = []
-        for t, d in zip(time, data):
-            if d is not None:
-                valid.append(d)
-                stamps.append(t)
-        if len(valid) == 0:
-            return
-        # check if valid data is tuple
-        if len(valid) > 0 and isinstance(valid[0], tuple):
-            d = np.zeros((len(valid), len(valid[0])))
-            for i, v in enumerate(valid):
-                d[i,:] = list(v)
-            array = nix_block.create_data_array(name, nix_type, data=d)
-            array.label = label
-            if unit is not None:
-                array.unit = unit
-            dim = array.append_range_dimension(stamps)
-            dim.label = 'time'
-            dim.unit = 's'
-            dim = array.append_set_dimension()
-            dim.labels = ['x', 'y']
-            return array
-        else:
-            d = np.asarray(valid)
-            array = nix_block.create_data_array(name, nix_type, data=d)
-            array.label = label
-            if unit is not None:
-                array.unit = unit
-            print len(stamps)
-            dim = array.append_range_dimension(stamps)
-            dim.label = 'time'
-            dim.unit = 's'
-            return array
-    
-    @staticmethod
-    def append_sources(entity, sources):
-        if entity is not None and hasattr(entity, "sources"):
-            entity.sources.extend(sources)
-
-    @staticmethod
-    def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
-        import nix
-        name = file_name.split('/')[-1].split('.')[0]
-        nix_file = nix.File.open(file_name, nix.FileMode.Overwrite)
-        block = nix_file.create_block(name, 'nix.tracking')
-
-        # some metadata
-        recording = nix_file.create_section('recording', 'recording')
-        recording['Date'] = name.split('_')[0]
-        recording['Experimenter'] = 'Some One'
-
-        tracker = nix_file.create_section('Tracker', 'software.tracker')
-        tracker['Version'] = 0.5
-        tracker['Source location'] = 'raven.am28.uni-tuebingen.de:tracker.git'
-        settings = tracker.create_section('settings', 'software.settings')
-        settings['Region of Interest X'] = roi.x1
-        settings['Region of Interest Y'] = roi.y1
-        settings['Region of Interest width'] = roi.x2 - roi.x1
-        settings['Region of Interest height'] = roi.y2 - roi.y1
-        settings['Fish size threshold'] = parameters['fish size']
-        settings['Start orientation'] = parameters['start ori']
-        settings['Fish starting area X-Axis factor1'] = parameters['starting area x1']
-        settings['Fish starting area X-Axis factor2'] = parameters['starting area x2']
-        settings['Fish starting area Y-Axis factor1'] = parameters['starting area y1']
-        settings['Fish starting area Y-Axis factor2'] = parameters['starting area y2']
-
-        movie = nix_file.create_section('Movie', 'recording.movie')
-        movie['Filename'] = parameters['source file']
-
-        camera = movie.create_section('Camera', 'hardware.camera')
-        camera['Model'] = 'Guppy F-038B NIR'
-        camera['Vendor'] = 'Allied Vision Technologies'
-        
-        # create sources and link entities to metadata
-        block.metadata = recording
-        movie_source = block.create_source('Original movie', 'nix.source.movie')
-        movie_source.metadata = movie
-        tracking_source = block.create_source('Video tracking', 'nix.source.analysis')
-        tracking_source.metadata = tracker
-
-        # save data
-        time_stamps = np.asarray(DataWriter.time_to_seconds(times))
-        a = DataWriter.save_trace(time_stamps, position, block, 'positions', 'nix.irregular_sampled.coordinates', label='position')
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-        
-        a = DataWriter.save_trace(time_stamps, est_position, block, 'estimated positions', 'nix.irregular_sampled.coordinates', label='position')
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, orientation, block, 'orientations', 'nix.irregular_sampled', label='orientation')
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, est_orientation, block, 'estimated_orientations', 'nix.irregular_sampled', label='orientation')
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, object_count, block, 'object count', 'nix.irregular_sampled', label='count')
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, fish_object_count, block, 'fish object count', 'nix.irregular_sampled', label='count')
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        # TODO need more metadata like info about the subject, who, when, where etc. 
-        # TODO If we support this (and we should suupport this) in the gui, we probably need a more elaborate DataWriter class!
-        nix_file.close()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
