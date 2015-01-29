@@ -34,7 +34,7 @@ class Tracker(object):
         self.output_directory = ""
         self.output_path_isset = False
         
-        self.cap = ""
+        self.cap = None
 
         self.save_frames = False
         if wait_time > 0:
