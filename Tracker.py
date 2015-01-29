@@ -44,7 +44,7 @@ class Tracker(object):
         self.frame_counter = 0
 
         # self.__roi = ROI(15, 695, 80, 515) # Eileen setup
-        self._roi = ROI(160, 80, 700, 525) # Isabell setup
+        self._roi = ROI(160, 80, 700, 525) # Isabel setup
 
         # image morphing data
         self._erosion_iterations = 1
@@ -268,6 +268,12 @@ class Tracker(object):
         self._roi.x2 = cfg.getint('roi', 'x2')
         self._roi.y1 = cfg.getint('roi', 'y1')
         self._roi.y2 = cfg.getint('roi', 'y2')
+
+        # starting area
+        self.starting_area_x1_factor = cfg.getfloat('starting_area', 'x1_factor')
+        self.starting_area_x2_factor = cfg.getfloat('starting_area', 'x2_factor')
+        self.starting_area_y1_factor = cfg.getfloat('starting_area', 'y1_factor')
+        self.starting_area_y2_factor = cfg.getfloat('starting_area', 'y2_factor')
 
         self._start_ori = cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
