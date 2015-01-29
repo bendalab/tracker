@@ -104,141 +104,6 @@ class Tracker(object):
         if self.will_import_config_values:
             self.import_config_values()
 
-    @property
-    def roi(self):
-        return self._roi
-
-    @property
-    def erosion_iterations(self):
-        return self._erosion_iterations
-
-    @erosion_iterations.setter
-    def erosion_iterations(self, value):
-        self._erosion_iterations = value
-
-    @property
-    def dilation_iterations(self):
-        return self._dilation_iterations
-
-    @dilation_iterations.setter
-    def dilation_iterations(self, value):
-        self._dilation_iterations = value
-
-    @property
-    def fish_size_threshold(self):
-        return self._fish_size_threshold
-
-    @fish_size_threshold.setter
-    def fish_size_threshold(self, value):
-        self._fish_size_threshold = value
-        self.cm.fish_max_size_threshold = self.fish_size_threshold
-
-    @property
-    def fish_max_size_threshold(self):
-        return self._fish_max_size_threshold
-
-    @fish_max_size_threshold.setter
-    def fish_max_size_threshold(self, value):
-        self._fish_max_size_threshold = value
-        self.cm.fish_max_size_threshold = self.fish_max_size_threshold
-
-    @property
-    def enable_max_size_threshold(self):
-        return self._enable_max_size_threshold
-
-    @enable_max_size_threshold.setter
-    def enable_max_size_threshold(self, bool):
-        self._enable_max_size_threshold = bool
-
-    @property
-    def starting_area_x1_factor(self):
-        return self._starting_area_x1_factor
-
-    @starting_area_x1_factor.setter
-    def starting_area_x1_factor(self, value):
-        self._starting_area_x1_factor = value
-
-    @property
-    def starting_area_x2_factor(self):
-        return self._starting_area_x2_factor
-
-    @starting_area_x2_factor.setter
-    def starting_area_x2_factor(self, value):
-        self._starting_area_x2_factor = value
-
-    @property
-    def starting_area_y1_factor(self):
-        return self._starting_area_y1_factor
-
-    @starting_area_y1_factor.setter
-    def starting_area_y1_factor(self, value):
-        self._starting_area_y1_factor = value
-
-    @property
-    def starting_area_y2_factor(self):
-        return self._starting_area_y2_factor
-
-    @starting_area_y2_factor.setter
-    def starting_area_y2_factor(self, value):
-        self._starting_area_y2_factor = value
-
-    @property
-    def start_ori(self):
-        return self._start_ori
-
-    @start_ori.setter
-    def start_ori(self, value):
-        self._start_ori = value
-
-    @property
-    def lineend_offset(self):
-        return self._lineend_offset
-
-    @lineend_offset.setter
-    def lineend_offset(self, value):
-        self._lineend_offset = value
-
-    @property
-    def circle_size(self):
-        return self._circle_size
-
-    @circle_size.setter
-    def circle_size(self, value):
-        self._circle_size = value
-
-    @property
-    def draw_contour(self):
-        return self._draw_contour
-
-    @draw_contour.setter
-    def draw_contour(self, boo):
-        self._draw_contour = boo
-
-    @property
-    def draw_ellipse(self):
-        return self._draw_ellipse
-
-    @draw_ellipse.setter
-    def draw_ellipse(self, boo):
-        self._draw_ellipse = boo
-
-    @property
-    def show_bg_sub_img(self):
-        return self._show_bg_sub_img
-
-    @show_bg_sub_img.setter
-    def show_bg_sub_img(self, boo):
-        self._show_bg_sub_img = boo
-
-    @property
-    def show_morphed_img(self):
-        return self._show_bg_sub_img
-
-    @show_morphed_img.setter
-    def show_morphed_img(self, boo):
-        self._show_morphed_img = boo
-
-
     def import_config_values(self):
         if not self.will_import_config_values:
             return
@@ -617,6 +482,140 @@ class Tracker(object):
         #     cv2.imshow("result_ov", self.last_frame_OV_output)
         #
         # cv2.waitKey(0)
+
+    @property
+    def roi(self):
+        return self._roi
+
+    @property
+    def erosion_iterations(self):
+        return self._erosion_iterations
+
+    @erosion_iterations.setter
+    def erosion_iterations(self, value):
+        self._erosion_iterations = value
+
+    @property
+    def dilation_iterations(self):
+        return self._dilation_iterations
+
+    @dilation_iterations.setter
+    def dilation_iterations(self, value):
+        self._dilation_iterations = value
+
+    @property
+    def fish_size_threshold(self):
+        return self._fish_size_threshold
+
+    @fish_size_threshold.setter
+    def fish_size_threshold(self, value):
+        self._fish_size_threshold = value
+        self.cm.fish_max_size_threshold = self.fish_size_threshold
+
+    @property
+    def fish_max_size_threshold(self):
+        return self._fish_max_size_threshold
+
+    @fish_max_size_threshold.setter
+    def fish_max_size_threshold(self, value):
+        self._fish_max_size_threshold = value
+        self.cm.fish_max_size_threshold = self.fish_max_size_threshold
+
+    @property
+    def enable_max_size_threshold(self):
+        return self._enable_max_size_threshold
+
+    @enable_max_size_threshold.setter
+    def enable_max_size_threshold(self, bool):
+        self._enable_max_size_threshold = bool
+
+    @property
+    def starting_area_x1_factor(self):
+        return self._starting_area_x1_factor
+
+    @starting_area_x1_factor.setter
+    def starting_area_x1_factor(self, value):
+        self._starting_area_x1_factor = value
+
+    @property
+    def starting_area_x2_factor(self):
+        return self._starting_area_x2_factor
+
+    @starting_area_x2_factor.setter
+    def starting_area_x2_factor(self, value):
+        self._starting_area_x2_factor = value
+
+    @property
+    def starting_area_y1_factor(self):
+        return self._starting_area_y1_factor
+
+    @starting_area_y1_factor.setter
+    def starting_area_y1_factor(self, value):
+        self._starting_area_y1_factor = value
+
+    @property
+    def starting_area_y2_factor(self):
+        return self._starting_area_y2_factor
+
+    @starting_area_y2_factor.setter
+    def starting_area_y2_factor(self, value):
+        self._starting_area_y2_factor = value
+
+    @property
+    def start_ori(self):
+        return self._start_ori
+
+    @start_ori.setter
+    def start_ori(self, value):
+        self._start_ori = value
+
+    @property
+    def lineend_offset(self):
+        return self._lineend_offset
+
+    @lineend_offset.setter
+    def lineend_offset(self, value):
+        self._lineend_offset = value
+
+    @property
+    def circle_size(self):
+        return self._circle_size
+
+    @circle_size.setter
+    def circle_size(self, value):
+        self._circle_size = value
+
+    @property
+    def draw_contour(self):
+        return self._draw_contour
+
+    @draw_contour.setter
+    def draw_contour(self, boo):
+        self._draw_contour = boo
+
+    @property
+    def draw_ellipse(self):
+        return self._draw_ellipse
+
+    @draw_ellipse.setter
+    def draw_ellipse(self, boo):
+        self._draw_ellipse = boo
+
+    @property
+    def show_bg_sub_img(self):
+        return self._show_bg_sub_img
+
+    @show_bg_sub_img.setter
+    def show_bg_sub_img(self, boo):
+        self._show_bg_sub_img = boo
+
+    @property
+    def show_morphed_img(self):
+        return self._show_bg_sub_img
+
+    @show_morphed_img.setter
+    def show_morphed_img(self, boo):
+        self._show_morphed_img = boo
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
