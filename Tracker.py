@@ -221,24 +221,6 @@ class Tracker(object):
                 ## size  : ellipse[1]
                 ## angle : ellipse[2]
 
-    # # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
-    # def get_line_from_ellipse(self):
-    #     center_x = self.ellipse[0][0]
-    #     center_y = self.ellipse[0][1]
-    #     grade_angle = -1 * self.ellipse[2]
-    #     angle_prop = grade_angle/180
-    #     angle = math.pi*angle_prop
-    #
-    #     x_dif = math.sin(angle)
-    #     y_dif = math.cos(angle)
-    #
-    #     x1 = int(round(center_x - self._lineend_offset*x_dif))
-    #     y1 = int(round(center_y - self._lineend_offset*y_dif))
-    #     x2 = int(round(center_x + self._lineend_offset*x_dif))
-    #     y2 = int(round(center_y + self._lineend_offset*y_dif))
-    #
-    #     return x1, y1, x2, y2
-
     def extract_data(self):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG2()
