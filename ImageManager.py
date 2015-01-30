@@ -1,13 +1,17 @@
 import cv2
+import math
 
 class ImageManager(object):
 
     def __init__(self):
+        self._last_frame = None
+        self._last_frame_ov_output = None
+
         self._img_travel_orientation = []
         self._img_travel_route = []
 
-        self._last_frame = None
-        self._last_frame_ov_output = None
+        self._lineend_offset = 5
+        self._circle_size = 2
 
         self._draw_contour = False
         self._draw_ellipse = True
@@ -22,6 +26,22 @@ class ImageManager(object):
         self._show_bg_sub_img = False
         self._show_morphed_img = False
 
+        # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
+    def get_line_from_ellipse(self, ellipse):
+        center_x = ellipse[0][0]
+        center_y = ellipse[0][1]
+        grade_angle = -1 * ellipse[2]
+        angle_prop = grade_angle/180
+        angle = math.pi*angle_prop
+
+        x_dif = math.sin(angle)
+        y_dif = math.cos(angle)
+
+        self.lx1 = int(round(center_x - self.lineend_offset*x_dif))
+        self.ly1 = int(round(center_y - self.lineend_offset*y_dif))
+        self.lx2 = int(round(center_x + self.lineend_offset*x_dif))
+        self.ly2 = int(round(center_y + self.lineend_offset*y_dif))
+
     def append_to_travel_orientation(self):
         coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
         self.img_travel_orientation.append(coordinates)
@@ -33,11 +53,36 @@ class ImageManager(object):
             point = (ellipse_x, ellipse_y)
             self.img_travel_route.append(point)
 
-    # TODO create this to draw all the data and only call this function in Tracker.extract_dat()!
-    def draw_extracted_data(self):
-        return
+    def draw_extracted_data(self, ellipse, bool_fish_started, roi_img, contour_list):
+        # draw data for visual feedback while tracking
+        # draw ellipse
+        if self._draw_ellipse and ellipse is not None and bool_fish_started:
+            cv2.ellipse(roi_img, ellipse, (0, 0, 255), 2)
 
-    # FIXME estimated data not visible anymore after merging with real data!
+        # draw countours to ROI img and show img
+        if self.draw_contour:
+            cv2.drawContours(roi_img, contour_list, -1, (0, 255, 0), 3)
+
+        # draw travel route
+        if self.draw_travel_orientation:
+            for coordinates in self.img_travel_orientation:
+                cv2.line(roi_img, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
+
+        # draw travel orientation
+        if self.draw_travel_route:
+            for point in self.img_travel_route:
+                cv2.circle(roi_img, point, self._circle_size, (255, 0, 0))
+
+    def draw_data_on_overview_image(self, roi, dm):
+        # draw data for output image
+        if self.draw_original_output:
+            for coordinates in self.img_travel_orientation:
+                cv2.line(self.last_frame_ov_output, (coordinates[0] + roi.x1, coordinates[1] + roi.y1),
+                         (coordinates[2] + roi.x1, coordinates[3] + roi.y1), (150,150,0), 1)
+            for point in dm.all_pos_original:
+                if point is not None:
+                    cv2.circle(self.last_frame_ov_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
+
     def draw_estimated_data(self, boo_estimate_missing_data, estimated_pos_roi, roi, circle_size):
         if not boo_estimate_missing_data:
             return
@@ -156,3 +201,17 @@ class ImageManager(object):
     @ly2.setter
     def ly2(self, value):
         self._ly2 = value
+
+    @property
+    def lineend_offset(self):
+        return self._lineend_offset
+    @lineend_offset.setter
+    def lineend_offset(self, value):
+        self._lineend_offset = value
+
+    @property
+    def circle_size(self):
+        return self._circle_size
+    @circle_size.setter
+    def circle_size(self, value):
+        self._circle_size = value

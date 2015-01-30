@@ -76,8 +76,6 @@ class Tracker(object):
 
         self.ellipse = None
         self.line = None
-        self._lineend_offset = 5
-        self._circle_size = 2
 
         #TODO remove this!
         self.estimate_missing_data = True
@@ -122,19 +120,19 @@ class Tracker(object):
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
-        self._show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
-        self._show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
-        self._draw_contour = cfg.getboolean('image_processing', 'draw_contour')
-        self._draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
+        self.im.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
+        self.im.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
+        self.im.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
+        self.im.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
-        self._lineend_offset = cfg.getint('visualization', 'lineend_offset')
-        self._circle_size = cfg.getint('visualization', 'circle_size')
+        self.im._lineend_offset = cfg.getint('visualization', 'lineend_offset')
+        self.im._circle_size = cfg.getint('visualization', 'circle_size')
         return
 
-    def show_imgs(self, img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
-        if self._show_bg_sub_img:
+    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+        if self.im.show_bg_sub_img:
             cv2.imshow("bgsub", roi_bg_sub)
-        if self._show_morphed_img:
+        if self.im.show_morphed_img:
             cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
@@ -221,24 +219,6 @@ class Tracker(object):
                 ## size  : ellipse[1]
                 ## angle : ellipse[2]
 
-    # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
-    def get_line_from_ellipse(self):
-        center_x = self.ellipse[0][0]
-        center_y = self.ellipse[0][1]
-        grade_angle = -1 * self.ellipse[2]
-        angle_prop = grade_angle/180
-        angle = math.pi*angle_prop
-
-        x_dif = math.sin(angle)
-        y_dif = math.cos(angle)
-
-        x1 = int(round(center_x - self._lineend_offset*x_dif))
-        y1 = int(round(center_y - self._lineend_offset*y_dif))
-        x2 = int(round(center_x + self._lineend_offset*x_dif))
-        y2 = int(round(center_y + self._lineend_offset*y_dif))
-
-        return x1, y1, x2, y2
-
     def extract_data(self):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG2()
@@ -253,13 +233,13 @@ class Tracker(object):
             self.dm.frame_counter += 1
 
             # set region of interest ROI
-            roi = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
-            roi_output = copy.copy(roi)
+            roi_img = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
+            roi_output = copy.copy(roi_img)
 
-            frame_output = copy.copy(frame)
+            self.im.last_frame_ov_output = copy.copy(frame)
 
             # subtract background fro ROI
-            roi_bg_sub = bg_sub.apply(roi)
+            roi_bg_sub = bg_sub.apply(roi_img)
 
             # morph img
             ret, mo_roi_bg_sub = self.morph_img(roi_bg_sub)
@@ -289,7 +269,7 @@ class Tracker(object):
 
             # check if fish started
             if not self.fish_started:
-                self.check_if_fish_started(roi)
+                self.check_if_fish_started(roi_img)
 
             # if fish hasn't started yet, delete all contours
             if not self.fish_started:
@@ -302,22 +282,12 @@ class Tracker(object):
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
                 self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roi)
 
-            # draw countours to ROI img and show img
-            if self.draw_contour:
-                cv2.drawContours(roi, self.cm.contour_list, -1, (0, 255, 0), 3)
-
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
-            # draw ellipse
-            if self._draw_ellipse and self.ellipse is not None and self.fish_started:
-                cv2.ellipse(roi, self.ellipse, (0, 0, 255), 2)
 
             # get line from ellipse
             if self.fish_started and self.ellipse is not None:
-                self.im.lx1, self.im.ly1, self.im.lx2, self.im.ly2 = self.get_line_from_ellipse()
-            # draw line  #im!!!!!
-            if self.im.draw_line and self.ellipse is not None:
-                cv2.line(roi, (self.im.lx1, self.im.ly1), (self.im.lx2, self.im.ly2), (0, 0, 255), 1)
+                self.im.get_line_from_ellipse(self.ellipse)
 
             # append ellipse center to travel route
             if self.im.draw_travel_route:
@@ -339,39 +309,20 @@ class Tracker(object):
             if self.im.draw_travel_orientation and self.fish_started:
                 self.im.append_to_travel_orientation()
 
-
-            # draw travel route
-            if self.im.draw_travel_orientation:
-                for coordinates in self.im.img_travel_orientation:
-                    cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
-
-            # draw travel orientation
-            if self.im.draw_travel_route:
-                for point in self.im.img_travel_route:
-                    cv2.circle(roi, point, self._circle_size, (255, 0, 0))
-
-            if self.im.draw_original_output:
-                for coordinates in self.im.img_travel_orientation:
-                    cv2.line(frame_output, (coordinates[0] + self.roi.x1, coordinates[1] + self.roi.y1), 
-                             (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
-                for point in self.dm.all_pos_original:
-                    if point is not None:
-                        cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
+            self.im.draw_extracted_data(self.ellipse, self.fish_started, roi_img, self.cm.contour_list)
+            self.im.draw_data_on_overview_image(self.roi, self.dm)
 
             # show all imgs
-            if self.im.draw_original_output:
-                self.show_imgs(frame_output, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
-            else:
-                self.show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
+            self.show_imgs(roi_bg_sub, mo_roi_bg_sub)
 
             # show output img
             if not self.ui_mode_on:
-                cv2.imshow("contours", roi)
+                cv2.imshow("contours", roi_img)
             # if SAVE_FRAMES:
             #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
-            self.last_frame = roi
-            self.last_frame_OV_output = frame_output
+            self.im.last_frame = roi_img
+            # self.im.last_frame_ov_output = frame_output
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break
             if self.ui_abort_button_pressed:
@@ -400,7 +351,7 @@ class Tracker(object):
         if self.estimate_missing_data:
             self.dm.estimate_missing_pos(self.roi)
             self.dm.estimate_missing_ori()
-        self.im.draw_estimated_data(self.estimate_missing_data, self.dm.estimated_pos_roi, self.roi, self.circle_size)
+        self.im.draw_estimated_data(self.estimate_missing_data, self.dm.estimated_pos_roi, self.roi, self.im.circle_size)
 
         self.dm.copy_original_to_est_data()
 
@@ -434,16 +385,9 @@ class Tracker(object):
             DataWriter.write_nix(output_file_name + ".h5", times, self.dm.all_pos_original, self.dm.all_oris,
                                  self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
                                  self.dm.number_relevant_contours_per_frame, self.roi, params)
-        cv2.imwrite(output_file_name + "_OV_path.png", self.last_frame_OV_output)
+        cv2.imwrite(output_file_name + "_OV_path.png", self.im.last_frame_ov_output)
 
         self.dm.check_data_integrity()
-
-        # if self.draw_original_output:
-        #     cv2.namedWindow("result_ov")
-        #     cv2.moveWindow("result_ov", 900, 350)
-        #     cv2.imshow("result_ov", self.last_frame_OV_output)
-        #
-        # cv2.waitKey(0)
 
     @property
     def roi(self):
@@ -531,53 +475,6 @@ class Tracker(object):
     def start_ori(self, value):
         self._start_ori = value
 
-    @property
-    def lineend_offset(self):
-        return self._lineend_offset
-
-    @lineend_offset.setter
-    def lineend_offset(self, value):
-        self._lineend_offset = value
-
-    @property
-    def circle_size(self):
-        return self._circle_size
-
-    @circle_size.setter
-    def circle_size(self, value):
-        self._circle_size = value
-
-    @property
-    def draw_contour(self):
-        return self._draw_contour
-
-    @draw_contour.setter
-    def draw_contour(self, boo):
-        self._draw_contour = boo
-
-    @property
-    def draw_ellipse(self):
-        return self._draw_ellipse
-
-    @draw_ellipse.setter
-    def draw_ellipse(self, boo):
-        self._draw_ellipse = boo
-
-    @property
-    def show_bg_sub_img(self):
-        return self._show_bg_sub_img
-
-    @show_bg_sub_img.setter
-    def show_bg_sub_img(self, boo):
-        self._show_bg_sub_img = boo
-
-    @property
-    def show_morphed_img(self):
-        return self._show_bg_sub_img
-
-    @show_morphed_img.setter
-    def show_morphed_img(self, boo):
-        self._show_morphed_img = boo
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
