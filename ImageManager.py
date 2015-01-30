@@ -83,14 +83,18 @@ class ImageManager(object):
                 if point is not None:
                     cv2.circle(self.last_frame_ov_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
-    def draw_estimated_data(self, boo_estimate_missing_data, estimated_pos_roi, roi, circle_size):
-        if not boo_estimate_missing_data:
-            return
-
+    def draw_estimated_data(self, estimated_pos_roi, roi, circle_size):
         for c in estimated_pos_roi:
             if c is not None:
                 cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), circle_size, (0, 0, 255))
                 cv2.circle(self.last_frame_ov_output, (int(round(c[0])) + roi.x1, int(round(c[1]) + roi.y1)), circle_size, (0, 0, 255))
+
+    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+        if self.show_bg_sub_img:
+            cv2.imshow("bgsub", roi_bg_sub)
+        if self.show_morphed_img:
+            cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+        return
 
 
 

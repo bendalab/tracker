@@ -52,13 +52,12 @@ class Tracker(object):
         self._erosion_iterations = 1
         self._dilation_iterations = 4
 
-
         # fish size thresholds
         self._fish_size_threshold = 700
         self._fish_max_size_threshold = 4000
         self._enable_max_size_threshold = False
 
-        # tracking data
+        # Managers
         self.cm = ContourManager()
         self.dm = DataManager()
         self.im = ImageManager()
@@ -75,10 +74,7 @@ class Tracker(object):
         self.fish_not_detected_threshold_reached = False
 
         self.ellipse = None
-        self.line = None
-
-        #TODO remove this!
-        self.estimate_missing_data = True
+        # self.line = None
 
         # import config file values
         self.will_import_config_values = True
@@ -129,12 +125,12 @@ class Tracker(object):
         self.im._circle_size = cfg.getint('visualization', 'circle_size')
         return
 
-    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
-        if self.im.show_bg_sub_img:
-            cv2.imshow("bgsub", roi_bg_sub)
-        if self.im.show_morphed_img:
-            cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
-        return
+    # def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+    #     if self.im.show_bg_sub_img:
+    #         cv2.imshow("bgsub", roi_bg_sub)
+    #     if self.im.show_morphed_img:
+    #         cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+    #     return
 
     # sets video file to terminal-attribute path to video file
     def set_video_file(self):
@@ -244,12 +240,6 @@ class Tracker(object):
             # morph img
             ret, mo_roi_bg_sub = self.morph_img(roi_bg_sub)
 
-            # detect edges of bg-deleted img
-            edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
-
-            # detect edges of morphed img (not displayed)
-            mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
-
             # getting contours (of the morphed img)
             ret, thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
             self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -313,13 +303,11 @@ class Tracker(object):
             self.im.draw_data_on_overview_image(self.roi, self.dm)
 
             # show all imgs
-            self.show_imgs(roi_bg_sub, mo_roi_bg_sub)
+            self.im.show_imgs(roi_bg_sub, mo_roi_bg_sub)
 
             # show output img
             if not self.ui_mode_on:
                 cv2.imshow("contours", roi_img)
-            # if SAVE_FRAMES:
-            #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
             self.im.last_frame = roi_img
             # self.im.last_frame_ov_output = frame_output
@@ -348,10 +336,9 @@ class Tracker(object):
         self.set_video_capture()
 
         self.extract_data()
-        if self.estimate_missing_data:
-            self.dm.estimate_missing_pos(self.roi)
-            self.dm.estimate_missing_ori()
-        self.im.draw_estimated_data(self.estimate_missing_data, self.dm.estimated_pos_roi, self.roi, self.im.circle_size)
+        self.dm.estimate_missing_pos(self.roi)
+        self.dm.estimate_missing_ori()
+        self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roi, self.im.circle_size)
 
         self.dm.copy_original_to_est_data()
 

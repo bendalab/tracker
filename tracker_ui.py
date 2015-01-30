@@ -9,7 +9,7 @@ from PyQt4 import QtCore, QtGui
 from Tracker import Tracker
 import os
 import sys
-import numpy
+import numpy as np
 import cv2
 import copy
 import ConfigParser
