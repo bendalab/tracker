@@ -240,12 +240,6 @@ class Tracker(object):
             # morph img
             ret, mo_roi_bg_sub = self.morph_img(roi_bg_sub)
 
-            # detect edges of bg-deleted img
-            edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
-
-            # detect edges of morphed img (not displayed)
-            mo_edges = cv2.Canny(mo_roi_bg_sub, 500, 500)
-
             # getting contours (of the morphed img)
             ret, thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
             self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
