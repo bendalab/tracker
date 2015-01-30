@@ -76,8 +76,8 @@ class Tracker(object):
 
         self.ellipse = None
         self.line = None
-        self._lineend_offset = 5
-        self._circle_size = 2
+        # self._lineend_offset = 5
+        # self._circle_size = 2
 
         #TODO remove this!
         self.estimate_missing_data = True
@@ -253,13 +253,13 @@ class Tracker(object):
             self.dm.frame_counter += 1
 
             # set region of interest ROI
-            roi = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
-            roi_output = copy.copy(roi)
+            roi_img = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
+            roi_output = copy.copy(roi_img)
 
             frame_output = copy.copy(frame)
 
             # subtract background fro ROI
-            roi_bg_sub = bg_sub.apply(roi)
+            roi_bg_sub = bg_sub.apply(roi_img)
 
             # morph img
             ret, mo_roi_bg_sub = self.morph_img(roi_bg_sub)
@@ -289,7 +289,7 @@ class Tracker(object):
 
             # check if fish started
             if not self.fish_started:
-                self.check_if_fish_started(roi)
+                self.check_if_fish_started(roi_img)
 
             # if fish hasn't started yet, delete all contours
             if not self.fish_started:
@@ -302,22 +302,12 @@ class Tracker(object):
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
                 self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roi)
 
-            # draw countours to ROI img and show img
-            if self.draw_contour:
-                cv2.drawContours(roi, self.cm.contour_list, -1, (0, 255, 0), 3)
-
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
-            # draw ellipse
-            if self._draw_ellipse and self.ellipse is not None and self.fish_started:
-                cv2.ellipse(roi, self.ellipse, (0, 0, 255), 2)
 
             # get line from ellipse
             if self.fish_started and self.ellipse is not None:
                 self.im.lx1, self.im.ly1, self.im.lx2, self.im.ly2 = self.get_line_from_ellipse()
-            # draw line  #im!!!!!
-            if self.im.draw_line and self.ellipse is not None:
-                cv2.line(roi, (self.im.lx1, self.im.ly1), (self.im.lx2, self.im.ly2), (0, 0, 255), 1)
 
             # append ellipse center to travel route
             if self.im.draw_travel_route:
@@ -339,24 +329,8 @@ class Tracker(object):
             if self.im.draw_travel_orientation and self.fish_started:
                 self.im.append_to_travel_orientation()
 
-
-            # draw travel route
-            if self.im.draw_travel_orientation:
-                for coordinates in self.im.img_travel_orientation:
-                    cv2.line(roi, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
-
-            # draw travel orientation
-            if self.im.draw_travel_route:
-                for point in self.im.img_travel_route:
-                    cv2.circle(roi, point, self._circle_size, (255, 0, 0))
-
-            if self.im.draw_original_output:
-                for coordinates in self.im.img_travel_orientation:
-                    cv2.line(frame_output, (coordinates[0] + self.roi.x1, coordinates[1] + self.roi.y1), 
-                             (coordinates[2] + self.roi.x1, coordinates[3] + self.roi.y1), (150,150,0), 1)
-                for point in self.dm.all_pos_original:
-                    if point is not None:
-                        cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
+            self.im.draw_extracted_data(self.ellipse, self.fish_started, roi_img, self.cm.contour_list)
+            self.im.draw_data_on_overview_image(frame_output, self.roi, self.dm)
 
             # show all imgs
             if self.im.draw_original_output:
@@ -366,11 +340,11 @@ class Tracker(object):
 
             # show output img
             if not self.ui_mode_on:
-                cv2.imshow("contours", roi)
+                cv2.imshow("contours", roi_img)
             # if SAVE_FRAMES:
             #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
-            self.last_frame = roi
+            self.last_frame = roi_img
             self.last_frame_OV_output = frame_output
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break

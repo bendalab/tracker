@@ -3,11 +3,14 @@ import cv2
 class ImageManager(object):
 
     def __init__(self):
+        self._last_frame = None
+        self._last_frame_ov_output = None
+
         self._img_travel_orientation = []
         self._img_travel_route = []
 
-        self._last_frame = None
-        self._last_frame_ov_output = None
+        self._lineend_offset = 5
+        self._circle_size = 2
 
         self._draw_contour = False
         self._draw_ellipse = True
@@ -33,9 +36,35 @@ class ImageManager(object):
             point = (ellipse_x, ellipse_y)
             self.img_travel_route.append(point)
 
-    # TODO create this to draw all the data and only call this function in Tracker.extract_dat()!
-    def draw_extracted_data(self):
-        return
+    def draw_extracted_data(self, ellipse, bool_fish_started, roi_img, contour_list):
+        # draw data for visual feedback while tracking
+        # draw ellipse
+        if self._draw_ellipse and ellipse is not None and bool_fish_started:
+            cv2.ellipse(roi_img, ellipse, (0, 0, 255), 2)
+
+        # draw countours to ROI img and show img
+        if self.draw_contour:
+            cv2.drawContours(roi_img, contour_list, -1, (0, 255, 0), 3)
+
+        # draw travel route
+        if self.draw_travel_orientation:
+            for coordinates in self.img_travel_orientation:
+                cv2.line(roi_img, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
+
+        # draw travel orientation
+        if self.draw_travel_route:
+            for point in self.img_travel_route:
+                cv2.circle(roi_img, point, self._circle_size, (255, 0, 0))
+
+    def draw_data_on_overview_image(self, frame_output, roi, dm):
+        # draw data for output image
+        if self.draw_original_output:
+            for coordinates in self.img_travel_orientation:
+                cv2.line(frame_output, (coordinates[0] + roi.x1, coordinates[1] + roi.y1),
+                         (coordinates[2] + roi.x1, coordinates[3] + roi.y1), (150,150,0), 1)
+            for point in dm.all_pos_original:
+                if point is not None:
+                    cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
     # FIXME estimated data not visible anymore after merging with real data!
     def draw_estimated_data(self, boo_estimate_missing_data, estimated_pos_roi, roi, circle_size):
@@ -156,3 +185,17 @@ class ImageManager(object):
     @ly2.setter
     def ly2(self, value):
         self._ly2 = value
+
+    @property
+    def lineend_offset(self):
+        return self._lineend_offset
+    @lineend_offset.setter
+    def lineend_offset(self, value):
+        self.lineend_offset = value
+
+    @property
+    def circle_size(self):
+        return self._circle_size
+    @circle_size.setter
+    def circle_size(self, value):
+        self._circle_size = value
