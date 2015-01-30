@@ -52,7 +52,6 @@ class Tracker(object):
         self._erosion_iterations = 1
         self._dilation_iterations = 4
 
-
         # fish size thresholds
         self._fish_size_threshold = 700
         self._fish_max_size_threshold = 4000
@@ -75,10 +74,7 @@ class Tracker(object):
         self.fish_not_detected_threshold_reached = False
 
         self.ellipse = None
-        self.line = None
-
-        #TODO remove this!
-        self.estimate_missing_data = True
+        # self.line = None
 
         # import config file values
         self.will_import_config_values = True
@@ -348,10 +344,9 @@ class Tracker(object):
         self.set_video_capture()
 
         self.extract_data()
-        if self.estimate_missing_data:
-            self.dm.estimate_missing_pos(self.roi)
-            self.dm.estimate_missing_ori()
-        self.im.draw_estimated_data(self.estimate_missing_data, self.dm.estimated_pos_roi, self.roi, self.im.circle_size)
+        self.dm.estimate_missing_pos(self.roi)
+        self.dm.estimate_missing_ori()
+        self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roi, self.im.circle_size)
 
         self.dm.copy_original_to_est_data()
 
