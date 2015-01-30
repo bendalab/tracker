@@ -37,12 +37,10 @@ class ImageManager(object):
         x_dif = math.sin(angle)
         y_dif = math.cos(angle)
 
-        x1 = int(round(center_x - self.lineend_offset*x_dif))
-        y1 = int(round(center_y - self.lineend_offset*y_dif))
-        x2 = int(round(center_x + self.lineend_offset*x_dif))
-        y2 = int(round(center_y + self.lineend_offset*y_dif))
-
-        return x1, y1, x2, y2
+        self.lx1 = int(round(center_x - self.lineend_offset*x_dif))
+        self.ly1 = int(round(center_y - self.lineend_offset*y_dif))
+        self.lx2 = int(round(center_x + self.lineend_offset*x_dif))
+        self.ly2 = int(round(center_y + self.lineend_offset*y_dif))
 
     def append_to_travel_orientation(self):
         coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)

@@ -307,7 +307,7 @@ class Tracker(object):
 
             # get line from ellipse
             if self.fish_started and self.ellipse is not None:
-                self.im.lx1, self.im.ly1, self.im.lx2, self.im.ly2 = self.im.get_line_from_ellipse(self.ellipse)
+                self.im.get_line_from_ellipse(self.ellipse)
 
             # append ellipse center to travel route
             if self.im.draw_travel_route:
