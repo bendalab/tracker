@@ -869,16 +869,16 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tracker.dilation_iterations = value
 
     def change_show_bg_sub_img(self):
-        self.tracker.show_bg_sub_img = self.cbx_show_bgsub_img.isChecked()
+        self.tracker.im.show_bg_sub_img = self.cbx_show_bgsub_img.isChecked()
 
     def change_show_morphed_img(self):
-        self.tracker.show_morphed_img = self.cbx_show_morph_img.isChecked()
+        self.tracker.im.show_morphed_img = self.cbx_show_morph_img.isChecked()
 
     def change_draw_contour(self):
-        self.tracker.draw_contour = self.cbx_show_contour.isChecked()
+        self.tracker.im.draw_contour = self.cbx_show_contour.isChecked()
 
     def change_draw_ellipse(self):
-        self.tracker.draw_ellipse = self.cbx_show_ellipse.isChecked()
+        self.tracker.im.draw_ellipse = self.cbx_show_ellipse.isChecked()
 
     def change_lineend_offset(self, value):
         self.tracker.im.lineend_offset = value
