@@ -56,15 +56,15 @@ class ImageManager(object):
             for point in self.img_travel_route:
                 cv2.circle(roi_img, point, self._circle_size, (255, 0, 0))
 
-    def draw_data_on_overview_image(self, frame_output, roi, dm):
+    def draw_data_on_overview_image(self, roi, dm):
         # draw data for output image
         if self.draw_original_output:
             for coordinates in self.img_travel_orientation:
-                cv2.line(frame_output, (coordinates[0] + roi.x1, coordinates[1] + roi.y1),
+                cv2.line(self.last_frame_ov_output, (coordinates[0] + roi.x1, coordinates[1] + roi.y1),
                          (coordinates[2] + roi.x1, coordinates[3] + roi.y1), (150,150,0), 1)
             for point in dm.all_pos_original:
                 if point is not None:
-                    cv2.circle(frame_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
+                    cv2.circle(self.last_frame_ov_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
     # FIXME estimated data not visible anymore after merging with real data!
     def draw_estimated_data(self, boo_estimate_missing_data, estimated_pos_roi, roi, circle_size):
