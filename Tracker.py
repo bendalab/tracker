@@ -129,10 +129,10 @@ class Tracker(object):
         self.im._circle_size = cfg.getint('visualization', 'circle_size')
         return
 
-    def show_imgs(self, img, roi_output, roi_bg_sub, mo_roi_bg_sub, edges):
-        if self.im._show_bg_sub_img:
+    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+        if self.im.show_bg_sub_img:
             cv2.imshow("bgsub", roi_bg_sub)
-        if self.im._show_morphed_img:
+        if self.im.show_morphed_img:
             cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
@@ -313,10 +313,7 @@ class Tracker(object):
             self.im.draw_data_on_overview_image(self.roi, self.dm)
 
             # show all imgs
-            if self.im.draw_original_output:
-                self.show_imgs(self.im.last_frame_ov_output, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
-            else:
-                self.show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
+            self.show_imgs(roi_bg_sub, mo_roi_bg_sub)
 
             # show output img
             if not self.ui_mode_on:
