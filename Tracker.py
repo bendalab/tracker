@@ -125,12 +125,12 @@ class Tracker(object):
         self.im._circle_size = cfg.getint('visualization', 'circle_size')
         return
 
-    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
-        if self.im.show_bg_sub_img:
-            cv2.imshow("bgsub", roi_bg_sub)
-        if self.im.show_morphed_img:
-            cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
-        return
+    # def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+    #     if self.im.show_bg_sub_img:
+    #         cv2.imshow("bgsub", roi_bg_sub)
+    #     if self.im.show_morphed_img:
+    #         cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+    #     return
 
     # sets video file to terminal-attribute path to video file
     def set_video_file(self):
@@ -303,7 +303,7 @@ class Tracker(object):
             self.im.draw_data_on_overview_image(self.roi, self.dm)
 
             # show all imgs
-            self.show_imgs(roi_bg_sub, mo_roi_bg_sub)
+            self.im.show_imgs(roi_bg_sub, mo_roi_bg_sub)
 
             # show output img
             if not self.ui_mode_on:

@@ -89,6 +89,13 @@ class ImageManager(object):
                 cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), circle_size, (0, 0, 255))
                 cv2.circle(self.last_frame_ov_output, (int(round(c[0])) + roi.x1, int(round(c[1]) + roi.y1)), circle_size, (0, 0, 255))
 
+    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+        if self.show_bg_sub_img:
+            cv2.imshow("bgsub", roi_bg_sub)
+        if self.show_morphed_img:
+            cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+        return
+
 
 
 
