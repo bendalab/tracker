@@ -256,7 +256,7 @@ class Tracker(object):
             roi_img = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
             roi_output = copy.copy(roi_img)
 
-            frame_output = copy.copy(frame)
+            self.im.last_frame_ov_output = copy.copy(frame)
 
             # subtract background fro ROI
             roi_bg_sub = bg_sub.apply(roi_img)
@@ -330,11 +330,11 @@ class Tracker(object):
                 self.im.append_to_travel_orientation()
 
             self.im.draw_extracted_data(self.ellipse, self.fish_started, roi_img, self.cm.contour_list)
-            self.im.draw_data_on_overview_image(frame_output, self.roi, self.dm)
+            self.im.draw_data_on_overview_image(self.roi, self.dm)
 
             # show all imgs
             if self.im.draw_original_output:
-                self.show_imgs(frame_output, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
+                self.show_imgs(self.im.last_frame_ov_output, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
             else:
                 self.show_imgs(frame, roi_output, roi_bg_sub, mo_roi_bg_sub, edges)
 
@@ -344,8 +344,8 @@ class Tracker(object):
             # if SAVE_FRAMES:
             #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
-            self.last_frame = roi_img
-            self.last_frame_OV_output = frame_output
+            self.im.last_frame = roi_img
+            # self.im.last_frame_ov_output = frame_output
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break
             if self.ui_abort_button_pressed:
@@ -408,7 +408,7 @@ class Tracker(object):
             DataWriter.write_nix(output_file_name + ".h5", times, self.dm.all_pos_original, self.dm.all_oris,
                                  self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
                                  self.dm.number_relevant_contours_per_frame, self.roi, params)
-        cv2.imwrite(output_file_name + "_OV_path.png", self.last_frame_OV_output)
+        cv2.imwrite(output_file_name + "_OV_path.png", self.im.last_frame_ov_output)
 
         self.dm.check_data_integrity()
 
