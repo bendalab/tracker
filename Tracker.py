@@ -57,7 +57,7 @@ class Tracker(object):
         self._fish_max_size_threshold = 4000
         self._enable_max_size_threshold = False
 
-        # tracking data
+        # Managers
         self.cm = ContourManager()
         self.dm = DataManager()
         self.im = ImageManager()
@@ -314,8 +314,6 @@ class Tracker(object):
             # show output img
             if not self.ui_mode_on:
                 cv2.imshow("contours", roi_img)
-            # if SAVE_FRAMES:
-            #     cv2.imwrite(dir + "frames/" + str(frame_counter) + "_contours" + ".jpg", roi)
 
             self.im.last_frame = roi_img
             # self.im.last_frame_ov_output = frame_output
