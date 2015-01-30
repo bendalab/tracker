@@ -76,8 +76,6 @@ class Tracker(object):
 
         self.ellipse = None
         self.line = None
-        # self._lineend_offset = 5
-        # self._circle_size = 2
 
         #TODO remove this!
         self.estimate_missing_data = True
