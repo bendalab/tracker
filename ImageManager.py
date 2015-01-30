@@ -1,4 +1,5 @@
 import cv2
+import math
 
 class ImageManager(object):
 
@@ -24,6 +25,24 @@ class ImageManager(object):
         self._draw_original_output = True
         self._show_bg_sub_img = False
         self._show_morphed_img = False
+
+        # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
+    def get_line_from_ellipse(self, ellipse):
+        center_x = ellipse[0][0]
+        center_y = ellipse[0][1]
+        grade_angle = -1 * ellipse[2]
+        angle_prop = grade_angle/180
+        angle = math.pi*angle_prop
+
+        x_dif = math.sin(angle)
+        y_dif = math.cos(angle)
+
+        x1 = int(round(center_x - self.lineend_offset*x_dif))
+        y1 = int(round(center_y - self.lineend_offset*y_dif))
+        x2 = int(round(center_x + self.lineend_offset*x_dif))
+        y2 = int(round(center_y + self.lineend_offset*y_dif))
+
+        return x1, y1, x2, y2
 
     def append_to_travel_orientation(self):
         coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
@@ -66,7 +85,6 @@ class ImageManager(object):
                 if point is not None:
                     cv2.circle(self.last_frame_ov_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
-    # FIXME estimated data not visible anymore after merging with real data!
     def draw_estimated_data(self, boo_estimate_missing_data, estimated_pos_roi, roi, circle_size):
         if not boo_estimate_missing_data:
             return
@@ -191,7 +209,7 @@ class ImageManager(object):
         return self._lineend_offset
     @lineend_offset.setter
     def lineend_offset(self, value):
-        self.lineend_offset = value
+        self._lineend_offset = value
 
     @property
     def circle_size(self):
