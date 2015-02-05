@@ -198,7 +198,7 @@ class Tracker(object):
             for i in range(0, len(self.cm.contour_list)):
                 cnt = self.cm.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
-                if ellipse[0][0] > non_starting_area_x1 and ellipse[0][0] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
+                if non_starting_area_x2 > ellipse[0][0] > non_starting_area_x1 and non_starting_area_y2 > ellipse[0][1] > non_starting_area_y1:
                     self.fish_started = True
 
     # fitting ellipse onto contour
