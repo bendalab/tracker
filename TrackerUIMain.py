@@ -1,6 +1,6 @@
 import sys
 from PyQt4 import QtGui
-from UI.TrackerUI import TrackerUserInterface
+from ui.TrackerUI import TrackerUserInterface
 
 if __name__ == "__main__":
     print "ignore Gtk-warning..."
