@@ -6,7 +6,7 @@
 #      by: PyQt4 UI code generator 4.10.4
 
 from PyQt4 import QtCore, QtGui
-from Tracker import Tracker
+from Core.Tracker import Tracker
 import os
 import sys
 import numpy as np
