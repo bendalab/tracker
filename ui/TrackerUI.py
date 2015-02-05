@@ -3,10 +3,10 @@
 # Form implementation generated from reading ui file 'tracker_ui.ui'
 #
 # Created: Mon Dec  1 12:45:22 2014
-#      by: PyQt4 UI code generator 4.10.4
+#      by: PyQt4 ui code generator 4.10.4
 
 from PyQt4 import QtCore, QtGui
-from Core.Tracker import Tracker
+from core.Tracker import Tracker
 import os
 import sys
 import numpy as np
