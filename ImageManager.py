@@ -1,6 +1,7 @@
 import cv2
 import math
 
+
 class ImageManager(object):
 
     def __init__(self):
