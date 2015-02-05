@@ -9,6 +9,7 @@ import os
 import argparse
 import ConfigParser
 from ROI import ROI
+from RelROI import RelROI
 from DataWriter import DataWriter
 from ContourManager import ContourManager
 from DataManager import DataManager
@@ -63,10 +64,7 @@ class Tracker(object):
         self.im = ImageManager()
 
         self.fish_started = False
-        self._starting_area_x1_factor = 0.85
-        self._starting_area_x2_factor = 1.00
-        self._starting_area_y1_factor = 0.30
-        self._starting_area_y2_factor = 0.70
+        self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
 
         self._start_ori = 270
 
@@ -101,10 +99,10 @@ class Tracker(object):
         self._roi.y2 = cfg.getint('roi', 'y2')
 
         # starting area
-        self.starting_area_x1_factor = cfg.getfloat('starting_area', 'x1_factor')
-        self.starting_area_x2_factor = cfg.getfloat('starting_area', 'x2_factor')
-        self.starting_area_y1_factor = cfg.getfloat('starting_area', 'y1_factor')
-        self.starting_area_y2_factor = cfg.getfloat('starting_area', 'y2_factor')
+        self.starting_area.x1_factor = cfg.getfloat('starting_area', 'x1_factor')
+        self.starting_area.x2_factor = cfg.getfloat('starting_area', 'x2_factor')
+        self.starting_area.y1_factor = cfg.getfloat('starting_area', 'y1_factor')
+        self.starting_area.y2_factor = cfg.getfloat('starting_area', 'y2_factor')
 
         self._start_ori = cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
@@ -191,16 +189,16 @@ class Tracker(object):
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
         height, width, depth = roi.shape
-        non_starting_area_x1 = int(self._starting_area_x1_factor * width)
-        non_starting_area_x2 = int(self._starting_area_x2_factor * width)
-        non_starting_area_y1 = int(self._starting_area_y1_factor * height)
-        non_starting_area_y2 = int(self._starting_area_y2_factor * height)
+        starting_area_x1 = int(self.starting_area.x1_factor * width)
+        starting_area_x2 = int(self.starting_area.x2_factor * width)
+        starting_area_y1 = int(self.starting_area.y1_factor * height)
+        starting_area_y2 = int(self.starting_area.y2_factor * height)
 
         if self.cm.contour_list is not None:
             for i in range(0, len(self.cm.contour_list)):
                 cnt = self.cm.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
-                if ellipse[0][0] > non_starting_area_x1 and ellipse[0][0] < non_starting_area_x2 and ellipse[0][1] > non_starting_area_y1 and ellipse[0][1] < non_starting_area_y2:
+                if starting_area_x1 < ellipse[0][0] < starting_area_x2 and starting_area_y1 < ellipse[0][1] < starting_area_y2:
                     self.fish_started = True
 
     # fitting ellipse onto contour
@@ -355,10 +353,10 @@ class Tracker(object):
         params = {}
         params['fish size'] = self._fish_size_threshold
         params['start ori'] = self._start_ori
-        params['starting area x1'] = self._starting_area_x1_factor
-        params['starting area x2'] = self._starting_area_x2_factor
-        params['starting area y1'] = self._starting_area_y1_factor
-        params['starting area y2'] = self._starting_area_y2_factor
+        params['starting area x1'] = self.starting_area.x1_factor
+        params['starting area x2'] = self.starting_area.x2_factor
+        params['starting area y1'] = self.starting_area.y1_factor
+        params['starting area y2'] = self.starting_area.y2_factor
         params['source file'] = self.video_file
 
         if not os.path.exists(out_dir):
@@ -421,38 +419,6 @@ class Tracker(object):
     @enable_max_size_threshold.setter
     def enable_max_size_threshold(self, bool):
         self._enable_max_size_threshold = bool
-
-    @property
-    def starting_area_x1_factor(self):
-        return self._starting_area_x1_factor
-
-    @starting_area_x1_factor.setter
-    def starting_area_x1_factor(self, value):
-        self._starting_area_x1_factor = value
-
-    @property
-    def starting_area_x2_factor(self):
-        return self._starting_area_x2_factor
-
-    @starting_area_x2_factor.setter
-    def starting_area_x2_factor(self, value):
-        self._starting_area_x2_factor = value
-
-    @property
-    def starting_area_y1_factor(self):
-        return self._starting_area_y1_factor
-
-    @starting_area_y1_factor.setter
-    def starting_area_y1_factor(self, value):
-        self._starting_area_y1_factor = value
-
-    @property
-    def starting_area_y2_factor(self):
-        return self._starting_area_y2_factor
-
-    @starting_area_y2_factor.setter
-    def starting_area_y2_factor(self, value):
-        self._starting_area_y2_factor = value
 
     @property
     def start_ori(self):

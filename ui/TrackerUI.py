@@ -3,10 +3,10 @@
 # Form implementation generated from reading ui file 'tracker_ui.ui'
 #
 # Created: Mon Dec  1 12:45:22 2014
-#      by: PyQt4 UI code generator 4.10.4
+#      by: PyQt4 ui code generator 4.10.4
 
 from PyQt4 import QtCore, QtGui
-from Tracker import Tracker
+from core.Tracker import Tracker
 import os
 import sys
 import numpy as np
@@ -614,7 +614,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_browse_file.setShortcut('Ctrl+f')
         self.btn_browse_file.setToolTip("Strg + F")
 
-    def center_ui(self):
+    def center_ui(self, qApp):
         # screen = QDesktopWidget().screenGeometry()
         screen = qApp.desktop().screenGeometry()
         gui_size = self.geometry()
@@ -645,10 +645,10 @@ class TrackerUserInterface(QtGui.QWidget):
         self.spinBox_frame_waittime.setValue(self.tracker.frame_waittime)
 
         # starting area spinboxes
-        self.spinBox_starting_x1_factor.setValue(self.tracker.starting_area_x1_factor * 100)
-        self.spinBox_starting_x2_factor.setValue(self.tracker.starting_area_x2_factor * 100)
-        self.spinBox_starting_y1_factor.setValue(self.tracker.starting_area_y1_factor * 100)
-        self.spinBox_starting_y2_factor.setValue(self.tracker.starting_area_y2_factor * 100)
+        self.spinBox_starting_x1_factor.setValue(self.tracker.starting_area.x1_factor * 100)
+        self.spinBox_starting_x2_factor.setValue(self.tracker.starting_area.x2_factor * 100)
+        self.spinBox_starting_y1_factor.setValue(self.tracker.starting_area.y1_factor * 100)
+        self.spinBox_starting_y2_factor.setValue(self.tracker.starting_area.y2_factor * 100)
         self.spinBox_starting_x1_factor.setMaximum(self.spinBox_starting_x2_factor.value()-1)
         self.spinBox_starting_x2_factor.setMinimum(self.spinBox_starting_x1_factor.value()+1)
         self.spinBox_starting_y1_factor.setMaximum(self.spinBox_starting_y2_factor.value()-1)
@@ -791,10 +791,10 @@ class TrackerUserInterface(QtGui.QWidget):
     def display_starting_area_preview(self):
         roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi.y1:self.tracker.roi.y2, self.tracker.roi.x1:self.tracker.roi.x2])
         height, width, depth = roi_only_draw_numpy.shape
-        x1 = int(self.tracker.starting_area_x1_factor * width)
-        x2 = int(self.tracker.starting_area_x2_factor * width)
-        y1 = int(self.tracker.starting_area_y1_factor * height)
-        y2 = int(self.tracker.starting_area_y2_factor * height)
+        x1 = int(self.tracker.starting_area.x1_factor * width)
+        x2 = int(self.tracker.starting_area.x2_factor * width)
+        y1 = int(self.tracker.starting_area.y1_factor * height)
+        y2 = int(self.tracker.starting_area.y2_factor * height)
         cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
         # convert to qimage
         sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
@@ -834,13 +834,13 @@ class TrackerUserInterface(QtGui.QWidget):
             # self.display_starting_area_preview()
 
     def change_starting_area_factors(self):
-        self.tracker.starting_area_x1_factor = self.spinBox_starting_x1_factor.value()/100.0
+        self.tracker.starting_area.x1_factor = self.spinBox_starting_x1_factor.value()/100.0
         self.spinBox_starting_x1_factor.setMaximum(self.spinBox_starting_x2_factor.value()-1)
-        self.tracker.starting_area_x2_factor = self.spinBox_starting_x2_factor.value()/100.0
+        self.tracker.starting_area.x2_factor = self.spinBox_starting_x2_factor.value()/100.0
         self.spinBox_starting_x2_factor.setMinimum(self.spinBox_starting_x1_factor.value()+1)
-        self.tracker.starting_area_y1_factor = self.spinBox_starting_y1_factor.value()/100.0
+        self.tracker.starting_area.y1_factor = self.spinBox_starting_y1_factor.value()/100.0
         self.spinBox_starting_y1_factor.setMaximum(self.spinBox_starting_y2_factor.value()-1)
-        self.tracker.starting_area_y2_factor = self.spinBox_starting_y2_factor.value()/100.0
+        self.tracker.starting_area.y2_factor = self.spinBox_starting_y2_factor.value()/100.0
         self.spinBox_starting_y2_factor.setMinimum(self.spinBox_starting_y1_factor.value()+1)
 
         if self.preview_is_set:
@@ -948,12 +948,3 @@ class TrackerUserInterface(QtGui.QWidget):
     def abort_tracking(self):
         self.tracker.ui_abort_button_pressed = True
         self.set_new_tracker()
-
-
-if __name__ == "__main__":
-    print "ignore Gtk-warning..."
-    qApp = QtGui.QApplication(sys.argv)
-    ui_tr = TrackerUserInterface()
-    ui_tr.center_ui()
-    ui_tr.show()
-    sys.exit(qApp.exec_())
