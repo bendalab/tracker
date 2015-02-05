@@ -189,16 +189,16 @@ class Tracker(object):
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
         height, width, depth = roi.shape
-        non_starting_area_x1 = int(self.starting_area.x1_factor * width)
-        non_starting_area_x2 = int(self.starting_area.x2_factor * width)
-        non_starting_area_y1 = int(self.starting_area.y1_factor * height)
-        non_starting_area_y2 = int(self.starting_area.y2_factor * height)
+        starting_area_x1 = int(self.starting_area.x1_factor * width)
+        starting_area_x2 = int(self.starting_area.x2_factor * width)
+        starting_area_y1 = int(self.starting_area.y1_factor * height)
+        starting_area_y2 = int(self.starting_area.y2_factor * height)
 
         if self.cm.contour_list is not None:
             for i in range(0, len(self.cm.contour_list)):
                 cnt = self.cm.contour_list[i]
                 ellipse = cv2.fitEllipse(cnt)
-                if non_starting_area_x2 > ellipse[0][0] > non_starting_area_x1 and non_starting_area_y2 > ellipse[0][1] > non_starting_area_y1:
+                if starting_area_x1 < ellipse[0][0] < starting_area_x2 and starting_area_y1 < ellipse[0][1] < starting_area_y2:
                     self.fish_started = True
 
     # fitting ellipse onto contour
