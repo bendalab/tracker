@@ -614,7 +614,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_browse_file.setShortcut('Ctrl+f')
         self.btn_browse_file.setToolTip("Strg + F")
 
-    def center_ui(self):
+    def center_ui(self, qApp):
         # screen = QDesktopWidget().screenGeometry()
         screen = qApp.desktop().screenGeometry()
         gui_size = self.geometry()
@@ -948,12 +948,3 @@ class TrackerUserInterface(QtGui.QWidget):
     def abort_tracking(self):
         self.tracker.ui_abort_button_pressed = True
         self.set_new_tracker()
-
-
-if __name__ == "__main__":
-    print "ignore Gtk-warning..."
-    qApp = QtGui.QApplication(sys.argv)
-    ui_tr = TrackerUserInterface()
-    ui_tr.center_ui()
-    ui_tr.show()
-    sys.exit(qApp.exec_())
