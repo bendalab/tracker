@@ -7,12 +7,16 @@
 
 from PyQt4 import QtCore, QtGui
 from core.Tracker import Tracker
+from Controller import Controller
 import os
 import sys
 import numpy as np
 import cv2
 import copy
 import ConfigParser
+
+from TabFile import TabFile
+
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -33,6 +37,9 @@ except AttributeError:
 class TrackerUserInterface(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
+
+        self.cntrl = Controller()
+
         self.setupUi(self)
 
         self.set_new_tracker()
@@ -80,68 +87,69 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_widget_options.setObjectName(_fromUtf8("tab_widget_options"))
 
         # file tab
-        self.tab_file = QtGui.QWidget()
-        self.tab_file.setWhatsThis(_fromUtf8(""))
-        self.tab_file.setObjectName(_fromUtf8("tab_file"))
-        # vertLO file tab
-        self.vertLO_tab_file = QtGui.QVBoxLayout(self.tab_file)
-        self.vertLO_tab_file.setObjectName(_fromUtf8("vertLO_tab_file"))
-        # spacer
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_file.addItem(spacerItem)
-        # line
-        self.line = QtGui.QFrame(self.tab_file)
-        self.line.setFrameShape(QtGui.QFrame.HLine)
-        self.line.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line.setObjectName(_fromUtf8("line"))
-        self.vertLO_tab_file.addWidget(self.line)
-        # label file path
-        self.lbl_file_path = QtGui.QLabel(self.tab_file)
-        self.lbl_file_path.setObjectName(_fromUtf8("lbl_file_path"))
-        self.vertLO_tab_file.addWidget(self.lbl_file_path)
-        # line edit file path
-        self.lnEdit_file_path = QtGui.QLineEdit(self.tab_file)
-        self.lnEdit_file_path.setObjectName(_fromUtf8("lnEdit_file_path"))
-        self.vertLO_tab_file.addWidget(self.lnEdit_file_path)
-        # button browse file
-        self.btn_browse_file = QtGui.QPushButton(self.tab_file)
-        self.btn_browse_file.setObjectName(_fromUtf8("btn_browse_file"))
-        self.vertLO_tab_file.addWidget(self.btn_browse_file)
-        # line
-        self.line_2 = QtGui.QFrame(self.tab_file)
-        self.line_2.setFrameShape(QtGui.QFrame.HLine)
-        self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_2.setObjectName(_fromUtf8("line_2"))
-        self.vertLO_tab_file.addWidget(self.line_2)
-        # label output path
-        self.lbl_output_path = QtGui.QLabel(self.tab_file)
-        self.lbl_output_path.setObjectName(_fromUtf8("lbl_output_path"))
-        self.vertLO_tab_file.addWidget(self.lbl_output_path)
-        # checkbox output is input
-        self.cbx_output_is_input = QtGui.QCheckBox(self.tab_file)
-        self.cbx_output_is_input.setObjectName(_fromUtf8("cbx_output_is_input"))
-        self.vertLO_tab_file.addWidget(self.cbx_output_is_input)
-        # line edit output path
-        self.lnEdit_output_path = QtGui.QLineEdit(self.tab_file)
-        self.lnEdit_output_path.setObjectName(_fromUtf8("lnEdit_output_path"))
-        self.vertLO_tab_file.addWidget(self.lnEdit_output_path)
-        # button browse output folder
-        self.btn_browse_output = QtGui.QPushButton(self.tab_file)
-        self.btn_browse_output.setObjectName(_fromUtf8("btn_browse_file"))
-        self.vertLO_tab_file.addWidget(self.btn_browse_output)
-        # line
-        self.line_2_1 = QtGui.QFrame(self.tab_file)
-        self.line_2_1.setFrameShape(QtGui.QFrame.HLine)
-        self.line_2_1.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_2_1.setObjectName(_fromUtf8("line_2_1"))
-        self.vertLO_tab_file.addWidget(self.line_2_1)
-        # checkbox nix output
-        self.cbx_enable_nix_output = QtGui.QCheckBox(self.tab_file)
-        self.cbx_enable_nix_output.setObjectName(_fromUtf8("cbx_enable_nix_output"))
-        self.vertLO_tab_file.addWidget(self.cbx_enable_nix_output)
-        # spacer
-        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_file.addItem(spacerItem1)
+        self.tab_file = TabFile(self.cntrl)
+        # self.tab_file = QtGui.QWidget()
+        # self.tab_file.setWhatsThis(_fromUtf8(""))
+        # self.tab_file.setObjectName(_fromUtf8("tab_file"))
+        # # vertLO file tab
+        # self.vertLO_tab_file = QtGui.QVBoxLayout(self.tab_file)
+        # self.vertLO_tab_file.setObjectName(_fromUtf8("vertLO_tab_file"))
+        # # spacer
+        # spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        # self.vertLO_tab_file.addItem(spacerItem)
+        # # line
+        # self.line = QtGui.QFrame(self.tab_file)
+        # self.line.setFrameShape(QtGui.QFrame.HLine)
+        # self.line.setFrameShadow(QtGui.QFrame.Sunken)
+        # self.line.setObjectName(_fromUtf8("line"))
+        # self.vertLO_tab_file.addWidget(self.line)
+        # # label file path
+        # self.lbl_file_path = QtGui.QLabel(self.tab_file)
+        # self.lbl_file_path.setObjectName(_fromUtf8("lbl_file_path"))
+        # self.vertLO_tab_file.addWidget(self.lbl_file_path)
+        # # line edit file path
+        # self.lnEdit_file_path = QtGui.QLineEdit(self.tab_file)
+        # self.lnEdit_file_path.setObjectName(_fromUtf8("lnEdit_file_path"))
+        # self.vertLO_tab_file.addWidget(self.lnEdit_file_path)
+        # # button browse file
+        # self.btn_browse_file = QtGui.QPushButton(self.tab_file)
+        # self.btn_browse_file.setObjectName(_fromUtf8("btn_browse_file"))
+        # self.vertLO_tab_file.addWidget(self.btn_browse_file)
+        # # line
+        # self.line_2 = QtGui.QFrame(self.tab_file)
+        # self.line_2.setFrameShape(QtGui.QFrame.HLine)
+        # self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
+        # self.line_2.setObjectName(_fromUtf8("line_2"))
+        # self.vertLO_tab_file.addWidget(self.line_2)
+        # # label output path
+        # self.lbl_output_path = QtGui.QLabel(self.tab_file)
+        # self.lbl_output_path.setObjectName(_fromUtf8("lbl_output_path"))
+        # self.vertLO_tab_file.addWidget(self.lbl_output_path)
+        # # checkbox output is input
+        # self.cbx_output_is_input = QtGui.QCheckBox(self.tab_file)
+        # self.cbx_output_is_input.setObjectName(_fromUtf8("cbx_output_is_input"))
+        # self.vertLO_tab_file.addWidget(self.cbx_output_is_input)
+        # # line edit output path
+        # self.lnEdit_output_path = QtGui.QLineEdit(self.tab_file)
+        # self.lnEdit_output_path.setObjectName(_fromUtf8("lnEdit_output_path"))
+        # self.vertLO_tab_file.addWidget(self.lnEdit_output_path)
+        # # button browse output folder
+        # self.btn_browse_output = QtGui.QPushButton(self.tab_file)
+        # self.btn_browse_output.setObjectName(_fromUtf8("btn_browse_file"))
+        # self.vertLO_tab_file.addWidget(self.btn_browse_output)
+        # # line
+        # self.line_2_1 = QtGui.QFrame(self.tab_file)
+        # self.line_2_1.setFrameShape(QtGui.QFrame.HLine)
+        # self.line_2_1.setFrameShadow(QtGui.QFrame.Sunken)
+        # self.line_2_1.setObjectName(_fromUtf8("line_2_1"))
+        # self.vertLO_tab_file.addWidget(self.line_2_1)
+        # # checkbox nix output
+        # self.cbx_enable_nix_output = QtGui.QCheckBox(self.tab_file)
+        # self.cbx_enable_nix_output.setObjectName(_fromUtf8("cbx_enable_nix_output"))
+        # self.vertLO_tab_file.addWidget(self.cbx_enable_nix_output)
+        # # spacer
+        # spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        # self.vertLO_tab_file.addItem(spacerItem1)
         # complete file tab
         self.tab_widget_options.addTab(self.tab_file, _fromUtf8(""))
 
@@ -562,12 +570,14 @@ class TrackerUserInterface(QtGui.QWidget):
 
     def retranslateUi(self, tracker_main_widget):
         tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
-        self.lbl_file_path.setText(_translate("tracker_main_widget", "File Path", None))
-        self.cbx_output_is_input.setText(_translate("tracker_main_widget", "Save in Input Directory", None))
-        self.btn_browse_file.setText(_translate("tracker_main_widget", "Browse File", None))
-        self.lbl_output_path.setText(_translate("tracker_main_widget", "Output Path", None))
-        self.btn_browse_output.setText(_translate("tracker_main_widget", "Browse Output Folder", None))
-        self.cbx_enable_nix_output.setText(_translate("tracker_main_widget", "Enable Output to NIX file", None))
+
+        self.tab_file.retranslate_tab_file()
+        # self.lbl_file_path.setText(_translate("tracker_main_widget", "File Path", None))
+        # self.cbx_output_is_input.setText(_translate("tracker_main_widget", "Save in Input Directory", None))
+        # self.btn_browse_file.setText(_translate("tracker_main_widget", "Browse File", None))
+        # self.lbl_output_path.setText(_translate("tracker_main_widget", "Output Path", None))
+        # self.btn_browse_output.setText(_translate("tracker_main_widget", "Browse Output Folder", None))
+        # self.cbx_enable_nix_output.setText(_translate("tracker_main_widget", "Enable Output to NIX file", None))
 
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_file), _translate("tracker_main_widget", "File", None))
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
@@ -611,8 +621,8 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_start_tracking.setShortcut('Ctrl+s')
         self.btn_start_tracking.setToolTip("Strg + S")
 
-        self.btn_browse_file.setShortcut('Ctrl+f')
-        self.btn_browse_file.setToolTip("Strg + F")
+        self.tab_file.btn_browse_file.setShortcut('Ctrl+f')
+        self.tab_file.btn_browse_file.setToolTip("Strg + F")
 
     def center_ui(self, qApp):
         # screen = QDesktopWidget().screenGeometry()
@@ -629,7 +639,7 @@ class TrackerUserInterface(QtGui.QWidget):
     def preset_options(self):
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
-        self.cbx_enable_nix_output.setChecked(self.tracker.nix_io)
+        self.tab_file.cbx_enable_nix_output.setChecked(self.tracker.nix_io)
 
         # region of interest
         self.spinBox_roi_x1.setValue(self.tracker.roi.x1)
@@ -678,13 +688,13 @@ class TrackerUserInterface(QtGui.QWidget):
 
     # TODO finish connecting!
     def connect_widgets(self):
-        self.btn_browse_file.clicked.connect(self.browse_file)
-        self.btn_browse_output.clicked.connect(self.browse_output_directory)
+        self.tab_file.btn_browse_file.clicked.connect(self.browse_file)
+        self.tab_file.btn_browse_output.clicked.connect(self.browse_output_directory)
         self.btn_start_tracking.clicked.connect(self.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.abort_tracking)
 
-        self.connect(self.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_nix_output)
-        self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), self.change_output_is_input)
+        self.connect(self.tab_file.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_nix_output)
+        self.connect(self.tab_file.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), self.change_output_is_input)
 
         self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
         self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
