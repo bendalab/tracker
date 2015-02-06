@@ -104,18 +104,18 @@ class Controller(object):
         self.ui.tab_adv.cbx_enable_max_size_thresh.setChecked(self.ui.tracker.enable_max_size_threshold)
 
         # image morphing
-        self.ui.spinBox_erosion.setValue(self.ui.tracker.erosion_iterations)
-        self.ui.spinBox_dilation.setValue(self.ui.tracker.dilation_iterations)
+        self.ui.tab_visual.spinBox_erosion.setValue(self.ui.tracker.erosion_iterations)
+        self.ui.tab_visual.spinBox_dilation.setValue(self.ui.tracker.dilation_iterations)
 
         # image processing steps
-        self.ui.cbx_show_bgsub_img.setChecked(self.ui.tracker.im.show_bg_sub_img)
-        self.ui.cbx_show_morph_img.setChecked(self.ui.tracker.im.show_morphed_img)
-        self.ui.cbx_show_contour.setChecked(self.ui.tracker.im.draw_contour)
-        self.ui.cbx_show_ellipse.setChecked(self.ui.tracker.im.draw_ellipse)
+        self.ui.tab_visual.cbx_show_bgsub_img.setChecked(self.ui.tracker.im.show_bg_sub_img)
+        self.ui.tab_visual.cbx_show_morph_img.setChecked(self.ui.tracker.im.show_morphed_img)
+        self.ui.tab_visual.cbx_show_contour.setChecked(self.ui.tracker.im.draw_contour)
+        self.ui.tab_visual.cbx_show_ellipse.setChecked(self.ui.tracker.im.draw_ellipse)
 
         # visualization
-        self.ui.spinBox_circle_size.setValue(self.ui.tracker.im.circle_size)
-        self.ui.spinBox_lineend_offset.setValue(self.ui.tracker.im.lineend_offset)
+        self.ui.tab_visual.spinBox_circle_size.setValue(self.ui.tracker.im.circle_size)
+        self.ui.tab_visual.spinBox_lineend_offset.setValue(self.ui.tracker.im.lineend_offset)
 
     def browse_output_directory(self):
         if self.output_is_input:
@@ -229,16 +229,16 @@ class Controller(object):
         self.ui.tracker.dilation_iterations = value
 
     def change_show_bg_sub_img(self):
-        self.ui.tracker.im.show_bg_sub_img = self.ui.cbx_show_bgsub_img.isChecked()
+        self.ui.tracker.im.show_bg_sub_img = self.ui.tab_visual.cbx_show_bgsub_img.isChecked()
 
     def change_show_morphed_img(self):
-        self.ui.tracker.im.show_morphed_img = self.ui.cbx_show_morph_img.isChecked()
+        self.ui.tracker.im.show_morphed_img = self.ui.tab_visual.cbx_show_morph_img.isChecked()
 
     def change_draw_contour(self):
-        self.ui.tracker.im.draw_contour = self.ui.cbx_show_contour.isChecked()
+        self.ui.tracker.im.draw_contour = self.ui.tab_visual.cbx_show_contour.isChecked()
 
     def change_draw_ellipse(self):
-        self.ui.tracker.im.draw_ellipse = self.ui.cbx_show_ellipse.isChecked()
+        self.ui.tracker.im.draw_ellipse = self.ui.tab_visual.cbx_show_ellipse.isChecked()
 
     def change_lineend_offset(self, value):
         self.ui.tracker.im.lineend_offset = value
@@ -266,16 +266,16 @@ class Controller(object):
         cfg.set('detection_values', 'max_area_threshold', str(self.ui.tab_adv.spinBox_fish_max_threshold.value()))
         cfg.set('detection_values', 'enable_max_size_threshold', str(self.ui.tab_adv.cbx_enable_max_size_thresh.isChecked()))
         cfg.add_section('image_morphing')
-        cfg.set('image_morphing', 'erosion_factor', str(self.ui.spinBox_erosion.value()))
-        cfg.set('image_morphing', 'dilation_factor', str(self.ui.spinBox_dilation.value()))
+        cfg.set('image_morphing', 'erosion_factor', str(self.ui.tab_visual.spinBox_erosion.value()))
+        cfg.set('image_morphing', 'dilation_factor', str(self.ui.tab_visual.spinBox_dilation.value()))
         cfg.add_section('image_processing')
-        cfg.set('image_processing', 'show_bg_sub_img', str(self.ui.cbx_show_bgsub_img.isChecked()))
-        cfg.set('image_processing', 'show_morphed_img', str(self.ui.cbx_show_morph_img.isChecked()))
-        cfg.set('image_processing', 'draw_contour', str(self.ui.cbx_show_contour.isChecked()))
-        cfg.set('image_processing', 'draw_ellipse', str(self.ui.cbx_show_ellipse.isChecked()))
+        cfg.set('image_processing', 'show_bg_sub_img', str(self.ui.tab_visual.cbx_show_bgsub_img.isChecked()))
+        cfg.set('image_processing', 'show_morphed_img', str(self.ui.tab_visual.cbx_show_morph_img.isChecked()))
+        cfg.set('image_processing', 'draw_contour', str(self.ui.tab_visual.cbx_show_contour.isChecked()))
+        cfg.set('image_processing', 'draw_ellipse', str(self.ui.tab_visual.cbx_show_ellipse.isChecked()))
         cfg.add_section('visualization')
-        cfg.set('visualization', 'lineend_offset', str(self.ui.spinBox_lineend_offset.value()))
-        cfg.set('visualization', 'circle_size', str(self.ui.spinBox_circle_size.value()))
+        cfg.set('visualization', 'lineend_offset', str(self.ui.tab_visual.spinBox_lineend_offset.value()))
+        cfg.set('visualization', 'circle_size', str(self.ui.tab_visual.spinBox_circle_size.value()))
         # cfg.set('visualization', 'line_color', str(self.))
         # cfg.set('visualization', 'circle_color', str(self.))
 
