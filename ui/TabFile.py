@@ -15,14 +15,10 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-#TODO export worker methods that use widgets from file tab from TrackerUI to Controller, move connection to TabFile, modify start_tracking method in TrackerUI
-
 
 class TabFile(QtGui.QWidget):
-    def __init__(self, controller):
+    def __init__(self):
         super(TabFile, self).__init__()
-
-        self.cntrl = controller
 
         self.name = "tab_file"
 

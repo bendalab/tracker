@@ -16,6 +16,7 @@ import copy
 import ConfigParser
 
 from TabFile import TabFile
+from TabRoi import TabRoi
 
 
 try:
@@ -38,30 +39,14 @@ class TrackerUserInterface(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
-        self.cntrl = Controller()
-
         self.setupUi(self)
 
-        self.set_new_tracker()
-        # self.tracker.ui_mode_on = True
+        self.tracker = Tracker()
+        self.controller = Controller(self)
 
-        self.preset_options()
-        self.track_file = ""
-        self.last_selected_folder = "/home"
-
-        self.output_directory = ""
-        self.output_is_input = False
-
+        self.controller.preset_options()
         self.connect_widgets()
         self.set_shortcuts()
-
-        # ROI variables
-        self.first_frame_numpy = None
-        self.roi_preview_draw_numpy = None
-        self.preview_is_set = False
-        self.roi_preview_displayed = False
-
-        # starting area variables
 
     def setupUi(self, tracker_main_widget):
         #main widget
@@ -87,151 +72,90 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_widget_options.setObjectName(_fromUtf8("tab_widget_options"))
 
         # file tab
-        self.tab_file = TabFile(self.cntrl)
-        # self.tab_file = QtGui.QWidget()
-        # self.tab_file.setWhatsThis(_fromUtf8(""))
-        # self.tab_file.setObjectName(_fromUtf8("tab_file"))
-        # # vertLO file tab
-        # self.vertLO_tab_file = QtGui.QVBoxLayout(self.tab_file)
-        # self.vertLO_tab_file.setObjectName(_fromUtf8("vertLO_tab_file"))
-        # # spacer
-        # spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        # self.vertLO_tab_file.addItem(spacerItem)
-        # # line
-        # self.line = QtGui.QFrame(self.tab_file)
-        # self.line.setFrameShape(QtGui.QFrame.HLine)
-        # self.line.setFrameShadow(QtGui.QFrame.Sunken)
-        # self.line.setObjectName(_fromUtf8("line"))
-        # self.vertLO_tab_file.addWidget(self.line)
-        # # label file path
-        # self.lbl_file_path = QtGui.QLabel(self.tab_file)
-        # self.lbl_file_path.setObjectName(_fromUtf8("lbl_file_path"))
-        # self.vertLO_tab_file.addWidget(self.lbl_file_path)
-        # # line edit file path
-        # self.lnEdit_file_path = QtGui.QLineEdit(self.tab_file)
-        # self.lnEdit_file_path.setObjectName(_fromUtf8("lnEdit_file_path"))
-        # self.vertLO_tab_file.addWidget(self.lnEdit_file_path)
-        # # button browse file
-        # self.btn_browse_file = QtGui.QPushButton(self.tab_file)
-        # self.btn_browse_file.setObjectName(_fromUtf8("btn_browse_file"))
-        # self.vertLO_tab_file.addWidget(self.btn_browse_file)
-        # # line
-        # self.line_2 = QtGui.QFrame(self.tab_file)
-        # self.line_2.setFrameShape(QtGui.QFrame.HLine)
-        # self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
-        # self.line_2.setObjectName(_fromUtf8("line_2"))
-        # self.vertLO_tab_file.addWidget(self.line_2)
-        # # label output path
-        # self.lbl_output_path = QtGui.QLabel(self.tab_file)
-        # self.lbl_output_path.setObjectName(_fromUtf8("lbl_output_path"))
-        # self.vertLO_tab_file.addWidget(self.lbl_output_path)
-        # # checkbox output is input
-        # self.cbx_output_is_input = QtGui.QCheckBox(self.tab_file)
-        # self.cbx_output_is_input.setObjectName(_fromUtf8("cbx_output_is_input"))
-        # self.vertLO_tab_file.addWidget(self.cbx_output_is_input)
-        # # line edit output path
-        # self.lnEdit_output_path = QtGui.QLineEdit(self.tab_file)
-        # self.lnEdit_output_path.setObjectName(_fromUtf8("lnEdit_output_path"))
-        # self.vertLO_tab_file.addWidget(self.lnEdit_output_path)
-        # # button browse output folder
-        # self.btn_browse_output = QtGui.QPushButton(self.tab_file)
-        # self.btn_browse_output.setObjectName(_fromUtf8("btn_browse_file"))
-        # self.vertLO_tab_file.addWidget(self.btn_browse_output)
-        # # line
-        # self.line_2_1 = QtGui.QFrame(self.tab_file)
-        # self.line_2_1.setFrameShape(QtGui.QFrame.HLine)
-        # self.line_2_1.setFrameShadow(QtGui.QFrame.Sunken)
-        # self.line_2_1.setObjectName(_fromUtf8("line_2_1"))
-        # self.vertLO_tab_file.addWidget(self.line_2_1)
-        # # checkbox nix output
-        # self.cbx_enable_nix_output = QtGui.QCheckBox(self.tab_file)
-        # self.cbx_enable_nix_output.setObjectName(_fromUtf8("cbx_enable_nix_output"))
-        # self.vertLO_tab_file.addWidget(self.cbx_enable_nix_output)
-        # # spacer
-        # spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        # self.vertLO_tab_file.addItem(spacerItem1)
-        # complete file tab
+        self.tab_file = TabFile()
         self.tab_widget_options.addTab(self.tab_file, _fromUtf8(""))
 
         # roi tab
-        self.tab_roi = QtGui.QWidget()
-        self.tab_roi.setObjectName(_fromUtf8("tab_roi"))
-        # vertical layout roi tab
-        self.vertLO_tab_roi = QtGui.QVBoxLayout(self.tab_roi)
-        self.vertLO_tab_roi.setObjectName(_fromUtf8("vertLO_tab_roi"))
-        # spaccer
-        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_roi.addItem(spacerItem2)
-        # line
-        self.line_3 = QtGui.QFrame(self.tab_roi)
-        self.line_3.setFrameShape(QtGui.QFrame.HLine)
-        self.line_3.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_3.setObjectName(_fromUtf8("line_3"))
-        self.vertLO_tab_roi.addWidget(self.line_3)
-        # label region of interest
-        self.lbl_roi = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
-        self.vertLO_tab_roi.addWidget(self.lbl_roi)
-        # roi preview output
-        self.lbl_roi_preview_label = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_preview_label.setObjectName(_fromUtf8("lbl_roi_preview_label"))
-        self.lbl_roi_preview_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.vertLO_tab_roi.addWidget(self.lbl_roi_preview_label)
-        # graphics viewer roi
-        # self.grView_roi = QtGui.QGraphicsView(self.tab_roi)
-        # self.grView_roi.setMinimumSize(QtCore.QSize(0, 350))
-        # self.grView_roi.setObjectName(_fromUtf8("grView_roi"))
-        # self.vertLO_tab_roi.addWidget(self.grView_roi)
-        # grid layout set roi
-        self.gridLO_set_roi = QtGui.QGridLayout()
-        self.gridLO_set_roi.setObjectName(_fromUtf8("gridLO_set_roi"))
-        # spin box x start
-        self.spinBox_roi_x1 = QtGui.QSpinBox(self.tab_roi)
-        self.spinBox_roi_x1.setMaximum(9999)
-        self.spinBox_roi_x1.setObjectName(_fromUtf8("spinBox_x_start"))
-        self.gridLO_set_roi.addWidget(self.spinBox_roi_x1, 0, 1, 1, 1)
-        # spin box x end
-        self.spinBox_roi_x2 = QtGui.QSpinBox(self.tab_roi)
-        self.spinBox_roi_x2.setMaximum(9999)
-        self.spinBox_roi_x2.setObjectName(_fromUtf8("spinBox_x_end"))
-        self.gridLO_set_roi.addWidget(self.spinBox_roi_x2, 0, 3, 1, 1)
-        # spin box y start
-        self.spinBox_roi_y1 = QtGui.QSpinBox(self.tab_roi)
-        self.spinBox_roi_y1.setMaximum(9999)
-        self.spinBox_roi_y1.setObjectName(_fromUtf8("spinBox_y_start"))
-        self.gridLO_set_roi.addWidget(self.spinBox_roi_y1, 1, 1, 1, 1)
-        # spin box y end
-        self.spinBox_roi_y2 = QtGui.QSpinBox(self.tab_roi)
-        self.spinBox_roi_y2.setMaximum(9999)
-        self.spinBox_roi_y2.setObjectName(_fromUtf8("spinBox_y_end"))
-        self.gridLO_set_roi.addWidget(self.spinBox_roi_y2, 1, 3, 1, 1)
-        # label x start
-        self.lbl_roi_x_start = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_x_start.setObjectName(_fromUtf8("lbl_roi_x_start"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_x_start, 0, 0, 1, 1)
-        # label x end
-        self.lbl_roi_x_end = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_x_end.setObjectName(_fromUtf8("lbl_roi_x_end"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_x_end, 0, 2, 1, 1)
-        # label y start
-        self.lbl_roi_y_start = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_y_start.setObjectName(_fromUtf8("lbl_roi_y_start"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_y_start, 1, 0, 1, 1)
-        # label y end
-        self.lbl_roi_y_end = QtGui.QLabel(self.tab_roi)
-        self.lbl_roi_y_end.setObjectName(_fromUtf8("lbl_roi_y_end"))
-        self.gridLO_set_roi.addWidget(self.lbl_roi_y_end, 1, 2, 1, 1)
-        # add grid_layout_set_roi to vertical layout of tab
-        self.vertLO_tab_roi.addLayout(self.gridLO_set_roi)
-        # line
-        self.line_4 = QtGui.QFrame(self.tab_roi)
-        self.line_4.setFrameShape(QtGui.QFrame.HLine)
-        self.line_4.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_4.setObjectName(_fromUtf8("line_4"))
-        self.vertLO_tab_roi.addWidget(self.line_4)
-        # spacer
-        spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_roi.addItem(spacerItem3)
+        # self.tab_roi = QtGui.QWidget()
+        self.tab_roi = TabRoi()
+
+        # self.tab_roi.setObjectName(_fromUtf8("tab_roi"))
+        # # vertical layout roi tab
+        # self.vertLO_tab_roi = QtGui.QVBoxLayout(self.tab_roi)
+        # self.vertLO_tab_roi.setObjectName(_fromUtf8("vertLO_tab_roi"))
+        # # spaccer
+        # spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        # self.vertLO_tab_roi.addItem(spacerItem2)
+        # # line
+        # self.line_3 = QtGui.QFrame(self.tab_roi)
+        # self.line_3.setFrameShape(QtGui.QFrame.HLine)
+        # self.line_3.setFrameShadow(QtGui.QFrame.Sunken)
+        # self.line_3.setObjectName(_fromUtf8("line_3"))
+        # self.vertLO_tab_roi.addWidget(self.line_3)
+        # # label region of interest
+        # self.lbl_roi = QtGui.QLabel(self.tab_roi)
+        # self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
+        # self.vertLO_tab_roi.addWidget(self.lbl_roi)
+        # # roi preview output
+        # self.lbl_roi_preview_label = QtGui.QLabel(self.tab_roi)
+        # self.lbl_roi_preview_label.setObjectName(_fromUtf8("lbl_roi_preview_label"))
+        # self.lbl_roi_preview_label.setAlignment(QtCore.Qt.AlignCenter)
+        # self.vertLO_tab_roi.addWidget(self.lbl_roi_preview_label)
+        # # graphics viewer roi
+        # # self.grView_roi = QtGui.QGraphicsView(self.tab_roi)
+        # # self.grView_roi.setMinimumSize(QtCore.QSize(0, 350))
+        # # self.grView_roi.setObjectName(_fromUtf8("grView_roi"))
+        # # self.vertLO_tab_roi.addWidget(self.grView_roi)
+        # # grid layout set roi
+        # self.gridLO_set_roi = QtGui.QGridLayout()
+        # self.gridLO_set_roi.setObjectName(_fromUtf8("gridLO_set_roi"))
+        # # spin box x start
+        # self.spinBox_roi_x1 = QtGui.QSpinBox(self.tab_roi)
+        # self.spinBox_roi_x1.setMaximum(9999)
+        # self.spinBox_roi_x1.setObjectName(_fromUtf8("spinBox_x_start"))
+        # self.gridLO_set_roi.addWidget(self.spinBox_roi_x1, 0, 1, 1, 1)
+        # # spin box x end
+        # self.spinBox_roi_x2 = QtGui.QSpinBox(self.tab_roi)
+        # self.spinBox_roi_x2.setMaximum(9999)
+        # self.spinBox_roi_x2.setObjectName(_fromUtf8("spinBox_x_end"))
+        # self.gridLO_set_roi.addWidget(self.spinBox_roi_x2, 0, 3, 1, 1)
+        # # spin box y start
+        # self.spinBox_roi_y1 = QtGui.QSpinBox(self.tab_roi)
+        # self.spinBox_roi_y1.setMaximum(9999)
+        # self.spinBox_roi_y1.setObjectName(_fromUtf8("spinBox_y_start"))
+        # self.gridLO_set_roi.addWidget(self.spinBox_roi_y1, 1, 1, 1, 1)
+        # # spin box y end
+        # self.spinBox_roi_y2 = QtGui.QSpinBox(self.tab_roi)
+        # self.spinBox_roi_y2.setMaximum(9999)
+        # self.spinBox_roi_y2.setObjectName(_fromUtf8("spinBox_y_end"))
+        # self.gridLO_set_roi.addWidget(self.spinBox_roi_y2, 1, 3, 1, 1)
+        # # label x start
+        # self.lbl_roi_x_start = QtGui.QLabel(self.tab_roi)
+        # self.lbl_roi_x_start.setObjectName(_fromUtf8("lbl_roi_x_start"))
+        # self.gridLO_set_roi.addWidget(self.lbl_roi_x_start, 0, 0, 1, 1)
+        # # label x end
+        # self.lbl_roi_x_end = QtGui.QLabel(self.tab_roi)
+        # self.lbl_roi_x_end.setObjectName(_fromUtf8("lbl_roi_x_end"))
+        # self.gridLO_set_roi.addWidget(self.lbl_roi_x_end, 0, 2, 1, 1)
+        # # label y start
+        # self.lbl_roi_y_start = QtGui.QLabel(self.tab_roi)
+        # self.lbl_roi_y_start.setObjectName(_fromUtf8("lbl_roi_y_start"))
+        # self.gridLO_set_roi.addWidget(self.lbl_roi_y_start, 1, 0, 1, 1)
+        # # label y end
+        # self.lbl_roi_y_end = QtGui.QLabel(self.tab_roi)
+        # self.lbl_roi_y_end.setObjectName(_fromUtf8("lbl_roi_y_end"))
+        # self.gridLO_set_roi.addWidget(self.lbl_roi_y_end, 1, 2, 1, 1)
+        # # add grid_layout_set_roi to vertical layout of tab
+        # self.vertLO_tab_roi.addLayout(self.gridLO_set_roi)
+        # # line
+        # self.line_4 = QtGui.QFrame(self.tab_roi)
+        # self.line_4.setFrameShape(QtGui.QFrame.HLine)
+        # self.line_4.setFrameShadow(QtGui.QFrame.Sunken)
+        # self.line_4.setObjectName(_fromUtf8("line_4"))
+        # self.vertLO_tab_roi.addWidget(self.line_4)
+        # # spacer
+        # spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        # self.vertLO_tab_roi.addItem(spacerItem3)
         # complete roi tab
         self.tab_widget_options.addTab(self.tab_roi, _fromUtf8(""))
 
@@ -572,21 +496,11 @@ class TrackerUserInterface(QtGui.QWidget):
         tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
 
         self.tab_file.retranslate_tab_file()
-        # self.lbl_file_path.setText(_translate("tracker_main_widget", "File Path", None))
-        # self.cbx_output_is_input.setText(_translate("tracker_main_widget", "Save in Input Directory", None))
-        # self.btn_browse_file.setText(_translate("tracker_main_widget", "Browse File", None))
-        # self.lbl_output_path.setText(_translate("tracker_main_widget", "Output Path", None))
-        # self.btn_browse_output.setText(_translate("tracker_main_widget", "Browse Output Folder", None))
-        # self.cbx_enable_nix_output.setText(_translate("tracker_main_widget", "Enable Output to NIX file", None))
+        self.tab_roi.retranslate_tab_roi()
 
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_file), _translate("tracker_main_widget", "File", None))
-        self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
-        self.lbl_roi.setText(_translate("tracker_main_widget", "Region of interest", None))
-        self.lbl_roi_y_end.setText(_translate("tracker_main_widget", "Y End", None))
-        self.lbl_roi_x_end.setText(_translate("tracker_main_widget", "X End", None))
-        self.lbl_roi_x_start.setText(_translate("tracker_main_widget", "X Start", None))
-        self.lbl_roi_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_roi), _translate("tracker_main_widget", "ROI", None))
+        
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))
         self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))
         self.lbl_start_x_end.setText(_translate("tracker_main_widget", "X End", None))
@@ -636,325 +550,41 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tracker = Tracker()
         return
 
-    def preset_options(self):
-        # video file
-        # self.lnEdit_file_path.setText(self.tracker.video_file)
-        self.tab_file.cbx_enable_nix_output.setChecked(self.tracker.nix_io)
-
-        # region of interest
-        self.spinBox_roi_x1.setValue(self.tracker.roi.x1)
-        self.spinBox_roi_x2.setValue(self.tracker.roi.x2)
-        self.spinBox_roi_y1.setValue(self.tracker.roi.y1)
-        self.spinBox_roi_y2.setValue(self.tracker.roi.y2)
-        self.spinBox_roi_x1.setMaximum(self.spinBox_roi_x2.value()-1)
-        self.spinBox_roi_x2.setMinimum(self.spinBox_roi_x1.value()+1)
-        self.spinBox_roi_y1.setMaximum(self.spinBox_roi_y2.value()-1)
-        self.spinBox_roi_y2.setMinimum(self.spinBox_roi_y1.value()+1)
-
-        # frame waittime
-        self.spinBox_frame_waittime.setValue(self.tracker.frame_waittime)
-
-        # starting area spinboxes
-        self.spinBox_starting_x1_factor.setValue(self.tracker.starting_area.x1_factor * 100)
-        self.spinBox_starting_x2_factor.setValue(self.tracker.starting_area.x2_factor * 100)
-        self.spinBox_starting_y1_factor.setValue(self.tracker.starting_area.y1_factor * 100)
-        self.spinBox_starting_y2_factor.setValue(self.tracker.starting_area.y2_factor * 100)
-        self.spinBox_starting_x1_factor.setMaximum(self.spinBox_starting_x2_factor.value()-1)
-        self.spinBox_starting_x2_factor.setMinimum(self.spinBox_starting_x1_factor.value()+1)
-        self.spinBox_starting_y1_factor.setMaximum(self.spinBox_starting_y2_factor.value()-1)
-        self.spinBox_starting_y2_factor.setMinimum(self.spinBox_starting_y1_factor.value()+1)
-
-        # starting orientation
-        self.spinBox_start_orientation.setValue(self.tracker.start_ori)
-
-        # fish size thresholds
-        self.spinBox_fish_threshold.setValue(self.tracker.fish_size_threshold)
-        self.spinBox_fish_max_threshold.setValue(self.tracker.fish_max_size_threshold)
-        self.cbx_enable_max_size_thresh.setChecked(self.tracker.enable_max_size_threshold)
-
-        # image morphing
-        self.spinBox_erosion.setValue(self.tracker.erosion_iterations)
-        self.spinBox_dilation.setValue(self.tracker.dilation_iterations)
-
-        # image processing steps
-        self.cbx_show_bgsub_img.setChecked(self.tracker.im.show_bg_sub_img)
-        self.cbx_show_morph_img.setChecked(self.tracker.im.show_morphed_img)
-        self.cbx_show_contour.setChecked(self.tracker.im.draw_contour)
-        self.cbx_show_ellipse.setChecked(self.tracker.im.draw_ellipse)
-
-        # data visualisation
-        self.spinBox_lineend_offset.setValue(self.tracker.im.lineend_offset)
-        self.spinBox_circle_size.setValue(self.tracker.im.circle_size)
-
     # TODO finish connecting!
     def connect_widgets(self):
-        self.tab_file.btn_browse_file.clicked.connect(self.browse_file)
-        self.tab_file.btn_browse_output.clicked.connect(self.browse_output_directory)
-        self.btn_start_tracking.clicked.connect(self.start_tracking)
-        self.btn_abort_tracking.clicked.connect(self.abort_tracking)
+        self.tab_file.btn_browse_file.clicked.connect(self.controller.browse_file)
+        self.tab_file.btn_browse_output.clicked.connect(self.controller.browse_output_directory)
+        self.btn_start_tracking.clicked.connect(self.controller.start_tracking)
+        self.btn_abort_tracking.clicked.connect(self.controller.abort_tracking)
 
-        self.connect(self.tab_file.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_nix_output)
-        self.connect(self.tab_file.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), self.change_output_is_input)
+        self.connect(self.tab_file.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_enable_nix_output)
+        self.connect(self.tab_file.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_output_is_input)
 
-        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
-        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
-        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
-        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), self.change_roi_values)
+        self.connect(self.tab_roi.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
+        self.connect(self.tab_roi.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
+        self.connect(self.tab_roi.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
+        self.connect(self.tab_roi.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
 
-        self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
-        self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
-        self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
-        self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), self.change_starting_area_factors)
+        self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
 
-        self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), self.change_frame_waittime)
+        self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_frame_waittime)
 
-        self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), self.change_start_orientation)
+        self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_start_orientation)
 
-        self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_min_fish_threshold)
-        self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), self.change_max_fish_threshold)
-        self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), self.change_enable_max_size_threshold)
+        self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_min_fish_threshold)
+        self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_max_fish_threshold)
+        self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_enable_max_size_threshold)
 
-        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), self.change_erosion_factor)
-        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), self.change_dilation_factor)
+        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_erosion_factor)
+        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_dilation_factor)
 
-        self.connect(self.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"), self.change_show_bg_sub_img)
-        self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), self.change_show_morphed_img)
-        self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_contour)
-        self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.change_draw_ellipse)
+        self.connect(self.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_show_bg_sub_img)
+        self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_show_morphed_img)
+        self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_draw_contour)
+        self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_draw_ellipse)
 
-        self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.change_lineend_offset)
-        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), self.change_circle_size)
-
-    def browse_file(self):
-        self.roi_preview_displayed = False
-
-        self.track_file = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.last_selected_folder)
-        if self.track_file == "":
-            return
-        self.lnEdit_file_path.setText(self.track_file)
-
-        self.set_first_frame_numpy()
-        self.display_roi_preview()
-        # self.display_starting_area_preview()
-
-    def browse_output_directory(self):
-        if self.output_is_input:
-            self.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
-            return
-        dial = QtGui.QFileDialog()
-        dial.setFileMode(QtGui.QFileDialog.Directory)
-        dial.setViewMode(QtGui.QFileDialog.List)
-        if dial.exec_():
-            self.output_directory = dial.selectedFiles()[0] + "/"
-        self.lnEdit_output_path.setText(self.output_directory)
-        return
-
-    def set_tracker_video_file(self):
-        self.track_file = self.lnEdit_file_path.text()
-        self.tracker.video_file = str(self.track_file) # FIXME you should make video_file a property in Tracker
-        self.set_last_selected_folder(self.track_file)
-
-    def set_output_directory(self):
-        if not self.output_is_input:
-            self.output_directory = str(self.lnEdit_output_path.text())
-            self.tracker.set_output_path(self.output_directory)
-
-    def set_last_selected_folder(self, path_string):
-        slash_pos = 0
-        for i in range(len(path_string)-1, 0, -1):
-            if path_string[i] == "/":
-                slash_pos = i
-                break
-        self.last_selected_folder = path_string[0:slash_pos]
-
-    def set_first_frame_numpy(self):
-        cap = cv2.VideoCapture(str(self.track_file))
-
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if frame is not None:
-                self.first_frame_numpy = frame
-                # cv2.imshow("roi preview", frame)
-                break
-        cap.release()
-
-        self.preview_is_set = True
-
-    def display_roi_preview(self):
-        self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
-        cv2.rectangle(self.roi_preview_draw_numpy, (self.tracker.roi.x1, self.tracker.roi.y1), (self.tracker.roi.x2, self.tracker.roi.y2), (255, 0, 255), 2)
-        if self.roi_preview_displayed:
-            cv2_output = copy.copy(self.first_frame_numpy[self.tracker.roi.y1: self.tracker.roi.y2, self.tracker.roi.x1:self.tracker.roi.x2])
-            cv2.imshow("roi preview", cv2_output)
-        # convert numpy-array to qimage
-        output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
-        output_pixm = QtGui.QPixmap.fromImage(output_qimg)
-        # fit picture to window size
-        width = self.tab_widget_options.geometry().width() - 20
-        height = int(width)
-        size = QtCore.QSize(width, height)
-        output_pixm_rescaled = output_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
-        # display picture
-        self.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
-        self.roi_preview_displayed = True
-
-    def display_starting_area_preview(self):
-        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.tracker.roi.y1:self.tracker.roi.y2, self.tracker.roi.x1:self.tracker.roi.x2])
-        height, width, depth = roi_only_draw_numpy.shape
-        x1 = int(self.tracker.starting_area.x1_factor * width)
-        x2 = int(self.tracker.starting_area.x2_factor * width)
-        y1 = int(self.tracker.starting_area.y1_factor * height)
-        y2 = int(self.tracker.starting_area.y2_factor * height)
-        cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
-        # convert to qimage
-        sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
-        sa_pixm = QtGui.QPixmap.fromImage(sa_qimg)
-        # fit img to size
-        max_width = self.tab_widget_options.geometry().width() - 20
-        max_height = int(max_width * 0.5)
-        size = QtCore.QSize(max_width, max_height)
-        sa_pixm_rescaled = sa_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
-        # display img
-        # following line doesn't work because of %4-bug noone knows... -.-
-        # self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
-        cv2.imshow("starting area", roi_only_draw_numpy)
-
-    def change_enable_nix_output(self):
-        self.tracker.nix_io = self.cbx_enable_nix_output.isChecked()
-
-    def change_output_is_input(self):
-        checked = self.cbx_output_is_input.isChecked()
-        if checked:
-            self.tracker.unset_output_path()
-            self.lnEdit_output_path.setText("Output = Input Folder")
-        self.output_is_input = checked
-
-    def change_roi_values(self):
-        self.tracker.roi.x1 = self.spinBox_roi_x1.value()
-        self.tracker.roi.x2 = self.spinBox_roi_x2.value()
-        self.tracker.roi.y1 = self.spinBox_roi_y1.value()
-        self.tracker.roi.y2 = self.spinBox_roi_y2.value()
-        self.spinBox_roi_x1.setMaximum(self.spinBox_roi_x2.value()-1)
-        self.spinBox_roi_x2.setMinimum(self.spinBox_roi_x1.value()+1)
-        self.spinBox_roi_y1.setMaximum(self.spinBox_roi_y2.value()-1)
-        self.spinBox_roi_y2.setMinimum(self.spinBox_roi_y1.value()+1)
-
-        if self.preview_is_set:
-            self.display_roi_preview()
-            # self.display_starting_area_preview()
-
-    def change_starting_area_factors(self):
-        self.tracker.starting_area.x1_factor = self.spinBox_starting_x1_factor.value()/100.0
-        self.spinBox_starting_x1_factor.setMaximum(self.spinBox_starting_x2_factor.value()-1)
-        self.tracker.starting_area.x2_factor = self.spinBox_starting_x2_factor.value()/100.0
-        self.spinBox_starting_x2_factor.setMinimum(self.spinBox_starting_x1_factor.value()+1)
-        self.tracker.starting_area.y1_factor = self.spinBox_starting_y1_factor.value()/100.0
-        self.spinBox_starting_y1_factor.setMaximum(self.spinBox_starting_y2_factor.value()-1)
-        self.tracker.starting_area.y2_factor = self.spinBox_starting_y2_factor.value()/100.0
-        self.spinBox_starting_y2_factor.setMinimum(self.spinBox_starting_y1_factor.value()+1)
-
-        if self.preview_is_set:
-            self.display_starting_area_preview()
-        return
-
-    def change_frame_waittime(self, value):
-        self.tracker.frame_waittime = value
-
-    def change_start_orientation(self, value):
-        self.tracker.start_ori = value
-
-    def change_min_fish_threshold(self, value):
-        self.tracker.fish_size_threshold = value
-
-    def change_max_fish_threshold(self, value):
-        self.tracker.fish_max_size_threshold = value
-
-    def change_enable_max_size_threshold(self):
-        self.tracker.enable_max_size_threshold = self.cbx_enable_max_size_thresh.isChecked()
-
-    def change_erosion_factor(self, value):
-        self.tracker.erosion_iterations = value
-
-    def change_dilation_factor(self, value):
-        self.tracker.dilation_iterations = value
-
-    def change_show_bg_sub_img(self):
-        self.tracker.im.show_bg_sub_img = self.cbx_show_bgsub_img.isChecked()
-
-    def change_show_morphed_img(self):
-        self.tracker.im.show_morphed_img = self.cbx_show_morph_img.isChecked()
-
-    def change_draw_contour(self):
-        self.tracker.im.draw_contour = self.cbx_show_contour.isChecked()
-
-    def change_draw_ellipse(self):
-        self.tracker.im.draw_ellipse = self.cbx_show_ellipse.isChecked()
-
-    def change_lineend_offset(self, value):
-        self.tracker.im.lineend_offset = value
-
-    def change_circle_size(self, value):
-        self.tracker.im.circle_size = value
-
-    def write_cfg_file(self):
-        cfg = ConfigParser.SafeConfigParser()
-        cfg.add_section('system')
-        cfg.set('system', 'frame_waittime', str(self.spinBox_frame_waittime.value()))
-        cfg.add_section('roi')
-        cfg.set('roi', 'x1', str(self.spinBox_roi_x1.value()))
-        cfg.set('roi', 'x2', str(self.spinBox_roi_x2.value()))
-        cfg.set('roi', 'y1', str(self.spinBox_roi_y1.value()))
-        cfg.set('roi', 'y2', str(self.spinBox_roi_y2.value()))
-        cfg.add_section('starting_area')
-        cfg.set('starting_area', 'x1_factor', str(float(self.spinBox_starting_x1_factor.value()/100.0)))
-        cfg.set('starting_area', 'x2_factor', str(float(self.spinBox_starting_x2_factor.value()/100.0)))
-        cfg.set('starting_area', 'y1_factor', str(float(self.spinBox_starting_y1_factor.value()/100.0)))
-        cfg.set('starting_area', 'y2_factor', str(float(self.spinBox_starting_y2_factor.value()/100.0)))
-        cfg.add_section('detection_values')
-        cfg.set('detection_values', 'start_orientation', str(self.spinBox_start_orientation.value()))
-        cfg.set('detection_values', 'min_area_threshold', str(self.spinBox_fish_threshold.value()))
-        cfg.set('detection_values', 'max_area_threshold', str(self.spinBox_fish_max_threshold.value()))
-        cfg.set('detection_values', 'enable_max_size_threshold', str(self.cbx_enable_max_size_thresh.isChecked()))
-        cfg.add_section('image_morphing')
-        cfg.set('image_morphing', 'erosion_factor', str(self.spinBox_erosion.value()))
-        cfg.set('image_morphing', 'dilation_factor', str(self.spinBox_dilation.value()))
-        cfg.add_section('image_processing')
-        cfg.set('image_processing', 'show_bg_sub_img', str(self.cbx_show_bgsub_img.isChecked()))
-        cfg.set('image_processing', 'show_morphed_img', str(self.cbx_show_morph_img.isChecked()))
-        cfg.set('image_processing', 'draw_contour', str(self.cbx_show_contour.isChecked()))
-        cfg.set('image_processing', 'draw_ellipse', str(self.cbx_show_ellipse.isChecked()))
-        cfg.add_section('visualization')
-        cfg.set('visualization', 'lineend_offset', str(self.spinBox_lineend_offset.value()))
-        cfg.set('visualization', 'circle_size', str(self.spinBox_circle_size.value()))
-        # cfg.set('visualization', 'line_color', str(self.))
-        # cfg.set('visualization', 'circle_color', str(self.))
-
-        with open("tracker.cnf", 'w') as cfg_file:
-            cfg.write(cfg_file)
-        return
-
-    def start_tracking(self):
-        self.set_tracker_video_file()
-        self.set_output_directory()
-        self.write_cfg_file()
-        if self.track_file == "":
-            self.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
-            return
-        if not self.output_is_input:
-            if self.output_directory == "":
-                self.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
-                return
-        if not os.path.exists(self.track_file):
-            self.lnEdit_file_path.setText(self.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
-            return
-        if not self.output_is_input:
-            if not os.path.exists(self.output_directory):
-                self.lnEdit_output_path.setText(self.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
-                return
-        self.tracker.run()
-        self.set_new_tracker()
-        self.preset_options() # make sure options match tracker-object (esp. nix-output option)
-
-    def abort_tracking(self):
-        self.tracker.ui_abort_button_pressed = True
-        self.set_new_tracker()
+        self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_lineend_offset)
+        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_circle_size)
