@@ -119,7 +119,7 @@ class Controller(object):
 
     def browse_output_directory(self):
         if self.output_is_input:
-            self.ui.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
+            self.ui.tab_file.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
             return
         dial = QtGui.QFileDialog()
         dial.setFileMode(QtGui.QFileDialog.Directory)
