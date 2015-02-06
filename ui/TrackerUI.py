@@ -8,12 +8,6 @@
 from PyQt4 import QtCore, QtGui
 from core.Tracker import Tracker
 from Controller import Controller
-import os
-import sys
-import numpy as np
-import cv2
-import copy
-import ConfigParser
 
 from TabFile import TabFile
 from TabRoi import TabRoi
@@ -41,36 +35,26 @@ class TrackerUserInterface(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
-        self.setupUi(self)
-
-        self.tracker = Tracker()
-        self.controller = Controller(self)
-
-        self.controller.preset_options()
-        self.connect_widgets()
-        self.set_shortcuts()
-
-    def setupUi(self, tracker_main_widget):
         #main widget
-        tracker_main_widget.setObjectName(_fromUtf8("tracker_main_widget"))
-        tracker_main_widget.resize(1400/2, 835)
-        tracker_main_widget.setMinimumSize(QtCore.QSize(900/2, 770))
+        self.setObjectName(_fromUtf8("self"))
+        self.resize(1400/2, 835)
+        self.setMinimumSize(QtCore.QSize(900/2, 770))
 
         # main vertical layout
-        self.vertLO_main = QtGui.QVBoxLayout(tracker_main_widget)
+        self.vertLO_main = QtGui.QVBoxLayout(self)
         self.vertLO_main.setObjectName(_fromUtf8("vertLO_main"))
         # horizontal layout video + options
         self.hoLO_video_plus_options = QtGui.QHBoxLayout()
         self.hoLO_video_plus_options.setObjectName(_fromUtf8("hoLO_video_plus_options"))
         # graphical output label
-        # self.lbl_video_output_label = QtGui.QLabel(tracker_main_widget)
-        # self.lbl_video_output_label.setMinimumWidth((tracker_main_widget.geometry().width()-22)/2)
+        # self.lbl_video_output_label = QtGui.QLabel(self)
+        # self.lbl_video_output_label.setMinimumWidth((self.geometry().width()-22)/2)
         # self.lbl_video_output_label.setObjectName(_fromUtf8("lbl_videl_output_label"))
         # self.lbl_video_output_label.setAlignment(QtCore.Qt.AlignCenter)
         # self.hoLO_video_plus_options.addWidget(self.lbl_video_output_label)
 
         # options tab widget
-        self.tab_widget_options = QtGui.QTabWidget(tracker_main_widget)
+        self.tab_widget_options = QtGui.QTabWidget(self)
         self.tab_widget_options.setObjectName(_fromUtf8("tab_widget_options"))
 
         # file tab
@@ -99,23 +83,30 @@ class TrackerUserInterface(QtGui.QWidget):
         self.hoLO_bot_buttons = QtGui.QHBoxLayout()
         self.hoLO_bot_buttons.setObjectName(_fromUtf8("hoLO_bot_buttons"))
         # button start tracking
-        self.btn_start_tracking = QtGui.QPushButton(tracker_main_widget)
+        self.btn_start_tracking = QtGui.QPushButton(self)
         self.btn_start_tracking.setMinimumSize(QtCore.QSize(0, 50))
         self.btn_start_tracking.setObjectName(_fromUtf8("btn_start_tracking"))
         self.hoLO_bot_buttons.addWidget(self.btn_start_tracking)
         # button abort tracking
-        self.btn_abort_tracking = QtGui.QPushButton(tracker_main_widget)
+        self.btn_abort_tracking = QtGui.QPushButton(self)
         self.btn_abort_tracking.setMinimumSize(QtCore.QSize(0, 50))
         self.btn_abort_tracking.setObjectName(_fromUtf8("btn_abort_tracking"))
         self.hoLO_bot_buttons.addWidget(self.btn_abort_tracking)
         # add button layout to main widget layout
         self.vertLO_main.addLayout(self.hoLO_bot_buttons)
 
-        self.retranslateUi(tracker_main_widget)
+        self.retranslate_ui(self)
         self.tab_widget_options.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(tracker_main_widget)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
-    def retranslateUi(self, tracker_main_widget):
+        self.tracker = Tracker()
+        self.controller = Controller(self)
+
+        self.controller.preset_options()
+        self.connect_widgets()
+        self.set_shortcuts()
+
+    def retranslate_ui(self, tracker_main_widget):
         tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
 
         self.tab_file.retranslate_tab_file()
