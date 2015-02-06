@@ -83,25 +83,25 @@ class Controller(object):
         self.ui.tab_roi.spinBox_roi_y2.setMinimum(self.ui.tab_roi.spinBox_roi_y1.value()+1)
 
         # frame waittime
-        self.ui.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
+        self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
 
         # starting area spinboxes
-        self.ui.spinBox_starting_x1_factor.setValue(self.ui.tracker.starting_area.x1_factor * 100)
-        self.ui.spinBox_starting_x2_factor.setValue(self.ui.tracker.starting_area.x2_factor * 100)
-        self.ui.spinBox_starting_y1_factor.setValue(self.ui.tracker.starting_area.y1_factor * 100)
-        self.ui.spinBox_starting_y2_factor.setValue(self.ui.tracker.starting_area.y2_factor * 100)
-        self.ui.spinBox_starting_x1_factor.setMaximum(self.ui.spinBox_starting_x2_factor.value()-1)
-        self.ui.spinBox_starting_x2_factor.setMinimum(self.ui.spinBox_starting_x1_factor.value()+1)
-        self.ui.spinBox_starting_y1_factor.setMaximum(self.ui.spinBox_starting_y2_factor.value()-1)
-        self.ui.spinBox_starting_y2_factor.setMinimum(self.ui.spinBox_starting_y1_factor.value()+1)
+        self.ui.tab_adv.spinBox_starting_x1_factor.setValue(self.ui.tracker.starting_area.x1_factor * 100)
+        self.ui.tab_adv.spinBox_starting_x2_factor.setValue(self.ui.tracker.starting_area.x2_factor * 100)
+        self.ui.tab_adv.spinBox_starting_y1_factor.setValue(self.ui.tracker.starting_area.y1_factor * 100)
+        self.ui.tab_adv.spinBox_starting_y2_factor.setValue(self.ui.tracker.starting_area.y2_factor * 100)
+        self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
+        self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
+        self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
+        self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
 
         # starting orientation
-        self.ui.spinBox_start_orientation.setValue(self.ui.tracker.start_ori)
+        self.ui.tab_adv.spinBox_start_orientation.setValue(self.ui.tracker.start_ori)
 
         # fish size thresholds
-        self.ui.spinBox_fish_threshold.setValue(self.ui.tracker.fish_size_threshold)
-        self.ui.spinBox_fish_max_threshold.setValue(self.ui.tracker.fish_max_size_threshold)
-        self.ui.cbx_enable_max_size_thresh.setChecked(self.ui.tracker.enable_max_size_threshold)
+        self.ui.tab_adv.spinBox_fish_threshold.setValue(self.ui.tracker.fish_size_threshold)
+        self.ui.tab_adv.spinBox_fish_max_threshold.setValue(self.ui.tracker.fish_max_size_threshold)
+        self.ui.tab_adv.cbx_enable_max_size_thresh.setChecked(self.ui.tracker.enable_max_size_threshold)
 
         # image morphing
         self.ui.spinBox_erosion.setValue(self.ui.tracker.erosion_iterations)
@@ -194,14 +194,14 @@ class Controller(object):
             # self.display_starting_area_preview()
 
     def change_starting_area_factors(self):
-        self.ui.tracker.starting_area.x1_factor = self.ui.spinBox_starting_x1_factor.value()/100.0
-        self.ui.spinBox_starting_x1_factor.setMaximum(self.ui.spinBox_starting_x2_factor.value()-1)
-        self.ui.tracker.starting_area.x2_factor = self.ui.spinBox_starting_x2_factor.value()/100.0
-        self.ui.spinBox_starting_x2_factor.setMinimum(self.ui.spinBox_starting_x1_factor.value()+1)
-        self.ui.tracker.starting_area.y1_factor = self.ui.spinBox_starting_y1_factor.value()/100.0
-        self.ui.spinBox_starting_y1_factor.setMaximum(self.ui.spinBox_starting_y2_factor.value()-1)
-        self.ui.tracker.starting_area.y2_factor = self.ui.spinBox_starting_y2_factor.value()/100.0
-        self.ui.spinBox_starting_y2_factor.setMinimum(self.ui.spinBox_starting_y1_factor.value()+1)
+        self.ui.tracker.starting_area.x1_factor = self.ui.tab_adv.spinBox_starting_x1_factor.value()/100.0
+        self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
+        self.ui.tracker.starting_area.x2_factor = self.ui.tab_adv.spinBox_starting_x2_factor.value()/100.0
+        self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
+        self.ui.tracker.starting_area.y1_factor = self.ui.tab_adv.spinBox_starting_y1_factor.value()/100.0
+        self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
+        self.ui.tracker.starting_area.y2_factor = self.ui.tab_adv.spinBox_starting_y2_factor.value()/100.0
+        self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
 
         if self.preview_is_set:
             self.display_starting_area_preview()
@@ -220,7 +220,7 @@ class Controller(object):
         self.ui.tracker.fish_max_size_threshold = value
 
     def change_enable_max_size_threshold(self):
-        self.ui.tracker.enable_max_size_threshold = self.ui.cbx_enable_max_size_thresh.isChecked()
+        self.ui.tracker.enable_max_size_threshold = self.ui.tab_adv.cbx_enable_max_size_thresh.isChecked()
 
     def change_erosion_factor(self, value):
         self.ui.tracker.erosion_iterations = value
@@ -249,22 +249,22 @@ class Controller(object):
     def write_cfg_file(self):
         cfg = ConfigParser.SafeConfigParser()
         cfg.add_section('system')
-        cfg.set('system', 'frame_waittime', str(self.ui.spinBox_frame_waittime.value()))
+        cfg.set('system', 'frame_waittime', str(self.ui.tab_adv.spinBox_frame_waittime.value()))
         cfg.add_section('roi')
         cfg.set('roi', 'x1', str(self.ui.tab_roi.spinBox_roi_x1.value()))
         cfg.set('roi', 'x2', str(self.ui.tab_roi.spinBox_roi_x2.value()))
         cfg.set('roi', 'y1', str(self.ui.tab_roi.spinBox_roi_y1.value()))
         cfg.set('roi', 'y2', str(self.ui.tab_roi.spinBox_roi_y2.value()))
         cfg.add_section('starting_area')
-        cfg.set('starting_area', 'x1_factor', str(float(self.ui.spinBox_starting_x1_factor.value()/100.0)))
-        cfg.set('starting_area', 'x2_factor', str(float(self.ui.spinBox_starting_x2_factor.value()/100.0)))
-        cfg.set('starting_area', 'y1_factor', str(float(self.ui.spinBox_starting_y1_factor.value()/100.0)))
-        cfg.set('starting_area', 'y2_factor', str(float(self.ui.spinBox_starting_y2_factor.value()/100.0)))
+        cfg.set('starting_area', 'x1_factor', str(float(self.ui.tab_adv.spinBox_starting_x1_factor.value()/100.0)))
+        cfg.set('starting_area', 'x2_factor', str(float(self.ui.tab_adv.spinBox_starting_x2_factor.value()/100.0)))
+        cfg.set('starting_area', 'y1_factor', str(float(self.ui.tab_adv.spinBox_starting_y1_factor.value()/100.0)))
+        cfg.set('starting_area', 'y2_factor', str(float(self.ui.tab_adv.spinBox_starting_y2_factor.value()/100.0)))
         cfg.add_section('detection_values')
-        cfg.set('detection_values', 'start_orientation', str(self.ui.spinBox_start_orientation.value()))
-        cfg.set('detection_values', 'min_area_threshold', str(self.ui.spinBox_fish_threshold.value()))
-        cfg.set('detection_values', 'max_area_threshold', str(self.ui.spinBox_fish_max_threshold.value()))
-        cfg.set('detection_values', 'enable_max_size_threshold', str(self.ui.cbx_enable_max_size_thresh.isChecked()))
+        cfg.set('detection_values', 'start_orientation', str(self.ui.tab_adv.spinBox_start_orientation.value()))
+        cfg.set('detection_values', 'min_area_threshold', str(self.ui.tab_adv.spinBox_fish_threshold.value()))
+        cfg.set('detection_values', 'max_area_threshold', str(self.ui.tab_adv.spinBox_fish_max_threshold.value()))
+        cfg.set('detection_values', 'enable_max_size_threshold', str(self.ui.tab_adv.cbx_enable_max_size_thresh.isChecked()))
         cfg.add_section('image_morphing')
         cfg.set('image_morphing', 'erosion_factor', str(self.ui.spinBox_erosion.value()))
         cfg.set('image_morphing', 'dilation_factor', str(self.ui.spinBox_dilation.value()))
