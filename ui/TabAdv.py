@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -28,10 +29,7 @@ class TabAdv(QtGui.QWidget):
         spacerItem4 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem4)
         # line
-        self.line_10 = QtGui.QFrame(self)
-        self.line_10.setFrameShape(QtGui.QFrame.HLine)
-        self.line_10.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_10.setObjectName(_fromUtf8("line_10"))
+        self.line_10 = MyQLine(self, "line_10")
         self.vertLO_tab_adv.addWidget(self.line_10)
         # spacer
         spacerItem5 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -54,10 +52,7 @@ class TabAdv(QtGui.QWidget):
         spacerItem6 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem6)
         # line
-        self.line_5 = QtGui.QFrame(self)
-        self.line_5.setFrameShape(QtGui.QFrame.HLine)
-        self.line_5.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_5.setObjectName(_fromUtf8("line_5"))
+        self.line_5 = MyQLine(self, "line_5")
         self.vertLO_tab_adv.addWidget(self.line_5)
         # label start area
         self.lbl_start_area = QtGui.QLabel(self)
@@ -111,10 +106,7 @@ class TabAdv(QtGui.QWidget):
         # add starting are selection grid layout to tab layout
         self.vertLO_tab_adv.addLayout(self.gridLO_start_area)
         # line
-        self.line_6 = QtGui.QFrame(self)
-        self.line_6.setFrameShape(QtGui.QFrame.HLine)
-        self.line_6.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_6.setObjectName(_fromUtf8("line_6"))
+        self.line_6 = MyQLine(self, "line_6")
         self.vertLO_tab_adv.addWidget(self.line_6)
         # spacer
         spacerItem7 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -137,10 +129,7 @@ class TabAdv(QtGui.QWidget):
         spacerItem8 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem8)
         # line
-        self.line_9 = QtGui.QFrame(self)
-        self.line_9.setFrameShape(QtGui.QFrame.HLine)
-        self.line_9.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_9.setObjectName(_fromUtf8("line_9"))
+        self.line_9 = MyQLine(self, "line_9")
         self.vertLO_tab_adv.addWidget(self.line_9)
         # spacer
         spacerItem9 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)

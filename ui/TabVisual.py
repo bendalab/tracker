@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -28,10 +29,7 @@ class TabVisual(QtGui.QWidget):
         spacerItem11 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_visual.addItem(spacerItem11)
         # line
-        self.line_7 = QtGui.QFrame(self)
-        self.line_7.setFrameShape(QtGui.QFrame.HLine)
-        self.line_7.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_7.setObjectName(_fromUtf8("line_7"))
+        self.line_7 = MyQLine(self, "line_7")
         self.vertLO_tab_visual.addWidget(self.line_7)
         # label image morphing
         self.lbl_img_morphing = QtGui.QLabel(self)
@@ -61,19 +59,13 @@ class TabVisual(QtGui.QWidget):
         # add grid layout image morphing
         self.vertLO_tab_visual.addLayout(self.gridLO_img_morphing)
         # line
-        self.line_8 = QtGui.QFrame(self)
-        self.line_8.setFrameShape(QtGui.QFrame.HLine)
-        self.line_8.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_8.setObjectName(_fromUtf8("line_8"))
+        self.line_8 = MyQLine(self, "line_8")
         self.vertLO_tab_visual.addWidget(self.line_8)
         # spacer
         spacerItem12 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_visual.addItem(spacerItem12)
         # line
-        self.line_13 = QtGui.QFrame(self)
-        self.line_13.setFrameShape(QtGui.QFrame.HLine)
-        self.line_13.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_13.setObjectName(_fromUtf8("line_13"))
+        self.line_13 = MyQLine(self, "line_13")
         self.vertLO_tab_visual.addWidget(self.line_13)
         # label image processing steps
         self.lbl_img_proc_steps = QtGui.QLabel(self)
@@ -97,19 +89,13 @@ class TabVisual(QtGui.QWidget):
         self.cbx_show_ellipse.setObjectName(_fromUtf8("cbx_show_ellipse"))
         self.vertLO_tab_visual.addWidget(self.cbx_show_ellipse)
         # line
-        self.line_14 = QtGui.QFrame(self)
-        self.line_14.setFrameShape(QtGui.QFrame.HLine)
-        self.line_14.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_14.setObjectName(_fromUtf8("line_14"))
+        self.line_14 = MyQLine(self, "line_14")
         self.vertLO_tab_visual.addWidget(self.line_14)
         # spacer
         spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_visual.addItem(spacerItem13)
         # line
-        self.line_11 = QtGui.QFrame(self)
-        self.line_11.setFrameShape(QtGui.QFrame.HLine)
-        self.line_11.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_11.setObjectName(_fromUtf8("line_11"))
+        self.line_11 = MyQLine(self, "line_11")
         self.vertLO_tab_visual.addWidget(self.line_11)
         # label data visualisation
         self.gridLO_data_visual = QtGui.QGridLayout()
@@ -157,10 +143,7 @@ class TabVisual(QtGui.QWidget):
         # add data visualization layout
         self.vertLO_tab_visual.addLayout(self.gridLO_data_visual)
         # line
-        self.line_12 = QtGui.QFrame(self)
-        self.line_12.setFrameShape(QtGui.QFrame.HLine)
-        self.line_12.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_12.setObjectName(_fromUtf8("line_12"))
+        self.line_12 = MyQLine(self, "line_12")
         self.vertLO_tab_visual.addWidget(self.line_12)
         # spacer
         spacerItem14 = QtGui.QSpacerItem(20, 119, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)

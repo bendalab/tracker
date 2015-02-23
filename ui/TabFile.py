@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -33,10 +34,7 @@ class TabFile(QtGui.QWidget):
         self.vertLO_tab_file.addItem(spacer_item)
 
         # line
-        self.line = QtGui.QFrame(self)
-        self.line.setFrameShape(QtGui.QFrame.HLine)
-        self.line.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line.setObjectName(_fromUtf8("line"))
+        self.line = MyQLine(self, "line")
         self.vertLO_tab_file.addWidget(self.line)
 
         # label file path
@@ -55,10 +53,7 @@ class TabFile(QtGui.QWidget):
         self.vertLO_tab_file.addWidget(self.btn_browse_file)
 
         # line
-        self.line_2 = QtGui.QFrame(self)
-        self.line_2.setFrameShape(QtGui.QFrame.HLine)
-        self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_2.setObjectName(_fromUtf8("line_2"))
+        self.line_2 = MyQLine(self, "line_2")
         self.vertLO_tab_file.addWidget(self.line_2)
 
         # label output path
@@ -82,10 +77,7 @@ class TabFile(QtGui.QWidget):
         self.vertLO_tab_file.addWidget(self.btn_browse_output)
 
         # line
-        self.line_2_1 = QtGui.QFrame(self)
-        self.line_2_1.setFrameShape(QtGui.QFrame.HLine)
-        self.line_2_1.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_2_1.setObjectName(_fromUtf8("line_2_1"))
+        self.line_2_1 = MyQLine(self, "line_2_1")
         self.vertLO_tab_file.addWidget(self.line_2_1)
 
         # checkbox nix output
