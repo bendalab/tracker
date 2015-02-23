@@ -13,6 +13,7 @@ from TabFile import TabFile
 from TabRoi import TabRoi
 from TabAdv import TabAdv
 from TabVisual import TabVisual
+from TabMeta import TabMeta
 
 
 try:
@@ -73,6 +74,10 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_visual = TabVisual()
         self.tab_widget_options.addTab(self.tab_visual, _fromUtf8(""))
 
+        # meta tab
+        self.tab_meta = TabMeta()
+        self.tab_widget_options.addTab(self.tab_meta, _fromUtf8(""))
+
         # add options widget to horizontal layout
         self.hoLO_video_plus_options.addWidget(self.tab_widget_options)
 
@@ -113,11 +118,13 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_roi.retranslate_tab_roi()
         self.tab_adv.retranslate_tab_adv()
         self.tab_visual.retranslate_tab_visual()
+        self.tab_meta.retranslate_tab_meta()
 
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_file), _translate("tracker_main_widget", "File", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_roi), _translate("tracker_main_widget", "ROI", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_adv), _translate("tracker_main_widget", "Advanced", None))
         self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_visual), _translate("tracker_main_widget", "Visualization", None))
+        self.tab_widget_options.setTabText(self.tab_widget_options.indexOf(self.tab_meta), _translate("tracker_main_widget", "Meta Data", None))
 
         self.btn_start_tracking.setText(_translate("tracker_main_widget", "Start Tracking", None))
         self.btn_abort_tracking.setText(_translate("tracker_main_widget", "Abort Tracking", None))

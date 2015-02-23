@@ -70,6 +70,10 @@ class Controller(object):
         # self.lnEdit_file_path.setText(self.tracker.video_file)
         self.ui.tab_file.cbx_enable_nix_output.setChecked(self.ui.tracker.nix_io)
 
+        # meta
+        self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
+        self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
+
         # region of interest
         self.ui.tab_roi.spinBox_roi_x1.setValue(self.ui.tracker.roi.x1)
         self.ui.tab_roi.spinBox_roi_x2.setValue(self.ui.tracker.roi.x2)
@@ -244,9 +248,20 @@ class Controller(object):
     def change_circle_size(self, value):
         self.ui.tracker.im.circle_size = value
 
+    def set_experimenter(self, value):
+        self.ui.tracker.mm.experimenter = value
+
+    def set_fish_id(self, value):
+        self.ui.tracker.mm.fish_id = value
+
     def write_cfg_file(self):
         cfg = ConfigParser.SafeConfigParser()
-        self.ui.tracker.mm.add_to_cfg(cfg)
+
+        # self.ui.tracker.mm.add_to_cfg(cfg)
+        cfg.add_section("meta")
+        cfg.set("meta", "experimenter", str(self.ui.tab_meta.ln_edit_experimenter.text()))
+        cfg.set("meta", "fish_id", str(self.ui.tab_meta.ln_edit_fish_id.text()))
+
         cfg.add_section('system')
         cfg.set('system', 'frame_waittime', str(self.ui.tab_adv.spinBox_frame_waittime.value()))
         cfg.add_section('roi')
