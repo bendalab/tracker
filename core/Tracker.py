@@ -118,9 +118,6 @@ class Tracker(object):
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
-
-        return
-
     # def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
     #     if self.im.show_bg_sub_img:
     #         cv2.imshow("bgsub", roi_bg_sub)
