@@ -92,16 +92,21 @@ class Tracker(object):
         cfg_file = open('tracker.cnf')
         cfg.readfp(cfg_file)
 
+        # meta manager values
         self.mm.import_cfg_values(cfg)
-
-        self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
-        self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
         # roi values
         self.roi.import_cfg_values(cfg)
 
         # starting area
         self.starting_area.import_cfg_values(cfg)
+
+        # image manager values
+        self.im.import_cfg_values(cfg)
+
+        # tracker values
+        self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
+        self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
         self._start_ori = cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
@@ -113,8 +118,7 @@ class Tracker(object):
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
-        # image manager values
-        self.im.import_cfg_values(cfg)
+
         return
 
     # def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
