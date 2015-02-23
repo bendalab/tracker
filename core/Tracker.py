@@ -96,17 +96,12 @@ class Tracker(object):
 
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
-        # roi
-        self._roi.x1 = cfg.getint('roi', 'x1')
-        self._roi.x2 = cfg.getint('roi', 'x2')
-        self._roi.y1 = cfg.getint('roi', 'y1')
-        self._roi.y2 = cfg.getint('roi', 'y2')
+
+        # roi values
+        self.roi.import_cfg_values(cfg)
 
         # starting area
-        self.starting_area.x1_factor = cfg.getfloat('starting_area', 'x1_factor')
-        self.starting_area.x2_factor = cfg.getfloat('starting_area', 'x2_factor')
-        self.starting_area.y1_factor = cfg.getfloat('starting_area', 'y1_factor')
-        self.starting_area.y2_factor = cfg.getfloat('starting_area', 'y2_factor')
+        self.starting_area.import_cfg_values(cfg)
 
         self._start_ori = cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
@@ -118,13 +113,8 @@ class Tracker(object):
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
 
-        self.im.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
-        self.im.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
-        self.im.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
-        self.im.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
-
-        self.im._lineend_offset = cfg.getint('visualization', 'lineend_offset')
-        self.im._circle_size = cfg.getint('visualization', 'circle_size')
+        # image manager values
+        self.im.import_cfg_values(cfg)
         return
 
     # def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
