@@ -141,41 +141,11 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tracker = Tracker()
         return
 
-    # TODO finish connecting!
     def connect_widgets(self):
-        self.tab_file.btn_browse_file.clicked.connect(self.controller.browse_file)
-        self.tab_file.btn_browse_output.clicked.connect(self.controller.browse_output_directory)
+        self.tab_file.connect_widgets(self.controller)
+        self.tab_roi.connect_widgets(self.controller)
+        self.tab_adv.connect_widgets(self.controller)
+        self.tab_visual.connect_widgets(self.controller)
+
         self.btn_start_tracking.clicked.connect(self.controller.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.controller.abort_tracking)
-
-        self.connect(self.tab_file.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_enable_nix_output)
-        self.connect(self.tab_file.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_output_is_input)
-
-        self.connect(self.tab_roi.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
-        self.connect(self.tab_roi.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
-        self.connect(self.tab_roi.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
-        self.connect(self.tab_roi.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_roi_values)
-
-        self.connect(self.tab_adv.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
-        self.connect(self.tab_adv.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
-        self.connect(self.tab_adv.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
-        self.connect(self.tab_adv.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_starting_area_factors)
-
-        self.connect(self.tab_adv.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_frame_waittime)
-
-        self.connect(self.tab_adv.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_start_orientation)
-
-        self.connect(self.tab_adv.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_min_fish_threshold)
-        self.connect(self.tab_adv.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_max_fish_threshold)
-        self.connect(self.tab_adv.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_enable_max_size_threshold)
-
-        self.connect(self.tab_visual.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_erosion_factor)
-        self.connect(self.tab_visual.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_dilation_factor)
-
-        self.connect(self.tab_visual.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_show_bg_sub_img)
-        self.connect(self.tab_visual.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_show_morphed_img)
-        self.connect(self.tab_visual.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_draw_contour)
-        self.connect(self.tab_visual.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), self.controller.change_draw_ellipse)
-
-        self.connect(self.tab_visual.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_lineend_offset)
-        self.connect(self.tab_visual.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), self.controller.change_circle_size)

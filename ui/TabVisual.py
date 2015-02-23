@@ -166,6 +166,19 @@ class TabVisual(QtGui.QWidget):
         spacerItem14 = QtGui.QSpacerItem(20, 119, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_visual.addItem(spacerItem14)
 
+    def connect_widgets(self, controller):
+        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), controller.change_erosion_factor)
+        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_factor)
+
+        self.connect(self.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"), controller.change_show_bg_sub_img)
+        self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), controller.change_show_morphed_img)
+        self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), controller.change_draw_contour)
+        self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), controller.change_draw_ellipse)
+
+        self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), controller.change_lineend_offset)
+        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), controller.change_circle_size)
+        return
+
     def retranslate_tab_visual(self):
         self.lbl_img_morphing.setText(_translate("tracker_main_widget", "Image Morphing", None))
         self.lbl_erosion.setText(_translate("tracker_main_widget", "Erosion Faktor", None))

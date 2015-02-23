@@ -100,6 +100,14 @@ class TabFile(QtGui.QWidget):
         # # complete file tab
         # self.tab_widget_options.addTab(self, _fromUtf8(""))
 
+    def connect_widgets(self, controller):
+        self.btn_browse_file.clicked.connect(controller.browse_file)
+        self.btn_browse_output.clicked.connect(controller.browse_output_directory)
+
+        self.connect(self.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), controller.change_enable_nix_output)
+        self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), controller.change_output_is_input)
+        return
+
 
     def retranslate_tab_file(self):
         self.lbl_file_path.setText(_translate(self.name, "File Path", None))

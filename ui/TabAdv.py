@@ -176,6 +176,21 @@ class TabAdv(QtGui.QWidget):
         spacerItem10 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem10)
 
+    def connect_widgets(self, controller):
+        self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+
+        self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), controller.change_frame_waittime)
+
+        self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), controller.change_start_orientation)
+
+        self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), controller.change_min_fish_threshold)
+        self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), controller.change_max_fish_threshold)
+        self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), controller.change_enable_max_size_threshold)
+        return
+
     def retranslate_tab_adv(self):
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))
         self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))

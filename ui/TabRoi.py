@@ -99,6 +99,13 @@ class TabRoi(QtGui.QWidget):
         spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_roi.addItem(spacerItem3)
 
+    def connect_widgets(self, controller):
+        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        return
+
     def retranslate_tab_roi(self):
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
         self.lbl_roi.setText(_translate("tracker_main_widget", "Region of interest", None))
