@@ -22,8 +22,6 @@ class Controller(object):
         self.roi_preview_displayed = False
         return
 
-
-
     def browse_file(self):
         self.roi_preview_displayed = False
 
@@ -248,6 +246,7 @@ class Controller(object):
 
     def write_cfg_file(self):
         cfg = ConfigParser.SafeConfigParser()
+        self.ui.tracker.mm.add_to_cfg(cfg)
         cfg.add_section('system')
         cfg.set('system', 'frame_waittime', str(self.ui.tab_adv.spinBox_frame_waittime.value()))
         cfg.add_section('roi')

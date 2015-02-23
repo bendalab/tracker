@@ -14,6 +14,7 @@ from DataWriter import DataWriter
 from ContourManager import ContourManager
 from DataManager import DataManager
 from ImageManager import ImageManager
+from MetaManager import MetaManager
 from IPython import embed
 
 class Tracker(object):
@@ -62,6 +63,7 @@ class Tracker(object):
         self.cm = ContourManager()
         self.dm = DataManager()
         self.im = ImageManager()
+        self.mm = MetaManager()
 
         self.fish_started = False
         self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
@@ -89,6 +91,8 @@ class Tracker(object):
         cfg = ConfigParser.ConfigParser()
         cfg_file = open('tracker.cnf')
         cfg.readfp(cfg_file)
+
+        self.mm.import_cfg_values(cfg)
 
         self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
