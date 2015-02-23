@@ -71,6 +71,7 @@ class TabMeta(QtGui.QWidget):
         self.vert_LO_tab_meta.addItem(spacer_item_2)
 
     def connect_widgets(self, controller):
+        #
         return
 
     def retranslate_tab_meta(self):
