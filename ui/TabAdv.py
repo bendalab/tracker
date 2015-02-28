@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -28,10 +29,7 @@ class TabAdv(QtGui.QWidget):
         spacerItem4 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem4)
         # line
-        self.line_10 = QtGui.QFrame(self)
-        self.line_10.setFrameShape(QtGui.QFrame.HLine)
-        self.line_10.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_10.setObjectName(_fromUtf8("line_10"))
+        self.line_10 = MyQLine(self, "line_10")
         self.vertLO_tab_adv.addWidget(self.line_10)
         # spacer
         spacerItem5 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -54,10 +52,7 @@ class TabAdv(QtGui.QWidget):
         spacerItem6 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem6)
         # line
-        self.line_5 = QtGui.QFrame(self)
-        self.line_5.setFrameShape(QtGui.QFrame.HLine)
-        self.line_5.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_5.setObjectName(_fromUtf8("line_5"))
+        self.line_5 = MyQLine(self, "line_5")
         self.vertLO_tab_adv.addWidget(self.line_5)
         # label start area
         self.lbl_start_area = QtGui.QLabel(self)
@@ -111,10 +106,7 @@ class TabAdv(QtGui.QWidget):
         # add starting are selection grid layout to tab layout
         self.vertLO_tab_adv.addLayout(self.gridLO_start_area)
         # line
-        self.line_6 = QtGui.QFrame(self)
-        self.line_6.setFrameShape(QtGui.QFrame.HLine)
-        self.line_6.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_6.setObjectName(_fromUtf8("line_6"))
+        self.line_6 = MyQLine(self, "line_6")
         self.vertLO_tab_adv.addWidget(self.line_6)
         # spacer
         spacerItem7 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -137,10 +129,7 @@ class TabAdv(QtGui.QWidget):
         spacerItem8 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem8)
         # line
-        self.line_9 = QtGui.QFrame(self)
-        self.line_9.setFrameShape(QtGui.QFrame.HLine)
-        self.line_9.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_9.setObjectName(_fromUtf8("line_9"))
+        self.line_9 = MyQLine(self, "line_9")
         self.vertLO_tab_adv.addWidget(self.line_9)
         # spacer
         spacerItem9 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -175,6 +164,21 @@ class TabAdv(QtGui.QWidget):
         # spacer
         spacerItem10 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem10)
+
+    def connect_widgets(self, controller):
+        self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+
+        self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), controller.change_frame_waittime)
+
+        self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), controller.change_start_orientation)
+
+        self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), controller.change_min_fish_threshold)
+        self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), controller.change_max_fish_threshold)
+        self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"), controller.change_enable_max_size_threshold)
+        return
 
     def retranslate_tab_adv(self):
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))

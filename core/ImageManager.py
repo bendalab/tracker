@@ -97,9 +97,14 @@ class ImageManager(object):
             cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
         return
 
+    def import_cfg_values(self, cfg):
+        self.show_bg_sub_img = cfg.getboolean('image_processing', 'show_bg_sub_img')
+        self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
+        self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
+        self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
 
-
-
+        self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
+        self.circle_size = cfg.getint('visualization', 'circle_size')
 
     @property
     def img_travel_orientation(self):

@@ -5,6 +5,13 @@ class ROI(object):
             self.__x_2 = x_2
             self.__y_2 = y_2
 
+    def import_cfg_values(self, cfg):
+        self.x1 = cfg.getint('roi', 'x1')
+        self.x2 = cfg.getint('roi', 'x2')
+        self.y1 = cfg.getint('roi', 'y1')
+        self.y2 = cfg.getint('roi', 'y2')
+
+
     @property
     def x1(self):
         return self.__x_1

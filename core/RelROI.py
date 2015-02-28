@@ -5,6 +5,12 @@ class RelROI(object):
         self._y1_factor = y1_factor
         self._y2_factor = y2_factor
 
+    def import_cfg_values(self, cfg):
+        self.x1_factor = cfg.getfloat('starting_area', 'x1_factor')
+        self.x2_factor = cfg.getfloat('starting_area', 'x2_factor')
+        self.y1_factor = cfg.getfloat('starting_area', 'y1_factor')
+        self.y2_factor = cfg.getfloat('starting_area', 'y2_factor')
+
     @property
     def x1_factor(self):
         return self._x1_factor

@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -29,10 +30,7 @@ class TabRoi(QtGui.QWidget):
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_roi.addItem(spacerItem2)
         # line
-        self.line_3 = QtGui.QFrame(self)
-        self.line_3.setFrameShape(QtGui.QFrame.HLine)
-        self.line_3.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_3.setObjectName(_fromUtf8("line_3"))
+        self.line_3 = MyQLine(self, "line_3")
         self.vertLO_tab_roi.addWidget(self.line_3)
         # label region of interest
         self.lbl_roi = QtGui.QLabel(self)
@@ -90,14 +88,18 @@ class TabRoi(QtGui.QWidget):
         # add grid_layout_set_roi to vertical layout of tab
         self.vertLO_tab_roi.addLayout(self.gridLO_set_roi)
         # line
-        self.line_4 = QtGui.QFrame(self)
-        self.line_4.setFrameShape(QtGui.QFrame.HLine)
-        self.line_4.setFrameShadow(QtGui.QFrame.Sunken)
-        self.line_4.setObjectName(_fromUtf8("line_4"))
+        self.line_4 = MyQLine(self, "line_4")
         self.vertLO_tab_roi.addWidget(self.line_4)
         # spacer
         spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_roi.addItem(spacerItem3)
+
+    def connect_widgets(self, controller):
+        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        return
 
     def retranslate_tab_roi(self):
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
