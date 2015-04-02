@@ -315,6 +315,9 @@ class Tracker(object):
     def load_frame_times(self, file_name):
         times_file = None
         if not os.path.exists(file_name):
+            print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
+                  "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
+                  "in the tools folder."
             sys.exit("ERROR: times file missing - data saving abortet")
         
         with open(file_name, 'r') as f:
