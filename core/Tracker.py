@@ -85,7 +85,7 @@ class Tracker(object):
         if not self.will_import_config_values:
             return
         if not os.path.exists('tracker.cnf'):
-            print "Couldn't import config data from file - file doesn't exist"
+            print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
             return
 
         cfg = ConfigParser.ConfigParser()
