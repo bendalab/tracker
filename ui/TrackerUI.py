@@ -7,6 +7,7 @@
 
 from PyQt4 import QtCore, QtGui
 from core.Tracker import Tracker
+# have  to do  this, gits messing with me
 from controller.Controller import Controller
 
 from TabFile import TabFile
