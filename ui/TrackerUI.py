@@ -7,7 +7,7 @@
 
 from PyQt4 import QtCore, QtGui
 from core.Tracker import Tracker
-from Controller import Controller
+from controller.Controller import Controller
 
 from TabFile import TabFile
 from TabRoi import TabRoi

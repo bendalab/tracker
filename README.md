@@ -12,6 +12,7 @@ For output of the tracking results we use the the nix data model and
 the nixpy python library (optional). Nixpy can be found here:
 https://github.com/g-node/nixpy
 
+For Visualization we use PyQt4.
 
 _Disclaimer_
 
