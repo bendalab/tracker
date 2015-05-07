@@ -121,10 +121,7 @@ class Tracker(object):
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
 
-        # # self.ui.tracker.mm.add_to_cfg(cfg)
-        # cfg.add_section("meta")
-        # cfg.set("meta", "experimenter", str(self.ui.tab_meta.ln_edit_experimenter.text()))
-        # cfg.set("meta", "fish_id", str(self.ui.tab_meta.ln_edit_fish_id.text()))
+        self.mm.write_cfg_values(cfg)
 
         cfg.add_section('system')
         cfg.set('system', 'frame_waittime', str(self.frame_waittime))
@@ -146,16 +143,8 @@ class Tracker(object):
         cfg.add_section('image_morphing')
         cfg.set('image_morphing', 'erosion_factor', str(self.erosion_iterations))
         cfg.set('image_morphing', 'dilation_factor', str(self.dilation_iterations))
-        cfg.add_section('image_processing')
-        cfg.set('image_processing', 'show_bg_sub_img', str(self.im.show_bg_sub_img))
-        cfg.set('image_processing', 'show_morphed_img', str(self.im.show_morphed_img))
-        cfg.set('image_processing', 'draw_contour', str(self.im.draw_contour))
-        cfg.set('image_processing', 'draw_ellipse', str(self.im.draw_ellipse))
-        cfg.add_section('visualization')
-        cfg.set('visualization', 'lineend_offset', str(self.im.lineend_offset))
-        cfg.set('visualization', 'circle_size', str(self.im.circle_size))
-        # cfg.set('visualization', 'line_color', str(self.))
-        # cfg.set('visualization', 'circle_color', str(self.))
+
+        self.im.write_cfg_values(cfg)
 
         with open("tracker.cnf", 'w') as cfg_file:
             cfg.write(cfg_file)
