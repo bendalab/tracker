@@ -254,53 +254,9 @@ class Controller(object):
     def set_fish_id(self, value):
         self.ui.tracker.mm.fish_id = value
 
-    def write_cfg_file(self):
-        cfg = ConfigParser.SafeConfigParser()
-
-        # self.ui.tracker.mm.add_to_cfg(cfg)
-        cfg.add_section("meta")
-        cfg.set("meta", "experimenter", str(self.ui.tab_meta.ln_edit_experimenter.text()))
-        cfg.set("meta", "fish_id", str(self.ui.tab_meta.ln_edit_fish_id.text()))
-
-        cfg.add_section('system')
-        cfg.set('system', 'frame_waittime', str(self.ui.tab_adv.spinBox_frame_waittime.value()))
-        cfg.add_section('roi')
-        cfg.set('roi', 'x1', str(self.ui.tab_roi.spinBox_roi_x1.value()))
-        cfg.set('roi', 'x2', str(self.ui.tab_roi.spinBox_roi_x2.value()))
-        cfg.set('roi', 'y1', str(self.ui.tab_roi.spinBox_roi_y1.value()))
-        cfg.set('roi', 'y2', str(self.ui.tab_roi.spinBox_roi_y2.value()))
-        cfg.add_section('starting_area')
-        cfg.set('starting_area', 'x1_factor', str(float(self.ui.tab_adv.spinBox_starting_x1_factor.value()/100.0)))
-        cfg.set('starting_area', 'x2_factor', str(float(self.ui.tab_adv.spinBox_starting_x2_factor.value()/100.0)))
-        cfg.set('starting_area', 'y1_factor', str(float(self.ui.tab_adv.spinBox_starting_y1_factor.value()/100.0)))
-        cfg.set('starting_area', 'y2_factor', str(float(self.ui.tab_adv.spinBox_starting_y2_factor.value()/100.0)))
-        cfg.add_section('detection_values')
-        cfg.set('detection_values', 'start_orientation', str(self.ui.tab_adv.spinBox_start_orientation.value()))
-        cfg.set('detection_values', 'min_area_threshold', str(self.ui.tab_adv.spinBox_fish_threshold.value()))
-        cfg.set('detection_values', 'max_area_threshold', str(self.ui.tab_adv.spinBox_fish_max_threshold.value()))
-        cfg.set('detection_values', 'enable_max_size_threshold', str(self.ui.tab_adv.cbx_enable_max_size_thresh.isChecked()))
-        cfg.add_section('image_morphing')
-        cfg.set('image_morphing', 'erosion_factor', str(self.ui.tab_visual.spinBox_erosion.value()))
-        cfg.set('image_morphing', 'dilation_factor', str(self.ui.tab_visual.spinBox_dilation.value()))
-        cfg.add_section('image_processing')
-        cfg.set('image_processing', 'show_bg_sub_img', str(self.ui.tab_visual.cbx_show_bgsub_img.isChecked()))
-        cfg.set('image_processing', 'show_morphed_img', str(self.ui.tab_visual.cbx_show_morph_img.isChecked()))
-        cfg.set('image_processing', 'draw_contour', str(self.ui.tab_visual.cbx_show_contour.isChecked()))
-        cfg.set('image_processing', 'draw_ellipse', str(self.ui.tab_visual.cbx_show_ellipse.isChecked()))
-        cfg.add_section('visualization')
-        cfg.set('visualization', 'lineend_offset', str(self.ui.tab_visual.spinBox_lineend_offset.value()))
-        cfg.set('visualization', 'circle_size', str(self.ui.tab_visual.spinBox_circle_size.value()))
-        # cfg.set('visualization', 'line_color', str(self.))
-        # cfg.set('visualization', 'circle_color', str(self.))
-
-        with open("tracker.cnf", 'w') as cfg_file:
-            cfg.write(cfg_file)
-        return
-
     def start_tracking(self):
         self.set_tracker_video_file()
         self.set_output_directory()
-        self.write_cfg_file()
         if self.track_file == "":
             self.ui.tab_file.lnEdit_file_path.setText("--- NO FILE SELECTED ---")
             return
