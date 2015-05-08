@@ -377,10 +377,13 @@ class Tracker(object):
         params = {}
         params['fish size'] = self._fish_size_threshold
         params['start ori'] = self._start_ori
-        params['starting area x1'] = self.roim.get_roi("starting_area").x1
-        params['starting area x2'] = self.roim.get_roi("starting_area").x2
-        params['starting area y1'] = self.roim.get_roi("starting_area").y1
-        params['starting area y2'] = self.roim.get_roi("starting_area").y2
+        roi_starting_area = self.roim.get_roi("starting_area")
+        x_offset = self.roim.get_roi("tracking_area").x1
+        y_offset = self.roim.get_roi("tracking_area").y1
+        params['starting area x1'] = roi_starting_area.x1 + x_offset
+        params['starting area x2'] = roi_starting_area.x2 + x_offset
+        params['starting area y1'] = roi_starting_area.y1 + y_offset
+        params['starting area y2'] = roi_starting_area.y2 + y_offset
         params['source file'] = self.video_file
 
         if not os.path.exists(out_dir):

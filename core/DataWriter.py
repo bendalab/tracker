@@ -45,10 +45,8 @@ class DataWriter(object):
         output_file.write("#     Region of Interest Y-Axis         : [" + str(roi.y1) + "," + str(roi.y2) + "]\n")
         output_file.write("#     Fish size threshold               : " + str(parameters['fish size']) + "\n")
         output_file.write("#     Start orientation                 : " + str(parameters['start ori']) + "\n")
-        output_file.write("#     Fish starting area X-Axis factor1 : " + str(parameters['starting area x1']) + "\n")
-        output_file.write("#     Fish starting area X-Axis factor2 : " + str(parameters['starting area x2']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor1 : " + str(parameters['starting area y1']) + "\n")
-        output_file.write("#     Fish starting area Y-Axis factor2 : " + str(parameters['starting area y2']) + "\n")
+        output_file.write("#     Fish starting area X-Axis         : [" + str(parameters['starting area x1']) + "," + str(parameters['starting area x2']) + "]\n")
+        output_file.write("#     Fish starting area Y-Axis         : [" + str(parameters['starting area y1']) + "," + str(parameters['starting area y2']) + "]\n")
         output_file.write("#\n")
         output_file.write("#     Orientation algorithm assumes that fish can not turn more than >> 90 << degrees from one frame to the next\n")
         if none_count > 0:
