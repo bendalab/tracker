@@ -48,10 +48,11 @@ class Controller(object):
         self.preview_is_set = True
 
     def display_roi_preview(self):
+        roi = self.ui.tracker.roim.get_roi("tracking_area")
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
-        cv2.rectangle(self.roi_preview_draw_numpy, (self.ui.tracker.roi.x1, self.ui.tracker.roi.y1), (self.ui.tracker.roi.x2, self.ui.tracker.roi.y2), (255, 0, 255), 2)
+        cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), (255, 0, 255), 2)
         if self.roi_preview_displayed:
-            cv2_output = copy.copy(self.first_frame_numpy[self.ui.tracker.roi.y1: self.ui.tracker.roi.y2, self.ui.tracker.roi.x1:self.ui.tracker.roi.x2])
+            cv2_output = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
             cv2.imshow("roi preview", cv2_output)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
@@ -75,10 +76,10 @@ class Controller(object):
         self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
 
         # region of interest
-        self.ui.tab_roi.spinBox_roi_x1.setValue(self.ui.tracker.roi.x1)
-        self.ui.tab_roi.spinBox_roi_x2.setValue(self.ui.tracker.roi.x2)
-        self.ui.tab_roi.spinBox_roi_y1.setValue(self.ui.tracker.roi.y1)
-        self.ui.tab_roi.spinBox_roi_y2.setValue(self.ui.tracker.roi.y2)
+        self.ui.tab_roi.spinBox_roi_x1.setValue(self.ui.tracker.roim.get_roi("tracking_area").x1)
+        self.ui.tab_roi.spinBox_roi_x2.setValue(self.ui.tracker.roim.get_roi("tracking_area").x2)
+        self.ui.tab_roi.spinBox_roi_y1.setValue(self.ui.tracker.roim.get_roi("tracking_area").y1)
+        self.ui.tab_roi.spinBox_roi_y2.setValue(self.ui.tracker.roim.get_roi("tracking_area").y2)
         self.ui.tab_roi.spinBox_roi_x1.setMaximum(self.ui.tab_roi.spinBox_roi_x2.value()-1)
         self.ui.tab_roi.spinBox_roi_x2.setMinimum(self.ui.tab_roi.spinBox_roi_x1.value()+1)
         self.ui.tab_roi.spinBox_roi_y1.setMaximum(self.ui.tab_roi.spinBox_roi_y2.value()-1)
@@ -88,10 +89,10 @@ class Controller(object):
         self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
 
         # starting area spinboxes
-        self.ui.tab_adv.spinBox_starting_x1_factor.setValue(self.ui.tracker.starting_area.x1_factor * 100)
-        self.ui.tab_adv.spinBox_starting_x2_factor.setValue(self.ui.tracker.starting_area.x2_factor * 100)
-        self.ui.tab_adv.spinBox_starting_y1_factor.setValue(self.ui.tracker.starting_area.y1_factor * 100)
-        self.ui.tab_adv.spinBox_starting_y2_factor.setValue(self.ui.tracker.starting_area.y2_factor * 100)
+        self.ui.tab_adv.spinBox_starting_x1_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").x1)
+        self.ui.tab_adv.spinBox_starting_x2_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").x2)
+        self.ui.tab_adv.spinBox_starting_y1_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").y1)
+        self.ui.tab_adv.spinBox_starting_y2_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").y2)
         self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
         self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
         self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
@@ -151,12 +152,15 @@ class Controller(object):
 
 
     def display_starting_area_preview(self):
-        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[self.ui.tracker.roi.y1:self.ui.tracker.roi.y2, self.ui.tracker.roi.x1:self.ui.tracker.roi.x2])
+        roi = self.ui.tracker.roim.get_roi("tracking_area")
+        starting_area = self.ui.tracker.roim.get_roi("starting_area")
+
+        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
         height, width, depth = roi_only_draw_numpy.shape
-        x1 = int(self.ui.tracker.starting_area.x1_factor * width)
-        x2 = int(self.ui.tracker.starting_area.x2_factor * width)
-        y1 = int(self.ui.tracker.starting_area.y1_factor * height)
-        y2 = int(self.ui.tracker.starting_area.y2_factor * height)
+        x1 = starting_area.x1
+        x2 = starting_area.x2
+        y1 = starting_area.y1
+        y2 = starting_area.y2
         cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
         # convert to qimage
         sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
@@ -181,11 +185,12 @@ class Controller(object):
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
 
-    def change_roi_values(self):
-        self.ui.tracker.roi.x1 = self.ui.tab_roi.spinBox_roi_x1.value()
-        self.ui.tracker.roi.x2 = self.ui.tab_roi.spinBox_roi_x2.value()
-        self.ui.tracker.roi.y1 = self.ui.tab_roi.spinBox_roi_y1.value()
-        self.ui.tracker.roi.y2 = self.ui.tab_roi.spinBox_roi_y2.value()
+    def change_tracking_roi_values(self):
+        x1 = self.ui.tab_roi.spinBox_roi_x1.value()
+        y1 = self.ui.tab_roi.spinBox_roi_y1.value()
+        x2 = self.ui.tab_roi.spinBox_roi_x2.value()
+        y2 = self.ui.tab_roi.spinBox_roi_y2.value()
+        self.ui.tracker.roim.set_roi(x1, y1, x2, y2, "tracking_area")
         self.ui.tab_roi.spinBox_roi_x1.setMaximum(self.ui.tab_roi.spinBox_roi_x2.value()-1)
         self.ui.tab_roi.spinBox_roi_x2.setMinimum(self.ui.tab_roi.spinBox_roi_x1.value()+1)
         self.ui.tab_roi.spinBox_roi_y1.setMaximum(self.ui.tab_roi.spinBox_roi_y2.value()-1)
@@ -196,13 +201,14 @@ class Controller(object):
             # self.display_starting_area_preview()
 
     def change_starting_area_factors(self):
-        self.ui.tracker.starting_area.x1_factor = self.ui.tab_adv.spinBox_starting_x1_factor.value()/100.0
+        x1 = self.ui.tab_adv.spinBox_starting_x1_factor.value()
+        x2 = self.ui.tab_adv.spinBox_starting_x2_factor.value()
+        y1 = self.ui.tab_adv.spinBox_starting_y1_factor.value()
+        y2 = self.ui.tab_adv.spinBox_starting_y2_factor.value()
+        self.ui.tracker.roim.set_roi(x1, y1, x2, y2, "starting_area")
         self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
-        self.ui.tracker.starting_area.x2_factor = self.ui.tab_adv.spinBox_starting_x2_factor.value()/100.0
         self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
-        self.ui.tracker.starting_area.y1_factor = self.ui.tab_adv.spinBox_starting_y1_factor.value()/100.0
         self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
-        self.ui.tracker.starting_area.y2_factor = self.ui.tab_adv.spinBox_starting_y2_factor.value()/100.0
         self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
 
         if self.preview_is_set:
