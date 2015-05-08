@@ -6,6 +6,8 @@ class ROI(object):
         self._x_2 = x_2
         self._y_2 = y_2
 
+        self.mean_color = None
+
     def import_cfg_values(self, cfg):
         self.x1 = cfg.getint('roi', 'x1')
         self.x2 = cfg.getint('roi', 'x2')
