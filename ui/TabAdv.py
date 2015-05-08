@@ -69,22 +69,22 @@ class TabAdv(QtGui.QWidget):
         self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
         # spinbox starting_x start
         self.spinBox_starting_x1_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_x1_factor.setMaximum(100)
+        self.spinBox_starting_x1_factor.setMaximum(10000)
         self.spinBox_starting_x1_factor.setObjectName(_fromUtf8("spinBox_starting_x_start"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_x1_factor, 0, 1, 1, 1)
         # spinbox starting_x end
         self.spinBox_starting_x2_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_x2_factor.setMaximum(100)
+        self.spinBox_starting_x2_factor.setMaximum(10000)
         self.spinBox_starting_x2_factor.setObjectName(_fromUtf8("spinBox_starting_x_end"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_x2_factor, 0, 3, 1, 1)
         # spinbox starting_y start
         self.spinBox_starting_y1_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_y1_factor.setMaximum(100)
+        self.spinBox_starting_y1_factor.setMaximum(10000)
         self.spinBox_starting_y1_factor.setObjectName(_fromUtf8("spinBox_starting_y_start"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_y1_factor, 1, 1, 1, 1)
         # spinbox starting_y end
         self.spinBox_starting_y2_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_y2_factor.setMaximum(100)
+        self.spinBox_starting_y2_factor.setMaximum(10000)
         self.spinBox_starting_y2_factor.setObjectName(_fromUtf8("spinBox_starting_y_end"))
         self.gridLO_start_area.addWidget(self.spinBox_starting_y2_factor, 1, 3, 1, 1)
         # label starting_x start
