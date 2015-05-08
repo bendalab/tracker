@@ -106,7 +106,7 @@ class ImageManager(object):
         self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
         self.circle_size = cfg.getint('visualization', 'circle_size')
 
-    def write_cfg_values(self, cfg):
+    def add_cfg_values(self, cfg):
         cfg.add_section('image_processing')
         cfg.set('image_processing', 'show_bg_sub_img', str(self.show_bg_sub_img))
         cfg.set('image_processing', 'show_morphed_img', str(self.show_morphed_img))
