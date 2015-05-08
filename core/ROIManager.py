@@ -33,7 +33,6 @@ class ROIManager(object):
     def import_cfg_values(self, cfg):
         for entry in self.roi_list:
             section = 'roi_{0:s}'.format(entry.name)
-            cfg.add_section(section)
             entry.x1 = cfg.getint(section, "x1")
             entry.x2 = cfg.getint(section, "x2")
             entry.y1 = cfg.getint(section, "y1")
