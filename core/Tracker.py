@@ -10,6 +10,7 @@ import argparse
 import ConfigParser
 from ROI import ROI
 from RelROI import RelROI
+from ROIManager import ROIManager
 from DataWriter import DataWriter
 from ContourManager import ContourManager
 from DataManager import DataManager
@@ -47,8 +48,7 @@ class Tracker(object):
 
         # self.frame_counter = 0
 
-        # self.__roi = ROI(15, 695, 80, 515)  # Eileen setup
-        self._roi = ROI(160, 80, 700, 525)  # Isabel setup
+
 
         # image morphing data
         self._erosion_iterations = 1
@@ -65,8 +65,11 @@ class Tracker(object):
         self.im = ImageManager()
         self.mm = MetaManager()
 
+        self.roim = ROIManager()
+        self.roim.add_roi(160, 80, 700, 525, "tracking_area")  # Isabel setup
+        self.roim.add_roi(300, 150, 600, 350, "starting_area")
         self.fish_started = False
-        self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
+        # self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
 
         self._start_ori = 270
 
@@ -77,13 +80,9 @@ class Tracker(object):
         # self.line = None
 
         # import config file values
-        self.will_import_config_values = True
-        if self.will_import_config_values:
-            self.import_config_values()
+        self.import_config_values()
 
     def import_config_values(self):
-        if not self.will_import_config_values:
-            return
         if not os.path.exists('tracker.cnf'):
             print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
             return
@@ -96,10 +95,11 @@ class Tracker(object):
         # self.mm.import_cfg_values(cfg)
 
         # roi values
-        self.roi.import_cfg_values(cfg)
-
-        # starting area
-        self.starting_area.import_cfg_values(cfg)
+        self.roim.import_cfg_values(cfg)
+        # self.roim.get_roi("tracking_area").import_cfg_values(cfg)
+        #
+        # # starting area
+        # self.roim.get_roi("starting_area").import_cfg_values(cfg)
 
         # image manager values
         self.im.import_cfg_values(cfg)
@@ -121,20 +121,13 @@ class Tracker(object):
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
 
-        self.mm.write_cfg_values(cfg)
+        self.mm.add_cfg_values(cfg)
 
         cfg.add_section('system')
         cfg.set('system', 'frame_waittime', str(self.frame_waittime))
-        cfg.add_section('roi')
-        cfg.set('roi', 'x1', str(self.roi.x1))
-        cfg.set('roi', 'x2', str(self.roi.x2))
-        cfg.set('roi', 'y1', str(self.roi.y1))
-        cfg.set('roi', 'y2', str(self.roi.y2))
-        cfg.add_section('starting_area')
-        cfg.set('starting_area', 'x1_factor', str(self.starting_area.x1_factor))
-        cfg.set('starting_area', 'x2_factor', str(self.starting_area.x2_factor))
-        cfg.set('starting_area', 'y1_factor', str(self.starting_area.y1_factor))
-        cfg.set('starting_area', 'y2_factor', str(self.starting_area.y2_factor))
+
+        self.roim.add_cfg_values(cfg)
+
         cfg.add_section('detection_values')
         cfg.set('detection_values', 'start_orientation', str(self.start_ori))
         cfg.set('detection_values', 'min_area_threshold', str(self.fish_size_threshold))
@@ -144,7 +137,7 @@ class Tracker(object):
         cfg.set('image_morphing', 'erosion_factor', str(self.erosion_iterations))
         cfg.set('image_morphing', 'dilation_factor', str(self.dilation_iterations))
 
-        self.im.write_cfg_values(cfg)
+        self.im.add_cfg_values(cfg)
 
         with open("tracker.cnf", 'w') as cfg_file:
             cfg.write(cfg_file)
@@ -216,10 +209,10 @@ class Tracker(object):
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
         height, width, depth = roi.shape
-        starting_area_x1 = int(self.starting_area.x1_factor * width)
-        starting_area_x2 = int(self.starting_area.x2_factor * width)
-        starting_area_y1 = int(self.starting_area.y1_factor * height)
-        starting_area_y2 = int(self.starting_area.y2_factor * height)
+        starting_area_x1 = self.roim.get_roi("starting_area").x1
+        starting_area_x2 = self.roim.get_roi("starting_area").x2
+        starting_area_y1 = self.roim.get_roi("starting_area").y1
+        starting_area_y2 = self.roim.get_roi("starting_area").y2
 
         if self.cm.contour_list is not None:
             for i in range(0, len(self.cm.contour_list)):
@@ -254,7 +247,8 @@ class Tracker(object):
             self.dm.frame_counter += 1
 
             # set region of interest ROI
-            roi_img = copy.copy(frame[self.roi.y1:self.roi.y2, self.roi.x1:self.roi.x2])
+            roi = self.roim.get_roi("tracking_area")
+            roi_img = copy.copy(frame[roi.y1:roi.y2, roi.x1:roi.x2])
             roi_output = copy.copy(roi_img)
 
             self.im.last_frame_ov_output = copy.copy(frame)
@@ -295,7 +289,7 @@ class Tracker(object):
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
-                self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roi)
+                self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roim.get_roi("tracking_area"))
 
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
@@ -312,7 +306,7 @@ class Tracker(object):
             self.dm.set_last_pos(self.ellipse)
 
             # save fish positions
-            self.dm.save_fish_positions(self.roi)
+            self.dm.save_fish_positions(self.roim.get_roi("tracking_area"))
 
             # set last orientation
             self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
@@ -325,7 +319,7 @@ class Tracker(object):
                 self.im.append_to_travel_orientation()
 
             self.im.draw_extracted_data(self.ellipse, self.fish_started, roi_img, self.cm.contour_list)
-            self.im.draw_data_on_overview_image(self.roi, self.dm)
+            self.im.draw_data_on_overview_image(self.roim.get_roi("tracking_area"), self.dm)
 
             # show all imgs
             self.im.show_imgs(roi_bg_sub, mo_roi_bg_sub)
@@ -364,9 +358,9 @@ class Tracker(object):
         self.set_video_capture()
 
         self.extract_data()
-        self.dm.estimate_missing_pos(self.roi)
+        self.dm.estimate_missing_pos(self.roim.get_roi("tracking_area"))
         self.dm.estimate_missing_ori()
-        self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roi, self.im.circle_size)
+        self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roim.get_roi("tracking_area"), self.im.circle_size)
 
         self.dm.copy_original_to_est_data()
 
@@ -383,10 +377,10 @@ class Tracker(object):
         params = {}
         params['fish size'] = self._fish_size_threshold
         params['start ori'] = self._start_ori
-        params['starting area x1'] = self.starting_area.x1_factor
-        params['starting area x2'] = self.starting_area.x2_factor
-        params['starting area y1'] = self.starting_area.y1_factor
-        params['starting area y2'] = self.starting_area.y2_factor
+        params['starting area x1'] = self.roim.get_roi("starting_area").x1
+        params['starting area x2'] = self.roim.get_roi("starting_area").x2
+        params['starting area y1'] = self.roim.get_roi("starting_area").y1
+        params['starting area y2'] = self.roim.get_roi("starting_area").y2
         params['source file'] = self.video_file
 
         if not os.path.exists(out_dir):
@@ -395,20 +389,20 @@ class Tracker(object):
         if not self.nix_io:
             DataWriter.write_ascii(output_file_name + ".txt", times, self.dm.all_pos_original, self.dm.all_oris,
                                    self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
-                                   self.dm.number_relevant_contours_per_frame, self.roi, self.dm.frame_counter, params)
+                                   self.dm.number_relevant_contours_per_frame, self.roim.get_roi("tracking_area"), self.dm.frame_counter, params)
         else:
             DataWriter.write_nix(output_file_name + ".h5", times, self.dm.all_pos_original, self.dm.all_oris,
                                  self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
-                                 self.dm.number_relevant_contours_per_frame, self.roi, params)
+                                 self.dm.number_relevant_contours_per_frame, self.roim.get_roi("tracking_area"), params)
         cv2.imwrite(output_file_name + "_OV_path.png", self.im.last_frame_ov_output)
 
         self.write_config_file()
 
         self.dm.check_data_integrity()
 
-    @property
-    def roi(self):
-        return self._roi
+    # @property
+    # def roi(self):
+    #     return self._roi
 
     @property
     def erosion_iterations(self):
