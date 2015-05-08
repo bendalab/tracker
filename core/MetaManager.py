@@ -9,7 +9,7 @@ class MetaManager(object):
         self.experimenter = cfg.get("meta", "experimenter")
         self.fish_id = cfg.get("meta", "fish_id")
 
-    def write_cfg_values(self, cfg):
+    def add_cfg_values(self, cfg):
         cfg.add_section("meta")
         cfg.set("meta", "experimenter", str(self.experimenter))
         cfg.set("meta", "fish_id", str(self.fish_id))
