@@ -8,7 +8,7 @@ class Controller(object):
     def __init__(self, ui):
         self._ui = ui
 
-        self.preset_options()
+        # self.preset_options()
         self.track_file = ""
         self.last_selected_folder = "/home"
 
