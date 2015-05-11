@@ -318,7 +318,7 @@ class Controller(object):
 
     def abort_tracking(self):
         self.ui.tracker.ui_abort_button_pressed = True
-        self.ui.set_new_tracker()
+        self.ui.set_new_tracker(self)
 
     @property
     def ui(self):
