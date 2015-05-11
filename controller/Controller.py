@@ -210,8 +210,9 @@ class Controller(object):
     def change_roi_values(self):
         for box in self.ui.tab_roi.roi_input_boxes:
             x1, y1, x2, y2 = box.get_values()
-            area_name = box.name
-            self.ui.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
+            area_name = "_".join(box.name.split("_")[1:])
+            self.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
+            print self.tracker.roim.get_roi(area_name).get_values()
             box.spinBox_roi_x1.setMaximum(box.spinBox_roi_x2.value()-1)
             box.spinBox_roi_x2.setMinimum(box.spinBox_roi_x1.value()+1)
             box.spinBox_roi_y1.setMaximum(box.spinBox_roi_y2.value()-1)
