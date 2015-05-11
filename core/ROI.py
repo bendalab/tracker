@@ -17,7 +17,6 @@ class ROI(object):
     def get_values(self):
         return self.x1, self.y1, self.x2, self.y2
 
-
     def import_cfg_values(self, cfg):
         section = 'roi_{0:s}'.format(self.name)
         self.x1 = cfg.getint(section, "x1")
