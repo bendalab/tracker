@@ -138,6 +138,8 @@ class Controller(object):
             box.spinBox_roi_y2.setValue(self.tracker.roim.get_roi(roi_name).y2)
             box.spinBox_roi_x1.setValue(self.tracker.roim.get_roi(roi_name).x1)
             box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
+        if self.preview_is_set:
+            self.display_roi_preview()
 
     def browse_output_directory(self):
         if self.output_is_input:
@@ -170,29 +172,29 @@ class Controller(object):
         self.last_selected_folder = path_string[0:slash_pos]
 
 
-    def display_starting_area_preview(self):
-        roi = self.ui.tracker.roim.get_roi("tracking_area")
-        starting_area = self.ui.tracker.roim.get_roi("starting_area")
-
-        roi_only_draw_numpy = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
-        height, width, depth = roi_only_draw_numpy.shape
-        x1 = starting_area.x1
-        x2 = starting_area.x2
-        y1 = starting_area.y1
-        y2 = starting_area.y2
-        cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
-        # convert to qimage
-        sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
-        sa_pixm = QtGui.QPixmap.fromImage(sa_qimg)
-        # fit img to size
-        max_width = self.ui.tab_widget_options.geometry().width() - 20
-        max_height = int(max_width * 0.5)
-        size = QtCore.QSize(max_width, max_height)
-        sa_pixm_rescaled = sa_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
-        # display img
-        # following line doesn't work because of %4-bug noone knows... -.-
-        # self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
-        cv2.imshow("starting area", roi_only_draw_numpy)
+    # def display_starting_area_preview(self):
+    #     roi = self.ui.tracker.roim.get_roi("tracking_area")
+    #     starting_area = self.ui.tracker.roim.get_roi("starting_area")
+    #
+    #     roi_only_draw_numpy = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
+    #     height, width, depth = roi_only_draw_numpy.shape
+    #     x1 = starting_area.x1
+    #     x2 = starting_area.x2
+    #     y1 = starting_area.y1
+    #     y2 = starting_area.y2
+    #     cv2.rectangle(roi_only_draw_numpy, (x1, y1), (x2, y2), (255, 0, 255), 2)
+    #     # convert to qimage
+    #     sa_qimg = QtGui.QImage(roi_only_draw_numpy, roi_only_draw_numpy.shape[1], roi_only_draw_numpy.shape[0], QtGui.QImage.Format_RGB888)
+    #     sa_pixm = QtGui.QPixmap.fromImage(sa_qimg)
+    #     # fit img to size
+    #     max_width = self.ui.tab_widget_options.geometry().width() - 20
+    #     max_height = int(max_width * 0.5)
+    #     size = QtCore.QSize(max_width, max_height)
+    #     sa_pixm_rescaled = sa_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
+    #     # display img
+    #     # following line doesn't work because of %4-bug noone knows... -.-
+    #     # self.lbl_starting_area_preview_label.setPixmap(sa_pixm_rescaled)
+    #     cv2.imshow("starting area", roi_only_draw_numpy)
 
     def change_enable_nix_output(self):
         self.ui.tracker.nix_io = self.ui.tab_file.cbx_enable_nix_output.isChecked()
@@ -204,15 +206,11 @@ class Controller(object):
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
 
-    def new_roi_created(self):
-        return
-
     def change_roi_values(self):
         for box in self.ui.tab_roi.roi_input_boxes:
             x1, y1, x2, y2 = box.get_values()
             area_name = "_".join(box.name.split("_")[1:])
             self.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
-            print self.tracker.roim.get_roi(area_name).get_values()
             box.spinBox_roi_x1.setMaximum(box.spinBox_roi_x2.value()-1)
             box.spinBox_roi_x2.setMinimum(box.spinBox_roi_x1.value()+1)
             box.spinBox_roi_y1.setMaximum(box.spinBox_roi_y2.value()-1)
