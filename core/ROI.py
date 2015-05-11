@@ -14,6 +14,11 @@ class ROI(object):
         self.y1 = cfg.getint('roi', 'y1')
         self.y2 = cfg.getint('roi', 'y2')
 
+    def set_values(self, x1, y1, x2, y2):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
 
     @property
     def name(self):
