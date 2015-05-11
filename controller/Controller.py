@@ -56,9 +56,9 @@ class Controller(object):
         for selected_roi in self.tracker.roim.roi_list:
             roi = self.tracker.roim.get_roi(selected_roi.name)
             cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), (255, 0, 255), 2)
-            if self.roi_preview_displayed:
-                cv2_output = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
-                cv2.imshow("roi preview", cv2_output)
+            # if self.roi_preview_displayed:
+            #     cv2_output = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
+            #     cv2.imshow("roi preview", cv2_output)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
@@ -127,7 +127,7 @@ class Controller(object):
         self.ui.tab_visual.spinBox_lineend_offset.setValue(self.ui.tracker.im.lineend_offset)
 
     def roi_added_to_tracker(self, roi):
-        self.ui.tab_roi.add_roi_input_box(roi)
+        self.ui.tab_roi.add_roi_input_box(roi, self)
         self.preset_roi_input_boxes()
         return
 
