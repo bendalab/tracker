@@ -7,6 +7,7 @@ import os
 class Controller(object):
     def __init__(self, ui):
         self._ui = ui
+        self.tracker = None
 
         # self.preset_options()
         self.track_file = ""
