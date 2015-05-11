@@ -16,10 +16,7 @@ class ROIManager(object):
     def set_roi(self, x1, y1, x2, y2, name):
         for entry in self.roi_list:
             if entry.name == name:
-                entry.x1 = x1
-                entry.y1 = y1
-                entry.x2 = x2
-                entry.y2 = y2
+                entry.set_values(x1, y1, x2, y2)
 
     def add_cfg_values(self, cfg):
         for entry in self.roi_list:
