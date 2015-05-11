@@ -185,20 +185,34 @@ class Controller(object):
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
 
-    def change_tracking_roi_values(self):
-        x1 = self.ui.tab_roi.spinBox_roi_x1.value()
-        y1 = self.ui.tab_roi.spinBox_roi_y1.value()
-        x2 = self.ui.tab_roi.spinBox_roi_x2.value()
-        y2 = self.ui.tab_roi.spinBox_roi_y2.value()
-        self.ui.tracker.roim.set_roi(x1, y1, x2, y2, "tracking_area")
-        self.ui.tab_roi.spinBox_roi_x1.setMaximum(self.ui.tab_roi.spinBox_roi_x2.value()-1)
-        self.ui.tab_roi.spinBox_roi_x2.setMinimum(self.ui.tab_roi.spinBox_roi_x1.value()+1)
-        self.ui.tab_roi.spinBox_roi_y1.setMaximum(self.ui.tab_roi.spinBox_roi_y2.value()-1)
-        self.ui.tab_roi.spinBox_roi_y2.setMinimum(self.ui.tab_roi.spinBox_roi_y1.value()+1)
+    def change_roi_values(self):
+        for box in self.ui.tab_roi.roi_input_boxes:
+            x1, y1, x2, y2 = box.get_values()
+            area_name = box.name
+            self.ui.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
+            box.spinBox_roi_x1.setMaximum(box.spinBox_roi_x2.value()-1)
+            box.spinBox_roi_x2.setMinimum(box.spinBox_roi_x1.value()+1)
+            box.spinBox_roi_y1.setMaximum(box.spinBox_roi_y2.value()-1)
+            box.spinBox_roi_y2.setMinimum(box.spinBox_roi_y1.value()+1)
 
         if self.preview_is_set:
             self.display_roi_preview()
             # self.display_starting_area_preview()
+
+    # def change_tracking_roi_values(self):
+    #     x1 = self.ui.tab_roi.spinBox_roi_x1.value()
+    #     y1 = self.ui.tab_roi.spinBox_roi_y1.value()
+    #     x2 = self.ui.tab_roi.spinBox_roi_x2.value()
+    #     y2 = self.ui.tab_roi.spinBox_roi_y2.value()
+    #     self.ui.tracker.roim.set_roi(x1, y1, x2, y2, "tracking_area")
+    #     self.ui.tab_roi.spinBox_roi_x1.setMaximum(self.ui.tab_roi.spinBox_roi_x2.value()-1)
+    #     self.ui.tab_roi.spinBox_roi_x2.setMinimum(self.ui.tab_roi.spinBox_roi_x1.value()+1)
+    #     self.ui.tab_roi.spinBox_roi_y1.setMaximum(self.ui.tab_roi.spinBox_roi_y2.value()-1)
+    #     self.ui.tab_roi.spinBox_roi_y2.setMinimum(self.ui.tab_roi.spinBox_roi_y1.value()+1)
+    #
+    #     if self.preview_is_set:
+    #         self.display_roi_preview()
+    #         # self.display_starting_area_preview()
 
     def change_starting_area_factors(self):
         x1 = self.ui.tab_adv.spinBox_starting_x1_factor.value()
