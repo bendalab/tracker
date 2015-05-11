@@ -211,10 +211,10 @@ class Tracker(object):
     # check if fish started from the right side
     def check_if_fish_started(self, roi):
         height, width, depth = roi.shape
-        starting_area_x1 = self.roim.get_roi("starting_area").x1
-        starting_area_x2 = self.roim.get_roi("starting_area").x2
-        starting_area_y1 = self.roim.get_roi("starting_area").y1
-        starting_area_y2 = self.roim.get_roi("starting_area").y2
+        starting_area_x1 = self.roim.get_roi("starting_area").x1 - self.roim.get_roi("tracking_area").x1
+        starting_area_x2 = self.roim.get_roi("starting_area").x2 - self.roim.get_roi("tracking_area").x1
+        starting_area_y1 = self.roim.get_roi("starting_area").y1 - self.roim.get_roi("tracking_area").y1
+        starting_area_y2 = self.roim.get_roi("starting_area").y2 - self.roim.get_roi("tracking_area").y1
 
         if self.cm.contour_list is not None:
             for i in range(0, len(self.cm.contour_list)):
