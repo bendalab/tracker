@@ -37,6 +37,11 @@ class Tracker(object):
         self.nix_io = nix_io
         self.output_directory = ""
         self.output_path_isset = False
+
+        self.read_cfg = None
+        self.config_file_present = True
+        self.init_read_cfg()
+        self.write_cfg = ConfigParser.SafeConfigParser()
         
         self.cap = None
 
@@ -84,41 +89,47 @@ class Tracker(object):
         # import config file values
         self.import_config_values()
 
-    def import_config_values(self):
+    def init_read_cfg(self):
+        self.read_cfg = ConfigParser.ConfigParser()
+
         if not os.path.exists('tracker.cnf'):
             print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
+            self.config_file_present = False
+            print "set to false"
             return
 
-        cfg = ConfigParser.ConfigParser()
         cfg_file = open('tracker.cnf')
-        cfg.readfp(cfg_file)
+        self.read_cfg.readfp(cfg_file)
 
+    def import_config_values(self):
+        if not self.config_file_present:
+            return
         # meta manager values
         # self.mm.import_cfg_values(cfg)
 
         # roi values
-        self.roim.import_cfg_values(cfg)
+        # self.roim.import_cfg_values(self.read_cfg)
         # self.roim.get_roi("tracking_area").import_cfg_values(cfg)
         #
         # # starting area
         # self.roim.get_roi("starting_area").import_cfg_values(cfg)
 
         # image manager values
-        self.im.import_cfg_values(cfg)
+        self.im.import_cfg_values(self.read_cfg)
 
         # tracker values
-        self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
-        self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
+        self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
+        self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
 
-        self._start_ori = cfg.getint('detection_values', 'start_orientation')
-        self._fish_size_threshold = cfg.getint('detection_values', 'min_area_threshold')
-        self._fish_max_size_threshold = cfg.getint('detection_values', 'max_area_threshold')
-        self._enable_max_size_threshold = cfg.getboolean('detection_values', 'enable_max_size_threshold')
+        self._start_ori = self.read_cfg.getint('detection_values', 'start_orientation')
+        self._fish_size_threshold = self.read_cfg.getint('detection_values', 'min_area_threshold')
+        self._fish_max_size_threshold = self.read_cfg.getint('detection_values', 'max_area_threshold')
+        self._enable_max_size_threshold = self.read_cfg.getboolean('detection_values', 'enable_max_size_threshold')
 
-        self.frame_waittime = cfg.getint('system', 'frame_waittime')
+        self.frame_waittime = self.read_cfg.getint('system', 'frame_waittime')
 
-        self._erosion_iterations = cfg.getint('image_morphing', 'erosion_factor')
-        self._dilation_iterations = cfg.getint('image_morphing', 'dilation_factor')
+        self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
+        self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
 
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
