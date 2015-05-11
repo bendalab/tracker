@@ -72,11 +72,22 @@ class RoiInputBox(QtGui.QWidget):
         # add grid_layout_set_roi to vertical layout of tab
         self.vertLO_input_box.addLayout(self.gridLO_set_roi)
 
+    def get_values(self):
+        x1 = self.spinBox_roi_x1.value()
+        y1 = self.spinBox_roi_y1.value()
+        x2 = self.spinBox_roi_x2.value()
+        y2 = self.spinBox_roi_y2.value()
+        return x1, y1, x2, y2
+
+    def send_change_to_controller(self, controller):
+        controller.change_roi_values(self.name)
+
+
     def connect_widgets(self, controller):
-        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
-        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
-        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
-        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
+        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
         return
 
     def retranslate_roi_input_box(self):
