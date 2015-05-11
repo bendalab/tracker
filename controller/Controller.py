@@ -314,7 +314,7 @@ class Controller(object):
                 self.ui.tab_file.lnEdit_output_path.setText(self.ui.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
                 return
         self.ui.tracker.run()
-        self.ui.set_new_tracker()
+        self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()  # make sure options match tracker-object (esp. nix-output option)
 
     def abort_tracking(self):

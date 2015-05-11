@@ -146,8 +146,8 @@ class TrackerUserInterface(QtGui.QWidget):
         y_pos = (screen.height() - gui_size.height() - gui_size.height()) / 2
         self.move(x_pos, y_pos)
 
-    def set_new_tracker(self):
-        self.tracker = Tracker()
+    def set_new_tracker(self, controller):
+        self.tracker = Tracker(controller=controller)
         return
 
     def connect_widgets(self):
