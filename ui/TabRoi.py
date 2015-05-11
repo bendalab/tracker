@@ -97,11 +97,13 @@ class TabRoi(QtGui.QWidget):
     #     for entry in roim.roi_list:
     #         self.add_roi_input_box(entry)
 
-    def add_roi_input_box(self, roi):
+    def add_roi_input_box(self, roi, controller):
         new_box = RoiInputBox(roi)
         self.roi_input_boxes.append(new_box)
         self.vertLO_tab_roi.addWidget(new_box)
         new_box.retranslate_roi_input_box()
+        controller.preset_roi_input_box(new_box)
+        new_box.connect_widgets(controller)
 
     def connect_widgets(self, controller):
         for box in self.roi_input_boxes:
