@@ -52,12 +52,13 @@ class Controller(object):
         self.preview_is_set = True
 
     def display_roi_preview(self):
-        roi = self.ui.tracker.roim.get_roi("tracking_area")
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
-        cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), (255, 0, 255), 2)
-        if self.roi_preview_displayed:
-            cv2_output = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
-            cv2.imshow("roi preview", cv2_output)
+        for selected_roi in self.tracker.roim.roi_list:
+            roi = self.tracker.roim.get_roi(selected_roi.name)
+            cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), (255, 0, 255), 2)
+            if self.roi_preview_displayed:
+                cv2_output = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
+                cv2.imshow("roi preview", cv2_output)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
