@@ -79,8 +79,8 @@ class RoiInputBox(QtGui.QWidget):
         y2 = self.spinBox_roi_y2.value()
         return x1, y1, x2, y2
 
-    def send_change_to_controller(self, controller):
-        controller.change_roi_values(self.name)
+    # def send_change_to_controller(self, controller):
+    #     controller.change_roi_values(self.name)
 
 
     def connect_widgets(self, controller):
