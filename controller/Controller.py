@@ -22,6 +22,9 @@ class Controller(object):
         self.roi_preview_displayed = False
         return
 
+    def connect_to_tracker(self, tracker):
+        self.tracker = tracker
+
     def browse_file(self):
         self.roi_preview_displayed = False
 
@@ -76,27 +79,28 @@ class Controller(object):
         self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
 
         # region of interest
-        self.ui.tab_roi.spinBox_roi_x1.setValue(self.ui.tracker.roim.get_roi("tracking_area").x1)
-        self.ui.tab_roi.spinBox_roi_x2.setValue(self.ui.tracker.roim.get_roi("tracking_area").x2)
-        self.ui.tab_roi.spinBox_roi_y1.setValue(self.ui.tracker.roim.get_roi("tracking_area").y1)
-        self.ui.tab_roi.spinBox_roi_y2.setValue(self.ui.tracker.roim.get_roi("tracking_area").y2)
-        self.ui.tab_roi.spinBox_roi_x1.setMaximum(self.ui.tab_roi.spinBox_roi_x2.value()-1)
-        self.ui.tab_roi.spinBox_roi_x2.setMinimum(self.ui.tab_roi.spinBox_roi_x1.value()+1)
-        self.ui.tab_roi.spinBox_roi_y1.setMaximum(self.ui.tab_roi.spinBox_roi_y2.value()-1)
-        self.ui.tab_roi.spinBox_roi_y2.setMinimum(self.ui.tab_roi.spinBox_roi_y1.value()+1)
+        self.preset_roi_input_boxes()
+        # self.ui.tab_roi.spinBox_roi_x1.setValue(self.ui.tracker.roim.get_roi("tracking_area").x1)
+        # self.ui.tab_roi.spinBox_roi_x2.setValue(self.ui.tracker.roim.get_roi("tracking_area").x2)
+        # self.ui.tab_roi.spinBox_roi_y1.setValue(self.ui.tracker.roim.get_roi("tracking_area").y1)
+        # self.ui.tab_roi.spinBox_roi_y2.setValue(self.ui.tracker.roim.get_roi("tracking_area").y2)
+        # self.ui.tab_roi.spinBox_roi_x1.setMaximum(self.ui.tab_roi.spinBox_roi_x2.value()-1)
+        # self.ui.tab_roi.spinBox_roi_x2.setMinimum(self.ui.tab_roi.spinBox_roi_x1.value()+1)
+        # self.ui.tab_roi.spinBox_roi_y1.setMaximum(self.ui.tab_roi.spinBox_roi_y2.value()-1)
+        # self.ui.tab_roi.spinBox_roi_y2.setMinimum(self.ui.tab_roi.spinBox_roi_y1.value()+1)
 
         # frame waittime
         self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
 
         # starting area spinboxes
-        self.ui.tab_adv.spinBox_starting_x1_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").x1)
-        self.ui.tab_adv.spinBox_starting_x2_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").x2)
-        self.ui.tab_adv.spinBox_starting_y1_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").y1)
-        self.ui.tab_adv.spinBox_starting_y2_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").y2)
-        self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
-        self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
-        self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
-        self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
+        # self.ui.tab_adv.spinBox_starting_x1_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").x1)
+        # self.ui.tab_adv.spinBox_starting_x2_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").x2)
+        # self.ui.tab_adv.spinBox_starting_y1_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").y1)
+        # self.ui.tab_adv.spinBox_starting_y2_factor.setValue(self.ui.tracker.roim.get_roi("starting_area").y2)
+        # self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
+        # self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
+        # self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
+        # self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
 
         # starting orientation
         self.ui.tab_adv.spinBox_start_orientation.setValue(self.ui.tracker.start_ori)
@@ -119,6 +123,14 @@ class Controller(object):
         # visualization
         self.ui.tab_visual.spinBox_circle_size.setValue(self.ui.tracker.im.circle_size)
         self.ui.tab_visual.spinBox_lineend_offset.setValue(self.ui.tracker.im.lineend_offset)
+
+    def preset_roi_input_boxes(self):
+        for box in self.ui.tab_roi.roi_input_boxes:
+            roi_name = "_".join(box.name.split("_")[1:])
+            box.spinBox_roi_x2.setValue(self.ui.tracker.roim.get_roi(roi_name).x2)
+            box.spinBox_roi_y2.setValue(self.ui.tracker.roim.get_roi(roi_name).y2)
+            box.spinBox_roi_x1.setValue(self.ui.tracker.roim.get_roi(roi_name).x1)
+            box.spinBox_roi_y1.setValue(self.ui.tracker.roim.get_roi(roi_name).y1)
 
     def browse_output_directory(self):
         if self.output_is_input:
@@ -185,6 +197,9 @@ class Controller(object):
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
 
+    def new_roi_created(self):
+        return
+
     def change_roi_values(self):
         for box in self.ui.tab_roi.roi_input_boxes:
             x1, y1, x2, y2 = box.get_values()
@@ -214,20 +229,20 @@ class Controller(object):
     #         self.display_roi_preview()
     #         # self.display_starting_area_preview()
 
-    def change_starting_area_factors(self):
-        x1 = self.ui.tab_adv.spinBox_starting_x1_factor.value()
-        x2 = self.ui.tab_adv.spinBox_starting_x2_factor.value()
-        y1 = self.ui.tab_adv.spinBox_starting_y1_factor.value()
-        y2 = self.ui.tab_adv.spinBox_starting_y2_factor.value()
-        self.ui.tracker.roim.set_roi(x1, y1, x2, y2, "starting_area")
-        self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
-        self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
-        self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
-        self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
-
-        if self.preview_is_set:
-            self.display_starting_area_preview()
-        return
+    # def change_starting_area_factors(self):
+    #     x1 = self.ui.tab_adv.spinBox_starting_x1_factor.value()
+    #     x2 = self.ui.tab_adv.spinBox_starting_x2_factor.value()
+    #     y1 = self.ui.tab_adv.spinBox_starting_y1_factor.value()
+    #     y2 = self.ui.tab_adv.spinBox_starting_y2_factor.value()
+    #     self.ui.tracker.roim.set_roi(x1, y1, x2, y2, "starting_area")
+    #     self.ui.tab_adv.spinBox_starting_x1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_x2_factor.value()-1)
+    #     self.ui.tab_adv.spinBox_starting_x2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_x1_factor.value()+1)
+    #     self.ui.tab_adv.spinBox_starting_y1_factor.setMaximum(self.ui.tab_adv.spinBox_starting_y2_factor.value()-1)
+    #     self.ui.tab_adv.spinBox_starting_y2_factor.setMinimum(self.ui.tab_adv.spinBox_starting_y1_factor.value()+1)
+    #
+    #     if self.preview_is_set:
+    #         self.display_starting_area_preview()
+    #     return
 
     def change_frame_waittime(self, value):
         self.ui.tracker.frame_waittime = value

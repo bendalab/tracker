@@ -104,8 +104,8 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_widget_options.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
 
-        self.tracker = Tracker()
         self.controller = Controller(self)
+        self.tracker = Tracker(controller=self.controller)
 
         self.tab_roi.populate(self.tracker.roim)
 
