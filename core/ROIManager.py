@@ -7,6 +7,7 @@ class ROIManager(object):
 
     def add_roi(self, x1, y1, x2, y2, name, controller):
         new_roi = ROI(x1, y1, x2, y2, name)
+        new_roi.import_cfg_values(controller.tracker.read_cfg)
         self.roi_list.append(new_roi)
         controller.roi_added_to_tracker(new_roi)
 
