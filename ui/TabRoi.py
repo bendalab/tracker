@@ -93,9 +93,9 @@ class TabRoi(QtGui.QWidget):
         spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_roi.addItem(spacerItem3)
 
-    def populate(self, roim):
-        for entry in roim.roi_list:
-            self.add_roi_input_box(entry)
+    # def populate(self, roim):
+    #     for entry in roim.roi_list:
+    #         self.add_roi_input_box(entry)
 
     def add_roi_input_box(self, roi):
         new_box = RoiInputBox(roi)
@@ -103,7 +103,6 @@ class TabRoi(QtGui.QWidget):
         self.vertLO_tab_roi.addWidget(new_box)
         new_box.retranslate_roi_input_box()
 
-    # TODO
     def connect_widgets(self, controller):
         for box in self.roi_input_boxes:
             box.connect_widgets(controller)
