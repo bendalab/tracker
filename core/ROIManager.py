@@ -5,8 +5,10 @@ class ROIManager(object):
     def __init__(self):
         self.roi_list = []
 
-    def add_roi(self, x1, y1, x2, y2, name):
-        self.roi_list.append(ROI(x1, y1, x2, y2, name))
+    def add_roi(self, x1, y1, x2, y2, name, controller):
+        new_roi = ROI(x1, y1, x2, y2, name)
+        self.roi_list.append(new_roi)
+        controller.roi_added_to_tracker(new_roi)
 
     def get_roi(self, name):
         for entry in self.roi_list:
@@ -29,8 +31,4 @@ class ROIManager(object):
 
     def import_cfg_values(self, cfg):
         for entry in self.roi_list:
-            section = 'roi_{0:s}'.format(entry.name)
-            entry.x1 = cfg.getint(section, "x1")
-            entry.x2 = cfg.getint(section, "x2")
-            entry.y1 = cfg.getint(section, "y1")
-            entry.y2 = cfg.getint(section, "y2")
+            entry.import_cfg_values(cfg)

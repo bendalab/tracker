@@ -8,17 +8,18 @@ class ROI(object):
 
         self.mean_color = None
 
-    def import_cfg_values(self, cfg):
-        self.x1 = cfg.getint('roi', 'x1')
-        self.x2 = cfg.getint('roi', 'x2')
-        self.y1 = cfg.getint('roi', 'y1')
-        self.y2 = cfg.getint('roi', 'y2')
-
     def set_values(self, x1, y1, x2, y2):
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
+
+    def import_cfg_values(self, cfg):
+        section = 'roi_{0:s}'.format(self.name)
+        self.x1 = cfg.getint(section, "x1")
+        self.x2 = cfg.getint(section, "x2")
+        self.y1 = cfg.getint(section, "y1")
+        self.y2 = cfg.getint(section, "y2")
 
     @property
     def name(self):

@@ -107,7 +107,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.controller = Controller(self)
         self.tracker = Tracker(controller=self.controller)
 
-        self.tab_roi.populate(self.tracker.roim)
+        # self.tab_roi.populate(self.tracker.roim)
 
         # self.controller.preset_options()
         self.connect_widgets()

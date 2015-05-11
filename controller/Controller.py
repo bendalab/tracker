@@ -125,13 +125,18 @@ class Controller(object):
         self.ui.tab_visual.spinBox_circle_size.setValue(self.ui.tracker.im.circle_size)
         self.ui.tab_visual.spinBox_lineend_offset.setValue(self.ui.tracker.im.lineend_offset)
 
+    def roi_added_to_tracker(self, roi):
+        self.ui.tab_roi.add_roi_input_box(roi)
+        self.preset_roi_input_boxes()
+        return
+
     def preset_roi_input_boxes(self):
         for box in self.ui.tab_roi.roi_input_boxes:
             roi_name = "_".join(box.name.split("_")[1:])
-            box.spinBox_roi_x2.setValue(self.ui.tracker.roim.get_roi(roi_name).x2)
-            box.spinBox_roi_y2.setValue(self.ui.tracker.roim.get_roi(roi_name).y2)
-            box.spinBox_roi_x1.setValue(self.ui.tracker.roim.get_roi(roi_name).x1)
-            box.spinBox_roi_y1.setValue(self.ui.tracker.roim.get_roi(roi_name).y1)
+            box.spinBox_roi_x2.setValue(self.tracker.roim.get_roi(roi_name).x2)
+            box.spinBox_roi_y2.setValue(self.tracker.roim.get_roi(roi_name).y2)
+            box.spinBox_roi_x1.setValue(self.tracker.roim.get_roi(roi_name).x1)
+            box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
 
     def browse_output_directory(self):
         if self.output_is_input:

@@ -68,8 +68,8 @@ class Tracker(object):
         self.mm = MetaManager()
 
         self.roim = ROIManager()
-        self.roim.add_roi(160, 80, 700, 525, "tracking_area")  # Isabel setup
-        self.roim.add_roi(300, 150, 600, 350, "starting_area")
+        self.roim.add_roi(160, 80, 700, 525, "tracking_area", self.controller)  # Isabel setup
+        self.roim.add_roi(300, 150, 600, 350, "starting_area", self.controller)
         self.fish_started = False
         # self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
 

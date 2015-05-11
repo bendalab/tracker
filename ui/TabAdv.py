@@ -54,60 +54,60 @@ class TabAdv(QtGui.QWidget):
         # line
         self.line_5 = MyQLine(self, "line_5")
         self.vertLO_tab_adv.addWidget(self.line_5)
-        # label start area
-        self.lbl_start_area = QtGui.QLabel(self)
-        self.lbl_start_area.setObjectName(_fromUtf8("lbl_start_area"))
-        self.vertLO_tab_adv.addWidget(self.lbl_start_area)
+        # # label start area
+        # self.lbl_start_area = QtGui.QLabel(self)
+        # self.lbl_start_area.setObjectName(_fromUtf8("lbl_start_area"))
+        # self.vertLO_tab_adv.addWidget(self.lbl_start_area)
         # graphics view starting area
-         # roi preview output
-        self.lbl_starting_area_preview_label = QtGui.QLabel(self)
-        self.lbl_starting_area_preview_label.setObjectName(_fromUtf8("lbl_starting_area_preview_label"))
-        self.lbl_starting_area_preview_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.vertLO_tab_adv.addWidget(self.lbl_starting_area_preview_label)
-        # grid layout set starting area
-        self.gridLO_start_area = QtGui.QGridLayout()
-        self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
-        # spinbox starting_x start
-        self.spinBox_starting_x1_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_x1_factor.setMaximum(10000)
-        self.spinBox_starting_x1_factor.setObjectName(_fromUtf8("spinBox_starting_x_start"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_x1_factor, 0, 1, 1, 1)
-        # spinbox starting_x end
-        self.spinBox_starting_x2_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_x2_factor.setMaximum(10000)
-        self.spinBox_starting_x2_factor.setObjectName(_fromUtf8("spinBox_starting_x_end"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_x2_factor, 0, 3, 1, 1)
-        # spinbox starting_y start
-        self.spinBox_starting_y1_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_y1_factor.setMaximum(10000)
-        self.spinBox_starting_y1_factor.setObjectName(_fromUtf8("spinBox_starting_y_start"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_y1_factor, 1, 1, 1, 1)
-        # spinbox starting_y end
-        self.spinBox_starting_y2_factor = QtGui.QSpinBox(self)
-        self.spinBox_starting_y2_factor.setMaximum(10000)
-        self.spinBox_starting_y2_factor.setObjectName(_fromUtf8("spinBox_starting_y_end"))
-        self.gridLO_start_area.addWidget(self.spinBox_starting_y2_factor, 1, 3, 1, 1)
-        # label starting_x start
-        self.lbl_start_x_start = QtGui.QLabel(self)
-        self.lbl_start_x_start.setObjectName(_fromUtf8("lbl_start_x_start"))
-        self.gridLO_start_area.addWidget(self.lbl_start_x_start, 0, 0, 1, 1)
-        # label starting_x end
-        self.lbl_start_x_end = QtGui.QLabel(self)
-        self.lbl_start_x_end.setObjectName(_fromUtf8("lbl_start_x_end"))
-        self.gridLO_start_area.addWidget(self.lbl_start_x_end, 0, 2, 1, 1)
-        # label starting_y start
-        self.lbl_start_y_start = QtGui.QLabel(self)
-        self.lbl_start_y_start.setObjectName(_fromUtf8("lbl_start_y_start"))
-        self.gridLO_start_area.addWidget(self.lbl_start_y_start, 1, 0, 1, 1)
-        # label starting_y end
-        self.lbl_start_y_end = QtGui.QLabel(self)
-        self.lbl_start_y_end.setObjectName(_fromUtf8("lbl_start_y_end"))
-        self.gridLO_start_area.addWidget(self.lbl_start_y_end, 1, 2, 1, 1)
-        # add starting are selection grid layout to tab layout
-        self.vertLO_tab_adv.addLayout(self.gridLO_start_area)
-        # line
-        self.line_6 = MyQLine(self, "line_6")
-        self.vertLO_tab_adv.addWidget(self.line_6)
+        #  # roi preview output
+        # self.lbl_starting_area_preview_label = QtGui.QLabel(self)
+        # self.lbl_starting_area_preview_label.setObjectName(_fromUtf8("lbl_starting_area_preview_label"))
+        # self.lbl_starting_area_preview_label.setAlignment(QtCore.Qt.AlignCenter)
+        # self.vertLO_tab_adv.addWidget(self.lbl_starting_area_preview_label)
+        # # grid layout set starting area
+        # self.gridLO_start_area = QtGui.QGridLayout()
+        # self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
+        # # spinbox starting_x start
+        # self.spinBox_starting_x1_factor = QtGui.QSpinBox(self)
+        # self.spinBox_starting_x1_factor.setMaximum(10000)
+        # self.spinBox_starting_x1_factor.setObjectName(_fromUtf8("spinBox_starting_x_start"))
+        # self.gridLO_start_area.addWidget(self.spinBox_starting_x1_factor, 0, 1, 1, 1)
+        # # spinbox starting_x end
+        # self.spinBox_starting_x2_factor = QtGui.QSpinBox(self)
+        # self.spinBox_starting_x2_factor.setMaximum(10000)
+        # self.spinBox_starting_x2_factor.setObjectName(_fromUtf8("spinBox_starting_x_end"))
+        # self.gridLO_start_area.addWidget(self.spinBox_starting_x2_factor, 0, 3, 1, 1)
+        # # spinbox starting_y start
+        # self.spinBox_starting_y1_factor = QtGui.QSpinBox(self)
+        # self.spinBox_starting_y1_factor.setMaximum(10000)
+        # self.spinBox_starting_y1_factor.setObjectName(_fromUtf8("spinBox_starting_y_start"))
+        # self.gridLO_start_area.addWidget(self.spinBox_starting_y1_factor, 1, 1, 1, 1)
+        # # spinbox starting_y end
+        # self.spinBox_starting_y2_factor = QtGui.QSpinBox(self)
+        # self.spinBox_starting_y2_factor.setMaximum(10000)
+        # self.spinBox_starting_y2_factor.setObjectName(_fromUtf8("spinBox_starting_y_end"))
+        # self.gridLO_start_area.addWidget(self.spinBox_starting_y2_factor, 1, 3, 1, 1)
+        # # label starting_x start
+        # self.lbl_start_x_start = QtGui.QLabel(self)
+        # self.lbl_start_x_start.setObjectName(_fromUtf8("lbl_start_x_start"))
+        # self.gridLO_start_area.addWidget(self.lbl_start_x_start, 0, 0, 1, 1)
+        # # label starting_x end
+        # self.lbl_start_x_end = QtGui.QLabel(self)
+        # self.lbl_start_x_end.setObjectName(_fromUtf8("lbl_start_x_end"))
+        # self.gridLO_start_area.addWidget(self.lbl_start_x_end, 0, 2, 1, 1)
+        # # label starting_y start
+        # self.lbl_start_y_start = QtGui.QLabel(self)
+        # self.lbl_start_y_start.setObjectName(_fromUtf8("lbl_start_y_start"))
+        # self.gridLO_start_area.addWidget(self.lbl_start_y_start, 1, 0, 1, 1)
+        # # label starting_y end
+        # self.lbl_start_y_end = QtGui.QLabel(self)
+        # self.lbl_start_y_end.setObjectName(_fromUtf8("lbl_start_y_end"))
+        # self.gridLO_start_area.addWidget(self.lbl_start_y_end, 1, 2, 1, 1)
+        # # add starting are selection grid layout to tab layout
+        # self.vertLO_tab_adv.addLayout(self.gridLO_start_area)
+        # # line
+        # self.line_6 = MyQLine(self, "line_6")
+        # self.vertLO_tab_adv.addWidget(self.line_6)
         # spacer
         spacerItem7 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem7)
@@ -166,10 +166,10 @@ class TabAdv(QtGui.QWidget):
         self.vertLO_tab_adv.addItem(spacerItem10)
 
     def connect_widgets(self, controller):
-        self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        # self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        # self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        # self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        # self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
 
         self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), controller.change_frame_waittime)
 
@@ -182,11 +182,11 @@ class TabAdv(QtGui.QWidget):
 
     def retranslate_tab_adv(self):
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))
-        self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))
-        self.lbl_start_x_end.setText(_translate("tracker_main_widget", "X End", None))
-        self.lbl_start_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
-        self.lbl_start_y_end.setText(_translate("tracker_main_widget", "Y End", None))
-        self.lbl_start_x_start.setText(_translate("tracker_main_widget", "X Start", None))
+        # self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))
+        # self.lbl_start_x_end.setText(_translate("tracker_main_widget", "X End", None))
+        # self.lbl_start_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
+        # self.lbl_start_y_end.setText(_translate("tracker_main_widget", "Y End", None))
+        # self.lbl_start_x_start.setText(_translate("tracker_main_widget", "X Start", None))
         self.lbl_start_orientation.setText(_translate("tracker_main_widget", "Starting Orientation", None))
         self.lbl_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection min Size Threshold", None))
         self.lbl_max_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection max Size Threshold", None))
