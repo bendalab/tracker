@@ -108,6 +108,12 @@ class TabRoi(QtGui.QWidget):
             box.connect_widgets(controller)
         return
 
+    def clear(self):
+        for input_box in self.roi_input_boxes:
+            self.vertLO_tab_roi.removeWidget(input_box)
+            input_box.deleteLater()
+        self.roi_input_boxes = []
+
     def retranslate_tab_roi(self):
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
         self.lbl_roi.setText(_translate("tracker_main_widget", "Region of interest", None))

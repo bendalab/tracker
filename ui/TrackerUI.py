@@ -147,6 +147,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.move(x_pos, y_pos)
 
     def set_new_tracker(self, controller):
+        self.tab_roi.clear()
         self.tracker = Tracker(controller=controller)
         return
 
