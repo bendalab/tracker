@@ -105,10 +105,8 @@ class TabRoi(QtGui.QWidget):
 
     # TODO
     def connect_widgets(self, controller):
-        # self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
-        # self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
-        # self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
-        # self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), controller.change_tracking_roi_values)
+        for box in self.roi_input_boxes:
+            box.connect_widgets(controller)
         return
 
     def retranslate_tab_roi(self):
