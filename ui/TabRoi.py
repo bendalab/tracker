@@ -83,6 +83,9 @@ class TabRoi(QtGui.QScrollArea):
         controller.preset_roi_input_box(new_box)
         new_box.connect_widgets(controller)
         self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        self.adjust_all_sizes()
+
+    def adjust_all_sizes(self):
         self.roi_config_widget.adjustSize()
         self.roi_preview_widget.adjustSize()
         self.tabRoi_widget.adjustSize()
