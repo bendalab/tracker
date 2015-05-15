@@ -106,6 +106,23 @@ class Controller(object):
         self.ui.tab_visual.spinBox_circle_size.setValue(self.ui.tracker.im.circle_size)
         self.ui.tab_visual.spinBox_lineend_offset.setValue(self.ui.tracker.im.lineend_offset)
 
+    def add_new_roi_clicked(self):
+        roi_name_lnedit = self.ui.tab_roi.lnEdit_new_roi_name.text()
+        if " " in roi_name_lnedit:
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("no spaces allowed!")
+            return
+        elif roi_name_lnedit == "":
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("enter a name for new roi!")
+            return
+        elif roi_name_lnedit in [n.name for n in self.tracker.roim.roi_list]:
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("roi with that name alread exists!")
+            return
+        else:
+            self.tracker.roim.add_roi(0, 0, 50, 50, roi_name_lnedit, self)
+            if self.preview_is_set:
+                self.display_roi_preview()
+        return
+
     def roi_added_to_tracker(self, roi):
         self.ui.tab_roi.add_roi_input_box(roi, self)
         return

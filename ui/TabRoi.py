@@ -22,6 +22,8 @@ class TabRoi(QtGui.QScrollArea):
     def __init__(self):
         super(TabRoi, self).__init__()
 
+        self.controller = None
+
         # widget to be put into scrollArea (TabRoi)
         self.tabRoi_widget = QtGui.QWidget()
 
@@ -62,6 +64,19 @@ class TabRoi(QtGui.QScrollArea):
         # vertical layout roi config
         self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
         self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
+        # label for new roi name
+        self.lbl_new_roi_name = QtGui.QLabel(self.tabRoi_widget)
+        self.lbl_new_roi_name.setObjectName(_fromUtf8("lbl_new_roi_name"))
+        self.vertLO_roi_config.addWidget(self.lbl_new_roi_name)
+        # line edit for new roi name
+        self.lnEdit_new_roi_name = QtGui.QLineEdit(self)
+        self.lnEdit_new_roi_name.setObjectName(_fromUtf8("new_roi_name"))
+        self.vertLO_roi_config.addWidget(self.lnEdit_new_roi_name)
+        # button for roi creation
+        self.btn_create_roi = QtGui.QPushButton()
+        self.btn_create_roi.setObjectName(_fromUtf8("btn_create_roi"))
+        self.vertLO_roi_config.addWidget(self.btn_create_roi)
+
         self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
         # add roi preview and config widget
@@ -74,6 +89,9 @@ class TabRoi(QtGui.QScrollArea):
     # def populate(self, roim):
     #     for entry in roim.roi_list:
     #         self.add_roi_input_box(entry)
+
+    def connect_to_controller(self, controller):
+        self.controller = controller
 
     def add_roi_input_box(self, roi, controller):
         new_box = RoiInputBox(roi)
@@ -93,7 +111,7 @@ class TabRoi(QtGui.QScrollArea):
     def connect_widgets(self, controller):
         for box in self.roi_input_boxes:
             box.connect_widgets(controller)
-        return
+        self.btn_create_roi.clicked.connect(self.controller.add_new_roi_clicked)
 
     def clear(self):
         for input_box in self.roi_input_boxes:
@@ -104,9 +122,7 @@ class TabRoi(QtGui.QScrollArea):
     def retranslate_tab_roi(self):
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
         self.lbl_roi.setText(_translate("tracker_main_widget", "Region of interest", None))
-        # self.lbl_roi_y_end.setText(_translate("tracker_main_widget", "Y End", None))
-        # self.lbl_roi_x_end.setText(_translate("tracker_main_widget", "X End", None))
-        # self.lbl_roi_x_start.setText(_translate("tracker_main_widget", "X Start", None))
-        # self.lbl_roi_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
+        self.btn_create_roi.setText(_translate("btn_create_roi", "Create ROI", None))
+        self.lbl_new_roi_name.setText(_translate("lbl_new_roi_name", "name of new ROI:", None))
         for box in self.roi_input_boxes:
             box.retranslate_roi_input_box()
