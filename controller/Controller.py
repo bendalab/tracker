@@ -63,13 +63,15 @@ class Controller(object):
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
         # fit picture to window size
-        width = self.ui.tab_widget_options.geometry().width() - 20
+        width = self.ui.tab_widget_options.geometry().width()*0.65
         height = int(width)
         size = QtCore.QSize(width, height)
         output_pixm_rescaled = output_pixm.scaled(size, QtCore.Qt.KeepAspectRatio)
         # display picture
         self.ui.tab_roi.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
         self.roi_preview_displayed = True
+        self.ui.tab_roi.roi_config_widget.adjustSize()
+        self.ui.tab_roi.roi_preview_widget.adjustSize()
         self.ui.tab_roi.tabRoi_widget.adjustSize()
 
     def preset_options(self):
