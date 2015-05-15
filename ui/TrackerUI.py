@@ -109,9 +109,14 @@ class TrackerUserInterface(QtGui.QWidget):
 
         # self.tab_roi.populate(self.tracker.roim)
 
+        self.connect_controller_to_tabs()
         self.controller.preset_options()
         self.connect_widgets()
         self.set_shortcuts()
+
+    def connect_controller_to_tabs(self):
+        self.tab_roi.connect_to_controller(self.controller)
+        # TODO connect to other tabs
 
     def retranslate_ui(self, tracker_main_widget):
         tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
