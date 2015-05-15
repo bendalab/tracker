@@ -26,7 +26,7 @@ class ROI(object):
             self.y2 = cfg.getint(section, "y2")
             print "values imported for roi: {0:s}".format(self.name)
         except:
-            print "no values imported for roi: {0:s}".format(self.name)
+            print "no values in config for roi: {0:s}".format(self.name)
             return
 
     @property
