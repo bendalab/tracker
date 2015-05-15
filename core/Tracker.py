@@ -53,8 +53,8 @@ class Tracker(object):
 
         # self.frame_counter = 0
 
+        self.controller = controller
         if controller is not None:
-            self.controller = controller
             self.controller.connect_to_tracker(self)
 
         # image morphing data
@@ -73,8 +73,12 @@ class Tracker(object):
         self.mm = MetaManager()
 
         self.roim = ROIManager()
-        self.roim.add_roi(160, 80, 700, 525, "tracking_area", self.controller)  # Isabel setup
-        self.roim.add_roi(300, 150, 600, 350, "starting_area", self.controller)
+        if self.controller is not None:
+            self.roim.add_roi(160, 80, 700, 525, "tracking_area", self.controller)  # Isabel setup
+            self.roim.add_roi(300, 150, 600, 350, "starting_area", self.controller)
+        else:
+            self.roim.add_roi(160, 80, 700, 525, "tracking_area")  # Isabel setup
+            self.roim.add_roi(300, 150, 600, 350, "starting_area")
         self.fish_started = False
         # self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
 
