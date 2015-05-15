@@ -5,11 +5,13 @@ class ROIManager(object):
     def __init__(self):
         self.roi_list = []
 
-    def add_roi(self, x1, y1, x2, y2, name, controller):
+    def add_roi(self, x1, y1, x2, y2, name, controller=None):
         new_roi = ROI(x1, y1, x2, y2, name)
-        new_roi.import_cfg_values(controller.tracker.read_cfg)
+        if controller is not None:
+            new_roi.import_cfg_values(controller.tracker.read_cfg)
         self.roi_list.append(new_roi)
-        controller.roi_added_to_tracker(new_roi)
+        if controller is not None:
+            controller.roi_added_to_tracker(new_roi)
 
     def get_roi(self, name):
         for entry in self.roi_list:
