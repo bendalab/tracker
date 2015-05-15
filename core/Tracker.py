@@ -19,7 +19,7 @@ from MetaManager import MetaManager
 from IPython import embed
 
 class Tracker(object):
-    def __init__(self, path=None, nix_io=False, wait_time=50, controller = None):
+    def __init__(self, path=None, nix_io=False, wait_time=50, controller=None):
         # program data
         self.ui_mode_on = False
         self.ui_abort_button_pressed = False
