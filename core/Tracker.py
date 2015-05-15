@@ -111,15 +111,19 @@ class Tracker(object):
         # meta manager values
         # self.mm.import_cfg_values(cfg)
 
-        # roi values
-        # self.roim.import_cfg_values(self.read_cfg)
-        # self.roim.get_roi("tracking_area").import_cfg_values(cfg)
-        #
-        # # starting area
-        # self.roim.get_roi("starting_area").import_cfg_values(cfg)
-
         # image manager values
         self.im.import_cfg_values(self.read_cfg)
+
+        # import rois
+        roi_sections = [sec for sec in self.read_cfg.sections() if "roi" == sec.split("_")[0]]
+        for roi_sec in roi_sections:
+            add_roi_name = "_".join(roi_sec.split("_")[1:])
+            if add_roi_name not in [roi.name for roi in self.roim.roi_list]:
+                x1 = self.read_cfg.getint(roi_sec, "x1")
+                y1 = self.read_cfg.getint(roi_sec, "x2")
+                x2 = self.read_cfg.getint(roi_sec, "y1")
+                y2 = self.read_cfg.getint(roi_sec, "y2")
+                self.roim.add_roi(x1, y1, x2, y2, add_roi_name, self.controller)
 
         # tracker values
         self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
