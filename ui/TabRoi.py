@@ -62,9 +62,7 @@ class TabRoi(QtGui.QScrollArea):
         # vertical layout roi config
         self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
         self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
-
-
-
+        self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
         # add roi preview and config widget
         self.hoLO_tab_roi.addWidget(self.roi_preview_widget)
@@ -84,6 +82,7 @@ class TabRoi(QtGui.QScrollArea):
         new_box.retranslate_roi_input_box()
         controller.preset_roi_input_box(new_box)
         new_box.connect_widgets(controller)
+        self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
         self.roi_config_widget.adjustSize()
         self.roi_preview_widget.adjustSize()
         self.tabRoi_widget.adjustSize()
