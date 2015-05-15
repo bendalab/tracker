@@ -29,31 +29,46 @@ class TabRoi(QtGui.QScrollArea):
 
         self.roi_input_boxes = []
 
-        # vertical layout roi tab
-        self.vertLO_tab_roi = QtGui.QVBoxLayout(self.tabRoi_widget)
-        self.vertLO_tab_roi.setObjectName(_fromUtf8("vertLO_tab_roi"))
+        # horizontal layout preview  + layout config
+        self.hoLO_tab_roi = QtGui.QHBoxLayout(self.tabRoi_widget)
+
+        # left side widget
+        self.roi_preview_widget = QtGui.QWidget()
+        self.vertLO_roi_preview = QtGui.QVBoxLayout(self.roi_preview_widget)
         # spaccer
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_roi.addItem(spacerItem2)
+        self.vertLO_roi_preview.addItem(spacerItem2)
         # line
         self.line_3 = MyQLine(self, "line_3")
-        self.vertLO_tab_roi.addWidget(self.line_3)
+        self.vertLO_roi_preview.addWidget(self.line_3)
         # label region of interest
         self.lbl_roi = QtGui.QLabel(self.tabRoi_widget)
         self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
-        self.vertLO_tab_roi.addWidget(self.lbl_roi)
-        # roi preview output
+        self.vertLO_roi_preview.addWidget(self.lbl_roi)
+        # add roi preview output
         self.lbl_roi_preview_label = QtGui.QLabel(self.tabRoi_widget)
         self.lbl_roi_preview_label.setObjectName(_fromUtf8("lbl_roi_preview_label"))
         self.lbl_roi_preview_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.vertLO_tab_roi.addWidget(self.lbl_roi_preview_label)
-
+        self.vertLO_roi_preview.addWidget(self.lbl_roi_preview_label)
         self.line_4 = MyQLine(self, "line_4")
-        self.vertLO_tab_roi.addWidget(self.line_4)
+        self.vertLO_roi_preview.addWidget(self.line_4)
         # spacer
         spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_roi.addItem(spacerItem3)
-        self.vertLO_tab_roi.setContentsMargins(0, 0, 30, 0)
+        self.vertLO_roi_preview.addItem(spacerItem3)
+        #self.vertLO_roi__preview.setContentsMargins(0, 0, 30, 0)
+
+        # right side widget
+        self.roi_config_widget = QtGui.QWidget()
+        # vertical layout roi config
+        self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
+        self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
+
+
+
+
+        # add roi preview and config widget
+        self.hoLO_tab_roi.addWidget(self.roi_preview_widget)
+        self.hoLO_tab_roi.addWidget(self.roi_config_widget)
 
         # put widget into scroll area
         self.setWidget(self.tabRoi_widget)
@@ -65,10 +80,12 @@ class TabRoi(QtGui.QScrollArea):
     def add_roi_input_box(self, roi, controller):
         new_box = RoiInputBox(roi)
         self.roi_input_boxes.append(new_box)
-        self.vertLO_tab_roi.addWidget(new_box)
+        self.vertLO_roi_config.addWidget(new_box)
         new_box.retranslate_roi_input_box()
         controller.preset_roi_input_box(new_box)
         new_box.connect_widgets(controller)
+        self.roi_config_widget.adjustSize()
+        self.roi_preview_widget.adjustSize()
         self.tabRoi_widget.adjustSize()
 
     def connect_widgets(self, controller):
@@ -78,7 +95,7 @@ class TabRoi(QtGui.QScrollArea):
 
     def clear(self):
         for input_box in self.roi_input_boxes:
-            self.vertLO_tab_roi.removeWidget(input_box)
+            self.vertLO_roi_config.removeWidget(input_box)
             input_box.deleteLater()
         self.roi_input_boxes = []
 

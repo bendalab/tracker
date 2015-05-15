@@ -38,8 +38,8 @@ class TrackerUserInterface(QtGui.QWidget):
 
         #main widget
         self.setObjectName(_fromUtf8("self"))
-        self.resize(1400/2, 835)
-        self.setMinimumSize(QtCore.QSize(900/2, 770))
+        self.resize(1000, 835)
+        self.setMinimumSize(QtCore.QSize(450, 770))
 
         # main vertical layout
         self.vertLO_main = QtGui.QVBoxLayout(self)
