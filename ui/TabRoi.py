@@ -18,24 +18,22 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 
-class TabRoi(QtGui.QScrollArea):
+class TabRoi(QtGui.QWidget):
     def __init__(self):
         super(TabRoi, self).__init__()
 
         self.controller = None
-
-        # widget to be put into scrollArea (TabRoi)
-        self.tabRoi_widget = QtGui.QWidget()
 
         self.setObjectName(_fromUtf8("tab_roi"))
 
         self.roi_input_boxes = []
 
         # horizontal layout preview  + layout config
-        self.hoLO_tab_roi = QtGui.QHBoxLayout(self.tabRoi_widget)
+        self.hoLO_tab_roi = QtGui.QHBoxLayout(self)
 
         # left side widget
         self.roi_preview_widget = QtGui.QWidget()
+        # self.roi_preview_widget.setMinimumWidth(int(self.width() * 0.65))
         self.vertLO_roi_preview = QtGui.QVBoxLayout(self.roi_preview_widget)
         # spaccer
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -44,11 +42,11 @@ class TabRoi(QtGui.QScrollArea):
         self.line_3 = MyQLine(self, "line_3")
         self.vertLO_roi_preview.addWidget(self.line_3)
         # label region of interest
-        self.lbl_roi = QtGui.QLabel(self.tabRoi_widget)
+        self.lbl_roi = QtGui.QLabel(self)
         self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
         self.vertLO_roi_preview.addWidget(self.lbl_roi)
         # add roi preview output
-        self.lbl_roi_preview_label = QtGui.QLabel(self.tabRoi_widget)
+        self.lbl_roi_preview_label = QtGui.QLabel(self)
         self.lbl_roi_preview_label.setObjectName(_fromUtf8("lbl_roi_preview_label"))
         self.lbl_roi_preview_label.setAlignment(QtCore.Qt.AlignCenter)
         self.vertLO_roi_preview.addWidget(self.lbl_roi_preview_label)
@@ -57,15 +55,21 @@ class TabRoi(QtGui.QScrollArea):
         # spacer
         spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_roi_preview.addItem(spacerItem3)
-        #self.vertLO_roi__preview.setContentsMargins(0, 0, 30, 0)
 
         # right side widget
+        self.roi_config_scroll_area = QtGui.QScrollArea()
         self.roi_config_widget = QtGui.QWidget()
+        self.roi_config_widget.setMinimumHeight(self.height()-50)
+        self.roi_config_widget.setMinimumWidth(300)
+        pal = QtGui.QPalette()
+        pal.setColor(QtGui.QPalette.Background, QtCore.Qt.black)
+        self.roi_config_widget.setAutoFillBackground(True)
+        self.roi_config_widget.setPalette(pal)
         # vertical layout roi config
         self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
         self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
         # label for new roi name
-        self.lbl_new_roi_name = QtGui.QLabel(self.tabRoi_widget)
+        self.lbl_new_roi_name = QtGui.QLabel(self)
         self.lbl_new_roi_name.setObjectName(_fromUtf8("lbl_new_roi_name"))
         self.vertLO_roi_config.addWidget(self.lbl_new_roi_name)
         # line edit for new roi name
@@ -77,14 +81,16 @@ class TabRoi(QtGui.QScrollArea):
         self.btn_create_roi.setObjectName(_fromUtf8("btn_create_roi"))
         self.vertLO_roi_config.addWidget(self.btn_create_roi)
 
-        self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        # self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+        self.roi_config_scroll_area.setWidget(self.roi_config_widget)
 
         # add roi preview and config widget
         self.hoLO_tab_roi.addWidget(self.roi_preview_widget)
-        self.hoLO_tab_roi.addWidget(self.roi_config_widget)
+        self.hoLO_tab_roi.addWidget(self.roi_config_scroll_area)
 
         # put widget into scroll area
-        self.setWidget(self.tabRoi_widget)
+        # self.setWidget(self.tabRoi_widget)
 
     # def populate(self, roim):
     #     for entry in roim.roi_list:
@@ -99,14 +105,14 @@ class TabRoi(QtGui.QScrollArea):
         self.vertLO_roi_config.addWidget(new_box)
         new_box.retranslate_roi_input_box()
         controller.preset_roi_input_box(new_box)
-        new_box.connect_widgets(controller)
-        self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-        self.adjust_all_sizes()
+        new_box.connect_widgets(self.controller)
+        # self.adjust_all_sizes()
 
     def adjust_all_sizes(self):
+        # self.roi_config_widget.setMinimumSize(int(self.width()*0.3), int(self.height()*0.85))
+        # self.roi_preview_widget.adjustSize()
         self.roi_config_widget.adjustSize()
-        self.roi_preview_widget.adjustSize()
-        self.tabRoi_widget.adjustSize()
+        return
 
     def connect_widgets(self, controller):
         for box in self.roi_input_boxes:
@@ -118,6 +124,7 @@ class TabRoi(QtGui.QScrollArea):
             self.vertLO_roi_config.removeWidget(input_box)
             input_box.deleteLater()
         self.roi_input_boxes = []
+        self.adjust_all_sizes()
 
     def retranslate_tab_roi(self):
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))

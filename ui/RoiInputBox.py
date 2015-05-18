@@ -19,6 +19,8 @@ class RoiInputBox(QtGui.QWidget):
     def __init__(self, roi):
         super(RoiInputBox, self).__init__()
 
+        self.setMinimumHeight(100)
+
         self.name = "roi_{0:s}".format(roi.name)
         self.roi_name = roi.name
 

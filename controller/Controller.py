@@ -70,7 +70,7 @@ class Controller(object):
         # display picture
         self.ui.tab_roi.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
         self.roi_preview_displayed = True
-        self.ui.tab_roi.adjust_all_sizes()
+        # self.ui.tab_roi.adjust_all_sizes()
 
     def preset_options(self):
         # video file
