@@ -13,6 +13,16 @@ class ROIManager(object):
         if controller is not None:
             controller.roi_added_to_tracker(new_roi)
 
+    def remove_roi(self, name, controller=None):
+        for i in range(len(self.roi_list)):
+            if self.roi_list[i].name == name:
+                self.roi_list.pop(i)
+                print "removed roi from tracker"
+                if controller is not None:
+                    controller.roi_removed_from_tracker(name)
+                break
+
+
     def get_roi(self, name):
         for entry in self.roi_list:
             if entry.name == name:

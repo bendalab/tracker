@@ -114,7 +114,7 @@ class Controller(object):
             self.ui.tab_roi.lnEdit_new_roi_name.setText("enter a name for new roi!")
             return
         elif roi_name_lnedit in [n.name for n in self.tracker.roim.roi_list]:
-            self.ui.tab_roi.lnEdit_new_roi_name.setText("roi with that name alread exists!")
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("roi with that name already exists!")
             return
         else:
             self.tracker.roim.add_roi(0, 0, 50, 50, roi_name_lnedit, self)
@@ -122,8 +122,29 @@ class Controller(object):
                 self.display_roi_preview()
         return
 
+    def delete_roi_clicked(self):
+        roi_name_lnedit = self.ui.tab_roi.lnEdit_new_roi_name.text()
+        if " " in roi_name_lnedit:
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("no spaces allowed!")
+            return
+        elif roi_name_lnedit == "":
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("enter a name of existing roi!")
+            return
+        elif roi_name_lnedit not in [n.name for n in self.tracker.roim.roi_list]:
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("roi with that name doesn't exist!")
+            return
+        else:
+            self.tracker.roim.remove_roi(roi_name_lnedit, self)
+            if self.preview_is_set:
+                self.display_roi_preview()
+        return
+
     def roi_added_to_tracker(self, roi):
         self.ui.tab_roi.add_roi_input_box(roi, self)
+        return
+
+    def roi_removed_from_tracker(self, roi_name):
+        self.ui.tab_roi.remove_roi_input_box(roi_name, self)
         return
 
     def preset_roi_input_box(self, box):

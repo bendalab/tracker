@@ -79,6 +79,10 @@ class TabRoi(QtGui.QWidget):
         self.btn_create_roi = QtGui.QPushButton()
         self.btn_create_roi.setObjectName(_fromUtf8("btn_create_roi"))
         self.vertLO_roi_config.addWidget(self.btn_create_roi)
+        # button for roi deletion
+        self.btn_delete_roi = QtGui.QPushButton()
+        self.btn_delete_roi.setObjectName(_fromUtf8("btn_delete_roi"))
+        self.vertLO_roi_config.addWidget(self.btn_delete_roi)
 
         self.roi_config_scroll_area.setWidget(self.roi_config_widget)
 
@@ -99,6 +103,18 @@ class TabRoi(QtGui.QWidget):
         controller.display_roi_preview()
         #self.adjust_all_sizes()
 
+    def remove_roi_input_box(self, roi_name, controller):
+        roi_box_name = "roi_{0:s}".format(roi_name)
+        for i in range(len(self.roi_input_boxes)):
+            print i
+            if self.roi_input_boxes[i].name == roi_box_name:
+                self.vertLO_roi_config.removeWidget(self.roi_input_boxes[i])
+                self.roi_input_boxes[i].deleteLater()
+                self.roi_input_boxes.pop(i)
+                print "deleted roi input box"
+                controller.display_roi_preview()
+                break
+
     def adjust_all_sizes(self):
         # self.roi_config_widget.setMinimumSize(int(self.width()*0.3), int(self.height()*0.85))
         # self.roi_preview_widget.adjustSize()
@@ -109,6 +125,7 @@ class TabRoi(QtGui.QWidget):
         for box in self.roi_input_boxes:
             box.connect_widgets(controller)
         self.btn_create_roi.clicked.connect(self.controller.add_new_roi_clicked)
+        self.btn_delete_roi.clicked.connect(self.controller.delete_roi_clicked)
 
     def clear(self):
         for input_box in self.roi_input_boxes:
@@ -121,6 +138,7 @@ class TabRoi(QtGui.QWidget):
         self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
         self.lbl_roi.setText(_translate("tracker_main_widget", "Region of interest", None))
         self.btn_create_roi.setText(_translate("btn_create_roi", "Create ROI", None))
-        self.lbl_new_roi_name.setText(_translate("lbl_new_roi_name", "name of new ROI:", None))
+        self.btn_delete_roi.setText(_translate("btn_delete_roi", "Delete ROI", None))
+        self.lbl_new_roi_name.setText(_translate("lbl_new_roi_name", "name of ROI:", None))
         for box in self.roi_input_boxes:
             box.retranslate_roi_input_box()
