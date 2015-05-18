@@ -14,6 +14,10 @@ class ROIManager(object):
             controller.roi_added_to_tracker(new_roi)
 
     def remove_roi(self, name, controller=None):
+        if name == "tracking_area" or name == "starting_area":
+            print "can't remove tracking area or starting area!"
+            return
+        
         for i in range(len(self.roi_list)):
             if self.roi_list[i].name == name:
                 self.roi_list.pop(i)

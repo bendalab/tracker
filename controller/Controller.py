@@ -124,6 +124,12 @@ class Controller(object):
 
     def delete_roi_clicked(self):
         roi_name_lnedit = self.ui.tab_roi.lnEdit_new_roi_name.text()
+        if roi_name_lnedit == "tracking_area":
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("can't remove tracking_area!")
+            return
+        if roi_name_lnedit == "starting_area":
+            self.ui.tab_roi.lnEdit_new_roi_name.setText("can't remove starting_area!")
+            return
         if " " in roi_name_lnedit:
             self.ui.tab_roi.lnEdit_new_roi_name.setText("no spaces allowed!")
             return
