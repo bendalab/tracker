@@ -52,13 +52,12 @@ class Controller(object):
         self.preview_is_set = True
 
     def display_roi_preview(self):
+        if not self.preview_is_set:
+            return
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
         for selected_roi in self.tracker.roim.roi_list:
             roi = self.tracker.roim.get_roi(selected_roi.name)
             cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), (255, 0, 255), 2)
-            # if self.roi_preview_displayed:
-            #     cv2_output = copy.copy(self.first_frame_numpy[roi.y1:roi.y2, roi.x1:roi.x2])
-            #     cv2.imshow("roi preview", cv2_output)
         # convert numpy-array to qimage
         output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
         output_pixm = QtGui.QPixmap.fromImage(output_qimg)
@@ -70,7 +69,7 @@ class Controller(object):
         # display picture
         self.ui.tab_roi.lbl_roi_preview_label.setPixmap(output_pixm_rescaled)
         self.roi_preview_displayed = True
-        # self.ui.tab_roi.adjust_all_sizes()
+        self.ui.tab_roi.adjust_all_sizes()
 
     def preset_options(self):
         # video file
@@ -133,12 +132,6 @@ class Controller(object):
         box.spinBox_roi_y2.setValue(self.tracker.roim.get_roi(roi_name).y2)
         box.spinBox_roi_x1.setValue(self.tracker.roim.get_roi(roi_name).x1)
         box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
-
-    # def preset_all_roi_input_boxes(self):
-    #     for box in self.ui.tab_roi.roi_input_boxes:
-    #         self.preset_roi_input_box(box)
-    #     if self.preview_is_set:
-    #         self.display_roi_preview()
 
     def browse_output_directory(self):
         if self.output_is_input:

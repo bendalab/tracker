@@ -33,7 +33,6 @@ class TabRoi(QtGui.QWidget):
 
         # left side widget
         self.roi_preview_widget = QtGui.QWidget()
-        # self.roi_preview_widget.setMinimumWidth(int(self.width() * 0.65))
         self.vertLO_roi_preview = QtGui.QVBoxLayout(self.roi_preview_widget)
         # spaccer
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -59,12 +58,12 @@ class TabRoi(QtGui.QWidget):
         # right side widget
         self.roi_config_scroll_area = QtGui.QScrollArea()
         self.roi_config_widget = QtGui.QWidget()
-        self.roi_config_widget.setMinimumHeight(self.height()-50)
-        self.roi_config_widget.setMinimumWidth(300)
-        pal = QtGui.QPalette()
-        pal.setColor(QtGui.QPalette.Background, QtCore.Qt.black)
-        self.roi_config_widget.setAutoFillBackground(True)
-        self.roi_config_widget.setPalette(pal)
+        self.roi_config_widget.setMinimumHeight(600)
+        self.roi_config_widget.setMinimumWidth(280)
+        # pal = QtGui.QPalette()
+        # pal.setColor(QtGui.QPalette.Background, QtCore.Qt.black)
+        # self.roi_config_widget.setAutoFillBackground(True)
+        # self.roi_config_widget.setPalette(pal)
         # vertical layout roi config
         self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
         self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
@@ -81,20 +80,11 @@ class TabRoi(QtGui.QWidget):
         self.btn_create_roi.setObjectName(_fromUtf8("btn_create_roi"))
         self.vertLO_roi_config.addWidget(self.btn_create_roi)
 
-        # self.vertLO_roi_config.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-
         self.roi_config_scroll_area.setWidget(self.roi_config_widget)
 
         # add roi preview and config widget
         self.hoLO_tab_roi.addWidget(self.roi_preview_widget)
         self.hoLO_tab_roi.addWidget(self.roi_config_scroll_area)
-
-        # put widget into scroll area
-        # self.setWidget(self.tabRoi_widget)
-
-    # def populate(self, roim):
-    #     for entry in roim.roi_list:
-    #         self.add_roi_input_box(entry)
 
     def connect_to_controller(self, controller):
         self.controller = controller
@@ -106,7 +96,8 @@ class TabRoi(QtGui.QWidget):
         new_box.retranslate_roi_input_box()
         controller.preset_roi_input_box(new_box)
         new_box.connect_widgets(self.controller)
-        # self.adjust_all_sizes()
+        controller.display_roi_preview()
+        #self.adjust_all_sizes()
 
     def adjust_all_sizes(self):
         # self.roi_config_widget.setMinimumSize(int(self.width()*0.3), int(self.height()*0.85))
