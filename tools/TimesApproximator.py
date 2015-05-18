@@ -17,10 +17,10 @@ import argparse
 
 
 class TimesApproximator(object):
-    def __init__(self):
+    def __init__(self, path):
         self.cap = None
-        self.info_file = sys.argv[1].split('.')[0][:-9] + "_info.dat"
-        self.times_file = sys.argv[1].split('.')[0] + "_times.dat"
+        self.info_file = path.split('.')[0][:-9] + "_info.dat"
+        self.times_file = path.split('.')[0] + "_times.dat"
 
         self.start_time = None
         self.end_time = None
@@ -29,12 +29,13 @@ class TimesApproximator(object):
 
         self.frame_count = 0
 
-    def run(self):
-        self._check_if_times_file_exists()
+    def run(self, path):
+        print "Frame times approximation started for " + str(path)
 
-        self.cap = cv2.VideoCapture(sys.argv[1])
+        if self._check_if_times_file_exists():
+            return
 
-        print "Frame times approximation started for " + str(sys.argv[1])
+        self.cap = cv2.VideoCapture(path)
 
         try:
             with open(self.info_file, 'r') as tf:
@@ -42,7 +43,7 @@ class TimesApproximator(object):
                 self.end_time = datetime.strptime(tf.readline()[11:].rstrip(), '%Y-%m-%d %H:%M:%S:%f')
         except:
             print "info file missing or badly formatted - can not approximate without start and end time"
-            exit()
+            return
 
         self._get_time_diff()
         self._count_frames()
@@ -79,16 +80,19 @@ class TimesApproximator(object):
     def _check_if_times_file_exists(self):
         if os.path.exists(self.times_file):
             print "Times File already exists! If you want to create a new Times File please delete the old one.\nApproximation aborted"
-            exit()
+            return True
+        return False
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='approximate frametimes for VideoRecorder')
-    parser.add_argument('path', type=str, help="absolute file path to VideoRecorder video including file name and file extension")
+    parser.add_argument('path', type=str, nargs="*", help="absolute file path to VideoRecorder video including file name and file extension")
     
     args = parser.parse_args()
-    if not os.path.exists(args.path):
-        print('Video file does not exist!')
-        exit()
 
-    approx = TimesApproximator()
-    approx.run()
+    for path in args.path:
+        if not os.path.exists(path):
+            print('Video file does not exist!')
+            continue
+
+        approx = TimesApproximator(path)
+        approx.run(path)
