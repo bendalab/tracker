@@ -73,7 +73,7 @@ class TimesApproximator(object):
 
         with open(self.times_file, 'a') as tf:
             for i in range(self.frame_count + 1):
-                tf.write(str(printtime)[11:] + " debug:" + str(i) + "\n")
+                tf.write(str(printtime)[11:] + "\n")
                 printtime = printtime + addtime
 
     def _check_if_times_file_exists(self):
