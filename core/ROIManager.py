@@ -5,9 +5,9 @@ class ROIManager(object):
     def __init__(self):
         self.roi_list = []
 
-    def calc_roi_data(self):
+    def calc_roi_data(self, img):
         for entry in self.roi_list:
-            entry.calc_all_data()
+            entry.calc_all_data(img)
 
     def add_roi(self, x1, y1, x2, y2, name, controller=None):
         new_roi = ROI(x1, y1, x2, y2, name)
