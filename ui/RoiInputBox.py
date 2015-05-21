@@ -94,7 +94,7 @@ class RoiInputBox(QtGui.QWidget):
 
     def retranslate_roi_input_box(self):
         # self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
-        self.lbl_name.setText(_translate("tracker_main_widget", self.name, None))
+        self.lbl_name.setText(_translate("tracker_main_widget", "_".join(self.name.split("_")[1:]), None))
         self.lbl_roi_y_end.setText(_translate("tracker_main_widget", "Y End", None))
         self.lbl_roi_x_end.setText(_translate("tracker_main_widget", "X End", None))
         self.lbl_roi_x_start.setText(_translate("tracker_main_widget", "X Start", None))
