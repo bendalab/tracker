@@ -73,6 +73,7 @@ class Tracker(object):
         self.mm = MetaManager()
 
         self.roim = ROIManager()
+
         if self.controller is not None:
             self.roim.add_roi(160, 80, 700, 525, "tracking_area", self.controller)  # Isabel setup
             self.roim.add_roi(300, 150, 600, 350, "starting_area", self.controller)
@@ -118,7 +119,7 @@ class Tracker(object):
         roi_sections = [sec for sec in self.read_cfg.sections() if "roi" == sec.split("_")[0]]
         for roi_sec in roi_sections:
             add_roi_name = "_".join(roi_sec.split("_")[1:])
-            if add_roi_name not in [roi.name for roi in self.roim.roi_list]:
+            if add_roi_name not in [roi.name for roi in self.roim._roi_list]:
                 x1 = self.read_cfg.getint(roi_sec, "x1")
                 y1 = self.read_cfg.getint(roi_sec, "x2")
                 x2 = self.read_cfg.getint(roi_sec, "y1")
@@ -339,6 +340,9 @@ class Tracker(object):
             if self.im.draw_travel_orientation and self.fish_started:
                 self.im.append_to_travel_orientation()
 
+            # calculate roi data
+            self.roim.calc_roi_data(frame)
+
             self.im.draw_extracted_data(self.ellipse, self.fish_started, roi_img, self.cm.contour_list)
             self.im.draw_data_on_overview_image(self.roim.get_roi("tracking_area"), self.dm)
 
@@ -379,6 +383,10 @@ class Tracker(object):
         self.set_video_capture()
 
         self.extract_data()
+        #debug
+        for entry in self.roim._roi_list:
+            print entry.frame_data
+        #======
         self.dm.estimate_missing_pos(self.roim.get_roi("tracking_area"))
         self.dm.estimate_missing_ori()
         self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roim.get_roi("tracking_area"), self.im.circle_size)
@@ -396,28 +404,23 @@ class Tracker(object):
         output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
 
         params = {}
-        params['fish size'] = self._fish_size_threshold
-        params['start ori'] = self._start_ori
-        roi_starting_area = self.roim.get_roi("starting_area")
-        x_offset = self.roim.get_roi("tracking_area").x1
-        y_offset = self.roim.get_roi("tracking_area").y1
-        params['starting area x1'] = roi_starting_area.x1 + x_offset
-        params['starting area x2'] = roi_starting_area.x2 + x_offset
-        params['starting area y1'] = roi_starting_area.y1 + y_offset
-        params['starting area y2'] = roi_starting_area.y2 + y_offset
         params['source file'] = self.video_file
+        params['fish_min_size'] = self._fish_size_threshold
+        params['fish_max_size'] = self._fish_max_size_threshold
+        params['fish_max_size_enabled'] = str(self._enable_max_size_threshold)
+        params['erosion_iterations'] = self._erosion_iterations
+        params['dilation_iterations'] = self._dilation_iterations
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
+        # TODO ADJUST!!!
         if not self.nix_io:
             DataWriter.write_ascii(output_file_name + ".txt", times, self.dm.all_pos_original, self.dm.all_oris,
                                    self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
                                    self.dm.number_relevant_contours_per_frame, self.roim.get_roi("tracking_area"), self.dm.frame_counter, params)
         else:
-            DataWriter.write_nix(output_file_name + ".h5", times, self.dm.all_pos_original, self.dm.all_oris,
-                                 self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
-                                 self.dm.number_relevant_contours_per_frame, self.roim.get_roi("tracking_area"), params)
+            DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
         cv2.imwrite(output_file_name + "_OV_path.png", self.im.last_frame_ov_output)
 
         self.write_config_file()

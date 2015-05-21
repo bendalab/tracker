@@ -144,8 +144,9 @@ class DataWriter(object):
         if entity is not None and hasattr(entity, "sources"):
             entity.sources.extend(sources)
 
+    # TODO ajdust to rois!!!
     @staticmethod
-    def write_nix(file_name, times, position, orientation, est_position, est_orientation, object_count, fish_object_count, roi, parameters):
+    def write_nix(file_name, times, data_manager, roi_manager, meta_manager, parameters):
         import nix
         name = file_name.split('/')[-1].split('.')[0]
         nix_file = nix.File.open(file_name, nix.FileMode.Overwrite)
