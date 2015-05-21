@@ -1,3 +1,5 @@
+import numpy as np
+
 class ROI(object):
     def __init__(self, x_1, y_1, x_2, y_2, name):
         self._name = name
@@ -6,7 +8,7 @@ class ROI(object):
         self._x_2 = x_2
         self._y_2 = y_2
 
-        self.mean_color = None
+        self.mean_color = []
 
     def set_values(self, x1, y1, x2, y2):
         self.x1 = x1
@@ -28,6 +30,16 @@ class ROI(object):
         except:
             print "no values in config for roi: {0:s}".format(self.name)
             return
+
+    def calc_mean_color(self, img):
+        img_roi = img[self.y1:self.y2, self.x1:self.x2]
+        mean_color = tuple([int(entry) for entry in np.mean(np.mean(img_roi, 0), 0)])
+        self.mean_color.append(mean_color)
+        return
+
+    def calc_all_properties(self):
+        # implemented to allow adding of more properties later
+        self.calc_mean_color()
 
     @property
     def name(self):
