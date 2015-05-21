@@ -5,6 +5,10 @@ class ROIManager(object):
     def __init__(self):
         self.roi_list = []
 
+    def calc_roi_data(self):
+        for entry in self.roi_list:
+            entry.calc_all_data()
+
     def add_roi(self, x1, y1, x2, y2, name, controller=None):
         new_roi = ROI(x1, y1, x2, y2, name)
         if controller is not None:
@@ -25,7 +29,6 @@ class ROIManager(object):
                 if controller is not None:
                     controller.roi_removed_from_tracker(name)
                 break
-
 
     def get_roi(self, name):
         for entry in self.roi_list:
