@@ -9,8 +9,8 @@ class ROI(object):
         self._x_2 = x_2
         self._y_2 = y_2
 
-        self.frame_data = {}
-        self.frame_data["mean_colors"] = []
+        self._frame_data = {}
+        self._frame_data["mean_colors"] = []
 
     def set_values(self, x1, y1, x2, y2):
         self.x1 = x1
@@ -36,7 +36,7 @@ class ROI(object):
     def calc_mean_color(self, img):
         img_roi = img[self.y1:self.y2, self.x1:self.x2]
         mean_color = tuple([int(entry) for entry in np.mean(np.mean(img_roi, 0), 0)])
-        self.frame_data["mean_colors"].append(mean_color)
+        self._frame_data["mean_colors"].append(mean_color)
         return
 
     def calc_all_data(self, img):
@@ -46,6 +46,10 @@ class ROI(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def frame_data(self):
+        return self._frame_data
 
     @property
     def x1(self):
