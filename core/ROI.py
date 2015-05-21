@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ROI(object):
     def __init__(self, x_1, y_1, x_2, y_2, name):
         self._name = name
@@ -8,7 +9,8 @@ class ROI(object):
         self._x_2 = x_2
         self._y_2 = y_2
 
-        self.mean_color = []
+        self.frame_data = {}
+        self.frame_data["mean_colors"] = []
 
     def set_values(self, x1, y1, x2, y2):
         self.x1 = x1
@@ -34,12 +36,12 @@ class ROI(object):
     def calc_mean_color(self, img):
         img_roi = img[self.y1:self.y2, self.x1:self.x2]
         mean_color = tuple([int(entry) for entry in np.mean(np.mean(img_roi, 0), 0)])
-        self.mean_color.append(mean_color)
+        self.frame_data["mean_colors"].append(mean_color)
         return
 
-    def calc_all_properties(self):
+    def calc_all_data(self, img):
         # implemented to allow adding of more properties later
-        self.calc_mean_color()
+        self.calc_mean_color(img)
 
     @property
     def name(self):
@@ -76,3 +78,16 @@ class ROI(object):
     @y2.setter
     def y2(self, value):
         self._y_2 = value
+
+# debug main
+# if __name__ == "__main__":
+#     import cv2
+#     img = cv2.imread("/home/madai/Pictures/two_color.png")
+#     roi1 = ROI(0, 0, 300, 400, "roi1")
+#     roi2 = ROI(0, 0, 400, 400, "roi2")
+#
+#     roi1.calc_mean_color(img)
+#     roi2.calc_mean_color(img)
+#
+#     print roi1.mean_color
+#     print roi2.mean_color
