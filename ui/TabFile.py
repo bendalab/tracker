@@ -80,11 +80,6 @@ class TabFile(QtGui.QWidget):
         self.line_2_1 = MyQLine(self, "line_2_1")
         self.vertLO_tab_file.addWidget(self.line_2_1)
 
-        # checkbox nix output
-        self.cbx_enable_nix_output = QtGui.QCheckBox(self)
-        self.cbx_enable_nix_output.setObjectName(_fromUtf8("cbx_enable_nix_output"))
-        self.vertLO_tab_file.addWidget(self.cbx_enable_nix_output)
-
         # spacer
         spacer_item_1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_file.addItem(spacer_item_1)
@@ -96,10 +91,8 @@ class TabFile(QtGui.QWidget):
         self.btn_browse_file.clicked.connect(controller.browse_file)
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
 
-        self.connect(self.cbx_enable_nix_output, QtCore.SIGNAL("stateChanged(int)"), controller.change_enable_nix_output)
         self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), controller.change_output_is_input)
         return
-
 
     def retranslate_tab_file(self):
         self.lbl_file_path.setText(_translate(self.name, "File Path", None))
@@ -107,4 +100,3 @@ class TabFile(QtGui.QWidget):
         self.btn_browse_file.setText(_translate(self.name, "Browse File", None))
         self.lbl_output_path.setText(_translate(self.name, "Output Path", None))
         self.btn_browse_output.setText(_translate(self.name, "Browse Output Folder", None))
-        self.cbx_enable_nix_output.setText(_translate(self.name, "Enable Output to NIX file", None))

@@ -215,16 +215,6 @@ class DataManager(object):
         if self.fish_not_detected_count > fish_not_detected_threshold:
             self.fish_not_detected_threshold_reached = True
 
-
-
-
-
-
-
-
-
-
-
     @property
     def frame_counter(self):
         return self._frame_counter

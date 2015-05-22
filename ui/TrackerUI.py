@@ -38,8 +38,8 @@ class TrackerUserInterface(QtGui.QWidget):
 
         #main widget
         self.setObjectName(_fromUtf8("self"))
-        self.resize(1400/2, 835)
-        self.setMinimumSize(QtCore.QSize(900/2, 770))
+        self.resize(1000, 835)
+        self.setMinimumSize(QtCore.QSize(450, 770))
 
         # main vertical layout
         self.vertLO_main = QtGui.QVBoxLayout(self)
@@ -104,15 +104,22 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_widget_options.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(self)
 
-        self.tracker = Tracker()
         self.controller = Controller(self)
+        self.connect_controller_to_tabs()
+        self.tracker = Tracker(controller=self.controller)
+
+        # self.tab_roi.populate(self.tracker.roim)
 
         self.controller.preset_options()
         self.connect_widgets()
         self.set_shortcuts()
 
+    def connect_controller_to_tabs(self):
+        self.tab_roi.connect_to_controller(self.controller)
+        # TODO connect to other tabs
+
     def retranslate_ui(self, tracker_main_widget):
-        tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
+        tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² Ver. 1.5 beta", None))
 
         self.tab_file.retranslate_tab_file()
         self.tab_roi.retranslate_tab_roi()
@@ -144,8 +151,9 @@ class TrackerUserInterface(QtGui.QWidget):
         y_pos = (screen.height() - gui_size.height() - gui_size.height()) / 2
         self.move(x_pos, y_pos)
 
-    def set_new_tracker(self):
-        self.tracker = Tracker()
+    def set_new_tracker(self, controller):
+        self.tab_roi.clear()
+        self.tracker = Tracker(controller=controller)
         return
 
     def connect_widgets(self):
