@@ -106,12 +106,10 @@ class TabRoi(QtGui.QWidget):
     def remove_roi_input_box(self, roi_name, controller):
         roi_box_name = "roi_{0:s}".format(roi_name)
         for i in range(len(self.roi_input_boxes)):
-            print i
             if self.roi_input_boxes[i].name == roi_box_name:
                 self.vertLO_roi_config.removeWidget(self.roi_input_boxes[i])
                 self.roi_input_boxes[i].deleteLater()
                 self.roi_input_boxes.pop(i)
-                print "deleted roi input box"
                 controller.display_roi_preview()
                 break
 
