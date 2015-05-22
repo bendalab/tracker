@@ -18,23 +18,22 @@ from ImageManager import ImageManager
 from MetaManager import MetaManager
 from IPython import embed
 
+try:
+    import nix
+except ImportError as e:
+    print e
+    print 'Unfortunately your system misses the NIX packages.'
+    quit()
+
 class Tracker(object):
-    def __init__(self, path=None, nix_io=False, wait_time=50, controller=None):
+    def __init__(self, path=None, wait_time=50, controller=None):
         # program data
         self.ui_mode_on = False
         self.ui_abort_button_pressed = False
         
         if path is not None:
             self.video_file = path
-        if nix_io:
-            try:
-                import nix
-            except ImportError as e:
-                print e
-                print 'falling back to text output!'
-                nix_io = False
 
-        self.nix_io = nix_io
         self.output_directory = ""
         self.output_path_isset = False
 
@@ -383,10 +382,6 @@ class Tracker(object):
         self.set_video_capture()
 
         self.extract_data()
-        #debug
-        for entry in self.roim._roi_list:
-            print entry.frame_data
-        #======
         self.dm.estimate_missing_pos(self.roim.get_roi("tracking_area"))
         self.dm.estimate_missing_ori()
         self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roim.get_roi("tracking_area"), self.im.circle_size)
@@ -408,19 +403,14 @@ class Tracker(object):
         params['fish_min_size'] = self._fish_size_threshold
         params['fish_max_size'] = self._fish_max_size_threshold
         params['fish_max_size_enabled'] = str(self._enable_max_size_threshold)
+        params['fish_start_orientation'] = self._start_ori
         params['erosion_iterations'] = self._erosion_iterations
         params['dilation_iterations'] = self._dilation_iterations
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
-        # TODO ADJUST!!!
-        if not self.nix_io:
-            DataWriter.write_ascii(output_file_name + ".txt", times, self.dm.all_pos_original, self.dm.all_oris,
-                                   self.dm.estimated_pos_original, self.dm.estimated_oris, self.dm.number_contours_per_frame,
-                                   self.dm.number_relevant_contours_per_frame, self.roim.get_roi("tracking_area"), self.dm.frame_counter, params)
-        else:
-            DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
+        DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
         cv2.imwrite(output_file_name + "_OV_path.png", self.im.last_frame_ov_output)
 
         self.write_config_file()
