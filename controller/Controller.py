@@ -74,7 +74,7 @@ class Controller(object):
     def preset_options(self):
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
-        self.ui.tab_file.cbx_enable_nix_output.setChecked(self.ui.tracker.nix_io)
+        # self.ui.tab_file.cbx_enable_nix_output.setChecked(self.ui.tracker.nix_io)
 
         # meta
         self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
@@ -189,9 +189,6 @@ class Controller(object):
                 slash_pos = i
                 break
         self.last_selected_folder = path_string[0:slash_pos]
-
-    def change_enable_nix_output(self):
-        self.ui.tracker.nix_io = self.ui.tab_file.cbx_enable_nix_output.isChecked()
 
     def change_output_is_input(self):
         checked = self.ui.tab_file.cbx_output_is_input.isChecked()
