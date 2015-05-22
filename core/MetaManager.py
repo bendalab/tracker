@@ -4,6 +4,8 @@ class MetaManager(object):
     def __init__(self):
         self._experimenter = ""
         self._fish_id = ""
+        self._camera_model = ""
+        self._camera_vendor = ""
 
     def import_cfg_values(self, cfg):
         self.experimenter = cfg.get("meta", "experimenter")
