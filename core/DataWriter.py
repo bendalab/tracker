@@ -104,7 +104,7 @@ class DataWriter(object):
         return seconds
 
     @staticmethod
-    def save_trace(time, data, nix_block, name, nix_type, label, unit=None):
+    def save_trace(time, data, nix_block, name, nix_type, data_label, unit=None, set_labels=None):
         # get only those that are valid
         valid = []
         stamps = []
@@ -118,21 +118,23 @@ class DataWriter(object):
         if len(valid) > 0 and isinstance(valid[0], tuple):
             d = np.zeros((len(valid), len(valid[0])))
             for i, v in enumerate(valid):
-                d[i,:] = list(v)
+                d[i, :] = list(v)
             array = nix_block.create_data_array(name, nix_type, data=d)
-            array.label = label
+            array.label = data_label
             if unit is not None:
                 array.unit = unit
             dim = array.append_range_dimension(stamps)
             dim.label = 'time'
             dim.unit = 's'
             dim = array.append_set_dimension()
-            dim.labels = ['x', 'y']
+            if set_labels is not None:
+                dim.labels = set_labels
+
             return array
         else:
             d = np.asarray(valid)
             array = nix_block.create_data_array(name, nix_type, data=d)
-            array.label = label
+            array.label = data_label
             if unit is not None:
                 array.unit = unit
             dim = array.append_range_dimension(stamps)
@@ -178,8 +180,8 @@ class DataWriter(object):
         camera = movie.create_section('Camera', 'hardware.camera')
         # camera['Model'] = 'Guppy F-038B NIR'
         # camera['Vendor'] = 'Allied Vision Technologies'
-        camera['Model'] = 'NA'
-        camera['Vendor'] = 'NA'
+        # camera['Model'] = 'NA'
+        # camera['Vendor'] = 'NA'
 
         # create sources and link entities to metadata
         block.metadata = recording
@@ -190,28 +192,27 @@ class DataWriter(object):
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
-        a = DataWriter.save_trace(time_stamps, data_manager.all_pos_original, block, 'positions', 'nix.irregular_sampled.coordinates', label='position')
+        a = DataWriter.save_trace(time_stamps, data_manager.all_pos_original, block, 'positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
         DataWriter.append_sources(a, [movie_source, tracking_source])
 
-        a = DataWriter.save_trace(time_stamps, data_manager.est_pos_original, block, 'estimated positions', 'nix.irregular_sampled.coordinates', label='position')
+        a = DataWriter.save_trace(time_stamps, data_manager.estimated_pos_original, block, 'estimated positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
         DataWriter.append_sources(a, [movie_source, tracking_source])
 
-        a = DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations', 'nix.irregular_sampled', label='orientation')
+        a = DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
         DataWriter.append_sources(a, [movie_source, tracking_source])
 
-        a = DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block, 'estimated_orientations', 'nix.irregular_sampled', label='orientation')
+        a = DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block, 'estimated_orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
         DataWriter.append_sources(a, [movie_source, tracking_source])
 
-        a = DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block, 'object count', 'nix.irregular_sampled', label='count')
+        a = DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block, 'object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
         DataWriter.append_sources(a, [movie_source, tracking_source])
 
-        a = DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame, block, 'fish object count', 'nix.irregular_sampled', label='count')
+        a = DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame, block, 'fish object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
         DataWriter.append_sources(a, [movie_source, tracking_source])
 
         for roi in roi_manager.roi_list:
-            a = DataWriter.save_trace(time_stamps, roi.frame_data["{0:s}_mean_colors".format(roi.name)], block, 'ROI {0:s} mean colors'.format(roi.name), 'nix.irregular_sampled', label='count')
+            a = DataWriter.save_trace(time_stamps, roi.frame_data["{0:s}_mean_colors".format(roi.name)], block, 'ROI {0:s} mean colors'.format(roi.name), 'nix.irregular_sampled', data_label='count', set_labels=['r', 'g', 'b'])
             DataWriter.append_sources(a, [movie_source, tracking_source])
 
-        # TODO need more metadata like info about the subject, who, when, where etc.
-        # TODO If we support this (and we should suupport this) in the gui, we probably need a more elaborate DataWriter class!
+        # TODO import of recording metadata from file
         nix_file.close()
