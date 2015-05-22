@@ -66,6 +66,7 @@ class TabMeta(QtGui.QWidget):
         self.line_2 = MyQLine(self, "line_2")
         self.vert_LO_tab_meta.addWidget(self.line_2)
 
+        # TODO are those needed? maybe import video meta file?
         # # spacer
         # spacer_item_2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         # self.vert_LO_tab_meta.addItem(spacer_item_2)
