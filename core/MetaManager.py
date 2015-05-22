@@ -29,3 +29,17 @@ class MetaManager(object):
     @fish_id.setter
     def fish_id(self, object_id):
         self._fish_id = object_id
+
+    @property
+    def camera_model(self):
+        return self._camera_model
+    @camera_model.setter
+    def camera_model(self, model):
+        self._camera_model = model
+
+    @property
+    def camera_vendor(self):
+        return self._camera_vendor
+    @camera_vendor.setter
+    def camera_vendor(self, vendor):
+        self._camera_vendor = vendor
