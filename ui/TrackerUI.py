@@ -119,7 +119,7 @@ class TrackerUserInterface(QtGui.QWidget):
         # TODO connect to other tabs
 
     def retranslate_ui(self, tracker_main_widget):
-        tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² 1.0", None))
+        tracker_main_widget.setWindowTitle(_translate("tracker_main_widget", "Tool For Tracking Fish - [TF]² Ver. 1.5 beta", None))
 
         self.tab_file.retranslate_tab_file()
         self.tab_roi.retranslate_tab_roi()
