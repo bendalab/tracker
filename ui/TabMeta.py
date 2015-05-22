@@ -66,10 +66,42 @@ class TabMeta(QtGui.QWidget):
         self.line_2 = MyQLine(self, "line_2")
         self.vert_LO_tab_meta.addWidget(self.line_2)
 
-        # spacer
-        spacer_item_2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vert_LO_tab_meta.addItem(spacer_item_2)
+        # # spacer
+        # spacer_item_2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        # self.vert_LO_tab_meta.addItem(spacer_item_2)
+        #
+        # # line
+        # self.line_2 = MyQLine(self, "line_2")
+        # self.vert_LO_tab_meta.addWidget(self.line_2)
+        #
+        # # label camera model
+        # self.lbl_camera_model = QtGui.QLabel(self)
+        # self.lbl_camera_model.setObjectName(_fromUtf8("lbl_camera_model"))
+        # self.vert_LO_tab_meta.addWidget(self.lbl_camera_model)
+        #
+        # # line edit camera model
+        # self.ln_edit_camera_model = QtGui.QLineEdit(self)
+        # self.ln_edit_camera_model.setObjectName(_fromUtf8("lnEdit_camera_model"))
+        # self.vert_LO_tab_meta.addWidget(self.ln_edit_camera_model)
+        #
+        # # line
+        # self.line_2 = MyQLine(self, "line_2")
+        # self.vert_LO_tab_meta.addWidget(self.line_2)
+        #
+        # # label camera vendor
+        # self.lbl_camera_vendor = QtGui.QLabel(self)
+        # self.lbl_camera_vendor.setObjectName(_fromUtf8("lbl_camera_vendor"))
+        # self.vert_LO_tab_meta.addWidget(self.lbl_camera_vendor)
+        #
+        # # line edit camera vendor
+        # self.ln_edit_camera_vendor = QtGui.QLineEdit(self)
+        # self.ln_edit_camera_vendor.setObjectName(_fromUtf8("lnEdit_camera_vendor"))
+        # self.vert_LO_tab_meta.addWidget(self.ln_edit_camera_vendor)
 
+        # spacer
+        self.vert_LO_tab_meta.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+    # TODO
     def connect_widgets(self, controller):
         #
         return
@@ -77,3 +109,5 @@ class TabMeta(QtGui.QWidget):
     def retranslate_tab_meta(self):
         self.lbl_experimenter.setText(_translate(self.name, "Experimenter", None))
         self.lbl_fish_id.setText(_translate(self.name, "Fish ID", None))
+        # self.lbl_camera_model.setText(_translate(self.name, "Camera Model", None))
+        # self.lbl_camera_vendor.setText(_translate(self.name, "Camera Vendor", None))
