@@ -256,7 +256,7 @@ class Tracker(object):
 
     def extract_data(self):
         # create BG subtractor
-        bg_sub = cv2.BackgroundSubtractorMOG2()
+        bg_sub = cv2.BackgroundSubtractorMOG()
 
         # main loop
         while self.cap.isOpened():
