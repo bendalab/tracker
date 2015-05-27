@@ -223,13 +223,10 @@ class Tracker(object):
         di_img = cv2.dilate(er_img, di_kernel, iterations=self._dilation_iterations)
         # thresholding to black-white
         ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
-        # ret, morphed_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
         return ret, morphed_img
 
-
     # check if fish started from the right side
-    def check_if_fish_started(self, roi):
-        height, width, depth = roi.shape
+    def check_if_fish_started(self):
         starting_area_x1 = self.roim.get_roi("starting_area").x1 - self.roim.get_roi("tracking_area").x1
         starting_area_x2 = self.roim.get_roi("starting_area").x2 - self.roim.get_roi("tracking_area").x1
         starting_area_y1 = self.roim.get_roi("starting_area").y1 - self.roim.get_roi("tracking_area").y1
@@ -258,6 +255,8 @@ class Tracker(object):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG()
 
+        roi = self.roim.get_roi("tracking_area")
+
         # main loop
         while self.cap.isOpened():
             ret, frame = self.cap.read()
@@ -265,24 +264,23 @@ class Tracker(object):
             if frame is None:
                 break
 
+            self.im.current_frame = frame
+
             self.dm.frame_counter += 1
 
             # set region of interest ROI
-            roi = self.roim.get_roi("tracking_area")
             roi_img = copy.copy(frame[roi.y1:roi.y2, roi.x1:roi.x2])
-            roi_output = copy.copy(roi_img)
 
-            self.im.last_frame_ov_output = copy.copy(frame)
+            # self.im.overview_output = copy.copy(frame)
 
             # subtract background fro ROI
-            roi_bg_sub = bg_sub.apply(roi_img)
+            self.im.current_bg_sub = bg_sub.apply(roi_img)
 
             # morph img
-            ret, mo_roi_bg_sub = self.morph_img(roi_bg_sub)
+            ret, self.im.current_morphed = self.morph_img(self.im.current_bg_sub)
 
             # getting contours (of the morphed img)
-            ret, thresh_img = cv2.threshold(mo_roi_bg_sub, 127, 255, cv2.THRESH_BINARY)
-            self.cm.contour_list, hierarchy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            self.cm.contour_list, hierarchy = cv2.findContours(self.im.current_morphed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
             # save amount of contours
             self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_contours_per_frame)
@@ -299,7 +297,7 @@ class Tracker(object):
 
             # check if fish started
             if not self.fish_started:
-                self.check_if_fish_started(roi_img)
+                self.check_if_fish_started()
 
             # if fish hasn't started yet, delete all contours
             if not self.fish_started:
@@ -319,10 +317,6 @@ class Tracker(object):
             if self.fish_started and self.ellipse is not None:
                 self.im.get_line_from_ellipse(self.ellipse)
 
-            # append ellipse center to travel route
-            if self.im.draw_travel_route:
-                self.im.append_to_travel_route(self.ellipse)
-
             # set last_pos to ellipse center
             self.dm.set_last_pos(self.ellipse)
 
@@ -335,29 +329,25 @@ class Tracker(object):
             # save orientations
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)
 
-            # append coordinates to travel_orientation
-            if self.im.draw_travel_orientation and self.fish_started:
-                self.im.append_to_travel_orientation()
-
             # calculate roi data
             self.roim.calc_roi_data(frame)
 
-            self.im.draw_extracted_data(self.ellipse, self.fish_started, roi_img, self.cm.contour_list)
-            self.im.draw_data_on_overview_image(self.roim.get_roi("tracking_area"), self.dm)
+            # draw current preview
+            self.im.draw_preview_img(self.ellipse, self.dm, self.fish_started, self.cm.contour_list, self.roim.get_roi("tracking_area"))
 
             # show all imgs
-            self.im.show_imgs(roi_bg_sub, mo_roi_bg_sub)
+            self.im.show_imgs()
 
             # show output img
-            if not self.ui_mode_on:
-                cv2.imshow("contours", roi_img)
+            # if not self.ui_mode_on:
+            #     cv2.imshow("contours", roi_img)
 
-            self.im.last_frame = roi_img
-            # self.im.last_frame_ov_output = frame_output
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break
             if self.ui_abort_button_pressed:
                 break
+
+        self.im.draw_data_on_overview_image(self.roim.get_roi("tracking_area"), self.dm)
 
         self.cap.release()
         cv2.destroyAllWindows()
@@ -411,7 +401,7 @@ class Tracker(object):
             os.makedirs(out_dir)
 
         DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
-        cv2.imwrite(output_file_name + "_OV_path.png", self.im.last_frame_ov_output)
+        cv2.imwrite(output_file_name + "_OV_path.png", self.im.current_frame)
 
         self.write_config_file()
 

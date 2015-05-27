@@ -5,11 +5,10 @@ import math
 class ImageManager(object):
 
     def __init__(self):
-        self._last_frame = None
-        self._last_frame_ov_output = None
-
-        self._img_travel_orientation = []
-        self._img_travel_route = []
+        self._current_frame = None
+        self._current_bg_sub = None
+        self._current_morphed = None
+        self._overview_output = None
 
         self._lineend_offset = 5
         self._circle_size = 2
@@ -21,9 +20,9 @@ class ImageManager(object):
         self._ly1 = 0
         self._lx2 = 0
         self._ly2 = 0
+        self._travel_route_draw_amount = 0  # 0 := all
         self._draw_travel_orientation = True
         self._draw_travel_route = True
-        self._draw_original_output = True
         self._show_bg_sub_img = False
         self._show_morphed_img = False
 
@@ -48,53 +47,62 @@ class ImageManager(object):
         self.img_travel_orientation.append(coordinates)
 
     def append_to_travel_route(self, ellipse):
+        if not self.draw_travel_route:
+            return
+
         if ellipse is not None:
             ellipse_x = int(round(ellipse[0][0]))
             ellipse_y = int(round(ellipse[0][1]))
             point = (ellipse_x, ellipse_y)
             self.img_travel_route.append(point)
 
-    def draw_extracted_data(self, ellipse, bool_fish_started, roi_img, contour_list):
+    def draw_preview_img(self, ellipse, data_manager, bool_fish_started, contour_list, roi):
         # draw data for visual feedback while tracking
+        if ellipse is not None:
+            ellipse = ((ellipse[0][0]+roi.x1, ellipse[0][1]+roi.y1), ellipse[1], ellipse[2])
+
         # draw ellipse
         if self._draw_ellipse and ellipse is not None and bool_fish_started:
-            cv2.ellipse(roi_img, ellipse, (0, 0, 255), 2)
+            cv2.ellipse(self.current_frame, ellipse, (0, 0, 255), 2)
 
         # draw countours to ROI img and show img
-        if self.draw_contour:
-            cv2.drawContours(roi_img, contour_list, -1, (0, 255, 0), 3)
+        if self.draw_contour and contour_list is not None:
+            cv2.drawContours(self.current_frame, contour_list, -1, (0, 255, 0), 3, offset=(roi.x1, roi.y1))
 
         # draw travel route
-        if self.draw_travel_orientation:
-            for coordinates in self.img_travel_orientation:
-                cv2.line(roi_img, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
-
-        # draw travel orientation
         if self.draw_travel_route:
-            for point in self.img_travel_route:
-                cv2.circle(roi_img, point, self._circle_size, (255, 0, 0))
+            for point in data_manager.all_pos_original:
+                if point is not None:
+                    cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
+
+        # draw travel orientation  # needed??
+        # if self.draw_travel_orientation:
+        #     for coordinates in data_manager.all_pos_original:
+        #         if coordinates is not None:
+        #             cv2.line(self.current_frame, (coordinates[0], coordinates[1]), (coordinates[2], coordinates[3]), (150,150,0), 1)
 
     def draw_data_on_overview_image(self, roi, dm):
-        # draw data for output image
-        if self.draw_original_output:
-            for coordinates in self.img_travel_orientation:
-                cv2.line(self.last_frame_ov_output, (coordinates[0] + roi.x1, coordinates[1] + roi.y1),
-                         (coordinates[2] + roi.x1, coordinates[3] + roi.y1), (150,150,0), 1)
-            for point in dm.all_pos_original:
-                if point is not None:
-                    cv2.circle(self.last_frame_ov_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
+        # for coordinates in self.dm.:  # needed?
+        #     cv2.line(self.overview_output, (coordinates[0] + roi.x1, coordinates[1] + roi.y1),
+        #              (coordinates[2] + roi.x1, coordinates[3] + roi.y1), (150,150,0), 1)
+        for point in dm.all_pos_original:
+            if point is not None:
+                cv2.circle(self.overview_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
     def draw_estimated_data(self, estimated_pos_roi, roi, circle_size):
         for c in estimated_pos_roi:
             if c is not None:
-                cv2.circle(self.last_frame, (int(round(c[0])), int(round(c[1]))), circle_size, (0, 0, 255))
-                cv2.circle(self.last_frame_ov_output, (int(round(c[0])) + roi.x1, int(round(c[1]) + roi.y1)), circle_size, (0, 0, 255))
+                cv2.circle(self.current_frame, (int(round(c[0])) + roi.x1, int(round(c[1]) + roi.y1)), circle_size, (0, 0, 255))
 
-    def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
+    def show_imgs(self):
+        cv2.namedWindow("current frame", cv2.WINDOW_NORMAL)
+        cv2.imshow("current frame", self.current_frame)
         if self.show_bg_sub_img:
-            cv2.imshow("bgsub", roi_bg_sub)
+            cv2.namedWindow("bgsub", cv2.WINDOW_NORMAL)
+            cv2.imshow("bgsub", self._current_bg_sub)
         if self.show_morphed_img:
-            cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
+            cv2.namedWindow("morphed_bgsub", cv2.WINDOW_NORMAL)
+            cv2.imshow("morphed_bgsub", self._current_morphed)
         return
 
     def import_cfg_values(self, cfg):
@@ -117,26 +125,32 @@ class ImageManager(object):
         cfg.set('visualization', 'circle_size', str(self.circle_size))
 
     @property
-    def img_travel_orientation(self):
-        return self._img_travel_orientation
+    def current_frame(self):
+        return self._current_frame
+    @current_frame.setter
+    def current_frame(self, frame):
+        self._current_frame = frame
 
     @property
-    def img_travel_route(self):
-        return self._img_travel_route
+    def current_bg_sub(self):
+        return self._current_bg_sub
+    @current_bg_sub.setter
+    def current_bg_sub(self, img):
+        self._current_bg_sub = img
 
     @property
-    def last_frame(self):
-        return self._last_frame
-    @last_frame.setter
-    def last_frame(self, frame):
-        self._last_frame = frame
+    def current_morphed(self):
+        return self._current_morphed
+    @current_morphed.setter
+    def current_morphed(self, img):
+        self._current_morphed = img
 
     @property
-    def last_frame_ov_output(self):
-        return self._last_frame_ov_output
-    @last_frame_ov_output.setter
-    def last_frame_ov_output(self, frame):
-        self._last_frame_ov_output = frame
+    def overview_output(self):
+        return self._overview_output
+    @overview_output.setter
+    def overview_output(self, frame):
+        self._overview_output = frame
 
     @property
     def draw_contour(self):
@@ -172,13 +186,6 @@ class ImageManager(object):
     @draw_travel_route.setter
     def draw_travel_route(self, boo):
         self._draw_travel_route = boo
-
-    @property
-    def draw_original_output(self):
-        return self._draw_original_output
-    @draw_original_output.setter
-    def draw_original_output(self, boo):
-        self._draw_original_output = boo
 
     @property
     def show_bg_sub_img(self):
