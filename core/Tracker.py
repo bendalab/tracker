@@ -271,7 +271,8 @@ class Tracker(object):
             # set region of interest ROI
             roi_img = copy.copy(frame[roi.y1:roi.y2, roi.x1:roi.x2])
 
-            # self.im.overview_output = copy.copy(frame)
+            if self.dm.frame_counter == 1:
+                self.im.overview_output = copy.copy(frame)
 
             # subtract background fro ROI
             self.im.current_bg_sub = bg_sub.apply(roi_img)
@@ -308,7 +309,7 @@ class Tracker(object):
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
-                self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roim.get_roi("tracking_area"))
+                self.cm.keep_nearest_contour(self.dm.last_pos, self.roim.get_roi("tracking_area"))
 
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
@@ -347,8 +348,6 @@ class Tracker(object):
             if self.ui_abort_button_pressed:
                 break
 
-        self.im.draw_data_on_overview_image(self.roim.get_roi("tracking_area"), self.dm)
-
         self.cap.release()
         cv2.destroyAllWindows()
 
@@ -374,7 +373,8 @@ class Tracker(object):
         self.extract_data()
         self.dm.estimate_missing_pos(self.roim.get_roi("tracking_area"))
         self.dm.estimate_missing_ori()
-        self.im.draw_estimated_data(self.dm.estimated_pos_roi, self.roim.get_roi("tracking_area"), self.im.circle_size)
+        self.im.draw_data_on_overview_image(self.roim.get_roi("tracking_area"), self.dm)
+        self.im.draw_estimated_data_on_overview_image(self.dm.estimated_pos_roi, self.roim.get_roi("tracking_area"), self.im.circle_size)
 
         self.dm.copy_original_to_est_data()
 
@@ -401,7 +401,7 @@ class Tracker(object):
             os.makedirs(out_dir)
 
         DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
-        cv2.imwrite(output_file_name + "_OV_path.png", self.im.current_frame)
+        cv2.imwrite(output_file_name + "_OV_path.png", self.im.overview_output)
 
         self.write_config_file()
 
