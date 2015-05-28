@@ -1,5 +1,6 @@
 import cv2
 import math
+from copy import copy
 
 
 class ImageManager(object):
@@ -90,12 +91,12 @@ class ImageManager(object):
         #              (coordinates[2] + roi.x1, coordinates[3] + roi.y1), (150,150,0), 1)
         for point in dm.all_pos_original:
             if point is not None:
-                cv2.circle(self.overview_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
+                cv2.circle(self._overview_output, (int(round(point[0])), int(round(point[1]))), self._circle_size, (255, 0, 0))
 
-    def draw_estimated_data(self, estimated_pos_roi, roi, circle_size):
+    def draw_estimated_data_on_overview_image(self, estimated_pos_roi, roi, circle_size):
         for c in estimated_pos_roi:
             if c is not None:
-                cv2.circle(self.current_frame, (int(round(c[0])) + roi.x1, int(round(c[1]) + roi.y1)), circle_size, (0, 0, 255))
+                cv2.circle(self._overview_output, (int(round(c[0])) + roi.x1, int(round(c[1]) + roi.y1)), circle_size, (0, 0, 255))
 
     def show_imgs(self):
         cv2.namedWindow("current frame", cv2.WINDOW_NORMAL)
