@@ -20,7 +20,7 @@ class ImageManager(object):
         self._ly1 = 0
         self._lx2 = 0
         self._ly2 = 0
-        self._travel_route_draw_amount = 0  # 0 := all
+        self._travel_route_draw_amount = 200
         self._draw_travel_orientation = True
         self._draw_travel_route = True
         self._show_bg_sub_img = False
@@ -42,19 +42,19 @@ class ImageManager(object):
         self.lx2 = int(round(center_x + self.lineend_offset*x_dif))
         self.ly2 = int(round(center_y + self.lineend_offset*y_dif))
 
-    def append_to_travel_orientation(self):
-        coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
-        self.img_travel_orientation.append(coordinates)
-
-    def append_to_travel_route(self, ellipse):
-        if not self.draw_travel_route:
-            return
-
-        if ellipse is not None:
-            ellipse_x = int(round(ellipse[0][0]))
-            ellipse_y = int(round(ellipse[0][1]))
-            point = (ellipse_x, ellipse_y)
-            self.img_travel_route.append(point)
+    # def append_to_travel_orientation(self):
+    #     coordinates = (self.lx1, self.ly1, self.lx2, self.ly2)
+    #     self.img_travel_orientation.append(coordinates)
+    #
+    # def append_to_travel_route(self, ellipse):
+    #     if not self.draw_travel_route:
+    #         return
+    #
+    #     if ellipse is not None:
+    #         ellipse_x = int(round(ellipse[0][0]))
+    #         ellipse_y = int(round(ellipse[0][1]))
+    #         point = (ellipse_x, ellipse_y)
+    #         self.img_travel_route.append(point)
 
     def draw_preview_img(self, ellipse, data_manager, bool_fish_started, contour_list, roi):
         # draw data for visual feedback while tracking
@@ -71,8 +71,11 @@ class ImageManager(object):
 
         # draw travel route
         if self.draw_travel_route:
-            for point in data_manager.all_pos_original:
-                if point is not None:
+            positions = data_manager.all_pos_original
+            for i in range(len(positions)-self._travel_route_draw_amount,  len(positions)):
+            # for point in data_manager.all_pos_original:
+                if i >= 0 and positions[i] is not None:
+                    point = positions[i]
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
 
         # draw travel orientation  # needed??
