@@ -308,7 +308,7 @@ class Tracker(object):
 
             # if two or more contours (of same size) in list delete which is farthest away from last point
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
-                self.cm.keep_nearest_contour(self.dm.last_pos, self.ellipse, self.roim.get_roi("tracking_area"))
+                self.cm.keep_nearest_contour(self.dm.last_pos, self.roim.get_roi("tracking_area"))
 
             # fit ellipse on contour
             self.fit_ellipse_on_contour()
