@@ -274,11 +274,11 @@ class Controller(object):
                 self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
                 return
         if not os.path.exists(self.track_file):
-            self.ui.tab_file.lnEdit_file_path.setText(self.ui.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
+            self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
             return
         if not self.output_is_input:
             if not os.path.exists(self.output_directory):
-                self.ui.tab_file.lnEdit_output_path.setText(self.ui.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+                self.ui.tab_file.lnEdit_output_path.setText(self.ui.tab_file.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
                 return
         self.ui.tracker.run()
         self.ui.set_new_tracker(self)
