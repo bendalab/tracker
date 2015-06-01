@@ -1,6 +1,7 @@
 import collections
 import numpy as np
 import nix
+import odml
 
 
 class DataWriter(object):
@@ -61,7 +62,6 @@ class DataWriter(object):
         if entity is not None and hasattr(entity, "sources"):
             entity.sources.extend(sources)
 
-    # TODO ajdust to rois!!!
     @staticmethod
     def write_nix(file_name, times, data_manager, roi_manager, meta_manager, parameters):
         name = file_name.split('/')[-1].split('.')[0]
@@ -69,10 +69,6 @@ class DataWriter(object):
         block = nix_file.create_block(name, 'nix.tracking')
 
         # some metadata
-        recording = nix_file.create_section('recording', 'recording')
-        recording['Date'] = name.split('_')[0]
-        recording['Experimenter'] = meta_manager.experimenter
-
         tracker = nix_file.create_section('Tracker', 'software.tracker')
         tracker['Version'] = 1.5
         tracker['Source location'] = 'https://github.com/bendalab/tracker'
@@ -88,8 +84,12 @@ class DataWriter(object):
             settings['ROI {0:s} WIDTH'.format(roi.name)] = roi.x2 - roi.x1
             settings['ROI {0:s} HEIGHT'.format(roi.name)] = roi.y2 - roi.y1
 
-        movie = nix_file.create_section('Movie', 'recording.movie')
-        movie['Filename'] = parameters['source file']
+        # TODO import template meta data
+        # recording = nix_file.create_section('recording', 'recording')
+        # recording['Date'] = name.split('_')[0]
+        # recording['Experimenter'] = meta_manager.experimenter
+                # movie = nix_file.create_section('Movie', 'recording.movie')
+        # movie['Filename'] = parameters['source file']
 
         camera = movie.create_section('Camera', 'hardware.camera')
         # camera['Model'] = 'Guppy F-038B NIR'
@@ -98,7 +98,7 @@ class DataWriter(object):
         # camera['Vendor'] = 'NA'
 
         # create sources and link entities to metadata
-        block.metadata = recording
+        # block.metadata = recording
         movie_source = block.create_source('Original movie', 'nix.source.movie')
         movie_source.metadata = movie
         tracking_source = block.create_source('Video tracking', 'nix.source.analysis')
