@@ -153,6 +153,13 @@ class Controller(object):
         self.ui.tab_roi.remove_roi_input_box(roi_name, self)
         return
 
+    def set_all_roi_input_boxes(self):
+        for box in self.ui.tab_roi.roi_input_boxes:
+            self.preset_roi_input_box(box)
+
+        if self.preview_is_set:
+            self.display_roi_preview()
+
     def preset_roi_input_box(self, box):
         roi_name = "_".join(box.name.split("_")[1:])
         box.spinBox_roi_x2.setValue(self.tracker.roim.get_roi(roi_name).x2)
