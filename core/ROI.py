@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 
 class ROI(object):
@@ -32,8 +33,20 @@ class ROI(object):
             print "New roi: {0:s}; no values in config.".format(self.name)
             return
 
+    def check_and_adjust_values(self, cap):
+        width = cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
+        height = cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
+        if self._x_1 < 0:
+            self._x_1 = 0
+        if self._y_1 < 0:
+            self._y_1 = 0
+        if self._x_2 > width:
+            self._x_2 = width
+        if self._y_2 > height:
+            self._y_2 = height
+
     def calc_mean_color(self, img):
-        img_roi = img[self.y1:self.y2, self.x1:self.x2]
+        img_roi = img[self._y_1:self._y_2, self._x_1:self._x_2]
         mean_color = tuple([int(entry) for entry in np.mean(np.mean(img_roi, 0), 0)])
         self._frame_data["{0:s}_mean_colors".format(self._name)].append(mean_color)
         return

@@ -40,6 +40,12 @@ class ROIManager(object):
             if entry.name == name:
                 entry.set_values(x1, y1, x2, y2)
 
+    def check_and_adjust_rois(self, cap, controller):
+        for roi in self._roi_list:
+            roi.check_and_adjust_values(cap)
+
+        controller.set_all_roi_input_boxes()
+
     def add_cfg_values(self, cfg):
         for entry in self._roi_list:
             section = 'roi_{0:s}'.format(entry.name)

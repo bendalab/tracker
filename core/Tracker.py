@@ -255,6 +255,8 @@ class Tracker(object):
         # create BG subtractor
         bg_sub = cv2.BackgroundSubtractorMOG()
 
+        self.roim.check_and_adjust_rois(self.cap, self.controller)
+
         roi = self.roim.get_roi("tracking_area")
 
         # main loop

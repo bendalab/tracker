@@ -153,6 +153,13 @@ class Controller(object):
         self.ui.tab_roi.remove_roi_input_box(roi_name, self)
         return
 
+    def set_all_roi_input_boxes(self):
+        for box in self.ui.tab_roi.roi_input_boxes:
+            self.preset_roi_input_box(box)
+
+        if self.preview_is_set:
+            self.display_roi_preview()
+
     def preset_roi_input_box(self, box):
         roi_name = "_".join(box.name.split("_")[1:])
         box.spinBox_roi_x2.setValue(self.tracker.roim.get_roi(roi_name).x2)
@@ -267,11 +274,11 @@ class Controller(object):
                 self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
                 return
         if not os.path.exists(self.track_file):
-            self.ui.tab_file.lnEdit_file_path.setText(self.ui.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
+            self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- FILE DOES NOT EXIST")
             return
         if not self.output_is_input:
             if not os.path.exists(self.output_directory):
-                self.ui.tab_file.lnEdit_output_path.setText(self.ui.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+                self.ui.tab_file.lnEdit_output_path.setText(self.ui.tab_file.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
                 return
         self.ui.tracker.run()
         self.ui.set_new_tracker(self)
