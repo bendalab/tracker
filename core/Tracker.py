@@ -109,7 +109,7 @@ class Tracker(object):
         if not self.config_file_present:
             return
         # meta manager values
-        # self.mm.import_cfg_values(cfg)
+        self.mm.import_cfg_values(self.read_cfg, self.controller)
 
         # image manager values
         self.im.import_cfg_values(self.read_cfg)
@@ -142,7 +142,7 @@ class Tracker(object):
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
 
-        # self.mm.add_cfg_values(cfg)
+        self.mm.add_cfg_values(cfg)
 
         cfg.add_section('system')
         cfg.set('system', 'frame_waittime', str(self.frame_waittime))
