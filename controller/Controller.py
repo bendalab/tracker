@@ -168,6 +168,7 @@ class Controller(object):
         box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
 
     def metadata_entry_added(self, meta_entry):
+        self.ui.tab_meta.add_tab_meta_entry(meta_entry)
         return
 
     def metadata_entry_removed(self, name):

@@ -1,5 +1,7 @@
 from PyQt4 import QtGui, QtCore
 from MyQLine import MyQLine
+from core.MetaEntry import MetaEntry
+from TabMetaEntry import TabMetaEntry
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -40,6 +42,10 @@ class TabMeta(QtGui.QTabWidget):
 
         # spacer
         self.vert_LO_tab_meta.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+    def add_tab_meta_entry(self, meta_entry):
+        new_tab = TabMetaEntry(meta_entry.name, meta_entry.path)
+        self.addTab(new_tab, meta_entry.name)
 
     # TODO
     def connect_widgets(self, controller):
