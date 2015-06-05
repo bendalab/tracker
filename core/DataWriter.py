@@ -67,18 +67,6 @@ class DataWriter(object):
         name = file_name.split('/')[-1].split('.')[0]
         nix_file = nix.File.open(file_name, nix.FileMode.Overwrite)
         block = nix_file.create_block(name, 'nix.tracking')
-        try:
-            meta_odml = odml.tools.xmlparser.load(meta_manager.metadata_path)
-        except:
-            print "could not load meta data template {0}".format(meta_manager.metadata_path)
-            meta_odml = None
-
-        try:
-            video_odml = odml.tools.xmlparser.load(meta_manager.video_meta_path)
-        except Exception as e:
-            print e
-            print "could not load video meta template {0}".format(meta_manager.video_meta_path)
-            video_odml = None
 
         # some metadata
         tracker = nix_file.create_section('Tracker', 'software.tracker')
@@ -96,11 +84,16 @@ class DataWriter(object):
             settings['ROI {0:s} WIDTH'.format(roi.name)] = roi.x2 - roi.x1
             settings['ROI {0:s} HEIGHT'.format(roi.name)] = roi.y2 - roi.y1
 
-        # TODO import template meta data
-        if meta_odml is not None:
-            DataWriter.transfer_data(nix_file, meta_odml, "metadata")
-        if video_odml is not None:
-            DataWriter.transfer_vid_data(nix_file, video_odml, "metadata.video")
+        # write meta data to nix
+        for entry in meta_manager.meta_entries:
+            try:
+                meta_odml = odml.tools.xmlparser.load(entry.path)
+            except Exception as e:
+                print e
+                print "could not read meta file {0:s} from {1:s}".format(entry.name, entry.path)
+                continue
+            section = nix_file.create_section(entry.name, "metadata")
+            DataWriter.save_subsections(section, meta_odml, "metadata")
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
@@ -117,28 +110,7 @@ class DataWriter(object):
         nix_file.close()
 
     @staticmethod
-    def transfer_vid_data(nix_file, video_odml, info_type):
-        odml_video_section = nix_file.create_section("video", info_type)
-        DataWriter.transfer_subsections(odml_video_section, video_odml, info_type)
-
-    @staticmethod
-    def transfer_data(nix_file, template, info_type):
-        for s in template.sections:
-            nix_section = nix_file.create_section(s.name, info_type)
-            print "added section {0}".format(s.name)
-            for p in s.properties:
-                if isinstance(p.value, list):
-                    nix_section[p.name] = str(p.value)
-                elif isinstance(p.value.value, unicode):
-                    nix_section[p.name] = str(p.value.value)
-                elif p.value.value is None:
-                    nix_section[p.name] = ""
-                else:
-                    nix_section[p.name] = p.value.value
-            DataWriter.transfer_subsections(nix_section, s, info_type)
-
-    @staticmethod
-    def transfer_subsections(nix_section, template_section, info_type):
+    def save_subsections(nix_section, template_section, info_type):
         if template_section.sections is not None and len(template_section.sections) > 0:
             for s in template_section.sections:
                 nix_subsection = nix_section.create_section(s.name, info_type)
@@ -151,7 +123,7 @@ class DataWriter(object):
                         nix_subsection[p.name] = ""
                     else:
                         nix_subsection[p.name] = p.value.value
-                DataWriter.transfer_subsections(nix_subsection, s, info_type)
+                DataWriter.save_subsections(nix_subsection, s, info_type)
 
 if __name__ == "__main__":
     from DataManager import DataManager
