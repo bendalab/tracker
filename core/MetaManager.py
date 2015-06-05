@@ -25,7 +25,6 @@ class MetaManager(object):
                     controller.metadata_entry_removed(name)
                 print "removed"
 
-
     def add_cfg_values(self, cfg):
         cfg.add_section('metadata')
         for entry in self._meta_entries:
@@ -43,4 +42,3 @@ class MetaManager(object):
     @property
     def meta_entries(self):
         return self._meta_entries
-
