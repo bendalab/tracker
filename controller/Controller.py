@@ -167,6 +167,9 @@ class Controller(object):
         box.spinBox_roi_x1.setValue(self.tracker.roim.get_roi(roi_name).x1)
         box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
 
+    def metadata_entry_added(self):
+        return
+
     def browse_output_directory(self):
         if self.output_is_input:
             self.ui.tab_file.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
