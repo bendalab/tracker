@@ -167,7 +167,7 @@ class Controller(object):
         box.spinBox_roi_x1.setValue(self.tracker.roim.get_roi(roi_name).x1)
         box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
 
-    def metadata_entry_added(self):
+    def metadata_entry_added(self, meta_entry):
         return
 
     def metadata_entry_removed(self, name):

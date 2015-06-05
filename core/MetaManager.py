@@ -10,9 +10,10 @@ class MetaManager(object):
 
     def add_meta_entry(self, name, path, controller=None):
         if name not in [entry.name for entry in self._meta_entries]:
-            self._meta_entries.append(MetaEntry(name, path))
+            new_meta_entry = MetaEntry(name, path)
+            self._meta_entries.append(new_meta_entry)
             if controller is not None:
-                controller.metadata_entry_added()
+                controller.metadata_entry_added(new_meta_entry)
         else:
             print "name of meta entry must be unique! name already exists!"
 
