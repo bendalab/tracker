@@ -77,8 +77,8 @@ class Controller(object):
         # self.ui.tab_file.cbx_enable_nix_output.setChecked(self.ui.tracker.nix_io)
 
         # meta
-        self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
-        self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
+        # self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
+        # self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
 
         # frame waittime
         self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)

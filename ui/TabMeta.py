@@ -30,9 +30,9 @@ class TabMeta(QtGui.QTabWidget):
 
 
 
-        # # vertLO meta tab
-        # self.vert_LO_tab_meta = QtGui.QVBoxLayout(self)
-        # self.vert_LO_tab_meta.setObjectName(_fromUtf8("vert_LO_tab_meta"))
+        # vertLO meta tab
+        self.vert_LO_tab_meta = QtGui.QVBoxLayout(self)
+        self.vert_LO_tab_meta.setObjectName(_fromUtf8("vert_LO_tab_meta"))
         #
         # # spacer
         # spacer_item = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -113,7 +113,8 @@ class TabMeta(QtGui.QTabWidget):
         return
 
     def retranslate_tab_meta(self):
-        self.lbl_experimenter.setText(_translate(self.name, "Experimenter", None))
-        self.lbl_fish_id.setText(_translate(self.name, "Fish ID", None))
+        # self.lbl_experimenter.setText(_translate(self.name, "Experimenter", None))
+        # self.lbl_fish_id.setText(_translate(self.name, "Fish ID", None))
         # self.lbl_camera_model.setText(_translate(self.name, "Camera Model", None))
         # self.lbl_camera_vendor.setText(_translate(self.name, "Camera Vendor", None))
+        pass
