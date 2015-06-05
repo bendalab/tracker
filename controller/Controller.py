@@ -170,6 +170,9 @@ class Controller(object):
     def metadata_entry_added(self):
         return
 
+    def metadata_entry_removed(self, name):
+        return
+
     def browse_output_directory(self):
         if self.output_is_input:
             self.ui.tab_file.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
