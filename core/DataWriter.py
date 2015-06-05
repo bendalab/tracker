@@ -68,9 +68,9 @@ class DataWriter(object):
         nix_file = nix.File.open(file_name, nix.FileMode.Overwrite)
         block = nix_file.create_block(name, 'nix.tracking')
         try:
-            meta_odml = odml.tools.xmlparser.load(meta_manager.template_path)
+            meta_odml = odml.tools.xmlparser.load(meta_manager.metadata_path)
         except:
-            print "could not load meta data template {0}".format(meta_manager.template_path)
+            print "could not load meta data template {0}".format(meta_manager.metadata_path)
             meta_odml = None
 
         try:
@@ -162,6 +162,6 @@ if __name__ == "__main__":
     mm = MetaManager()
     rm = ROIManager()
     file_name = "test_file_name"
-    mm.template_path = "/home/madai/Tracker/meta_templates/chripChamber_template.xml"
+    mm.metadata_path = "/home/madai/Tracker/meta_templates/chripChamber_template.xml"
 
     DataWriter.write_nix(file_name, None, dm, rm, mm, None)
