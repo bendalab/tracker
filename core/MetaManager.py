@@ -18,13 +18,12 @@ class MetaManager(object):
             print "name of meta entry must be unique! name already exists!"
 
     def remove_meta_entry(self, name, controller=None):
-        print "removing"
-        for i in range(len(self._meta_entries)-1):
+        for i in range(len(self._meta_entries)):
+            print self._meta_entries[i].name
             if name == self._meta_entries[i].name:
                 self._meta_entries.pop(i)
                 if controller is not None:
                     controller.metadata_entry_removed(name)
-                print "removed"
 
     def add_cfg_values(self, cfg):
         cfg.add_section('metadata')
