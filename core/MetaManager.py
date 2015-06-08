@@ -19,11 +19,12 @@ class MetaManager(object):
 
     def remove_meta_entry(self, name, controller=None):
         for i in range(len(self._meta_entries)):
-            print self._meta_entries[i].name
+            # print self._meta_entries[i].name
             if name == self._meta_entries[i].name:
                 self._meta_entries.pop(i)
                 if controller is not None:
                     controller.metadata_entry_removed(name)
+                break
 
     def add_cfg_values(self, cfg):
         cfg.add_section('metadata')
