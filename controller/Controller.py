@@ -201,6 +201,12 @@ class Controller(object):
         template = str(self.ui.tab_meta.ln_edit_remove_template.text())
         self.tracker.mm.remove_meta_entry(template, self)
 
+    def btn_remove_self_clicked(self):
+        for entry in self.ui.tab_meta.meta_entry_tabs:
+            if entry.delete_me:
+                self.tracker.mm.remove_meta_entry(entry.name, self)
+                break
+
     def browse_output_directory(self):
         if self.output_is_input:
             self.ui.tab_file.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
