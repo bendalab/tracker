@@ -116,6 +116,7 @@ class TrackerUserInterface(QtGui.QWidget):
 
     def connect_controller_to_tabs(self):
         self.tab_roi.connect_to_controller(self.controller)
+        self.tab_meta.connect_to_controller(self.controller)
         # TODO connect to other tabs
 
     def retranslate_ui(self, tracker_main_widget):
