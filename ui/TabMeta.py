@@ -23,6 +23,8 @@ class TabMeta(QtGui.QTabWidget):
     def __init__(self):
         super(TabMeta, self).__init__()
 
+        self.controller = None
+
         self.meta_entry_tabs = []
 
         self.name = "tab_meta"
@@ -62,7 +64,7 @@ class TabMeta(QtGui.QTabWidget):
         self.vert_LO_tab_meta.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
     def add_tab_meta_entry(self, meta_entry):
-        new_tab = TabMetaEntry(meta_entry.path, meta_entry.name)
+        new_tab = TabMetaEntry(meta_entry.path, meta_entry.name, self.controller)
         self.meta_entry_tabs.append(new_tab)
         self.addTab(new_tab, meta_entry.name)
 
@@ -77,6 +79,9 @@ class TabMeta(QtGui.QTabWidget):
         for i in range(len(self.meta_entry_tabs)):
             self.removeTab(1)
             self.meta_entry_tabs.pop()
+
+    def connect_to_controller(self, controller):
+        self.controller = controller
 
     def connect_widgets(self, controller):
         self.btn_template_browse.clicked.connect(controller.btn_template_browse_clicked)
