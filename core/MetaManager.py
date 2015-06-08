@@ -5,8 +5,6 @@ from MetaEntry import MetaEntry
 class MetaManager(object):
     def __init__(self):
         self._meta_entries = []
-        # self.add_meta_entry("meta1", "/home/madai/Tracker/meta_templates/chripChamber_template.xml")
-        # self.add_meta_entry("video", "/home/madai/Videos/meta_test/2015-06-05/trial_0000.xml")
 
     def add_meta_entry(self, name, path, controller=None):
         if name not in [entry.name for entry in self._meta_entries]:
