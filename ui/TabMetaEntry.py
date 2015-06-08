@@ -5,8 +5,10 @@ import odml
 # maybe enough to inherit from QTreeView
 #class TabMetaEntry(QtGui.QScrollArea):
 class TabMetaEntry(QtGui.QTreeWidget):
-    def __init__(self, path):
+    def __init__(self, path, name):
         super(TabMetaEntry, self).__init__()
+
+        self.name = name
 
         self.parents = []
         self.setColumnCount(2)

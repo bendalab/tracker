@@ -161,6 +161,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_roi.connect_widgets(self.controller)
         self.tab_adv.connect_widgets(self.controller)
         self.tab_visual.connect_widgets(self.controller)
+        self.tab_meta.connect_widgets(self.controller)
 
         self.btn_start_tracking.clicked.connect(self.controller.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.controller.abort_tracking)

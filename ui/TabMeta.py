@@ -66,6 +66,13 @@ class TabMeta(QtGui.QTabWidget):
         self.meta_entry_tabs.append(new_tab)
         self.addTab(new_tab, meta_entry.name)
 
+    def remove_tab_meta_entry(self, name):
+        for i in range(len(self.meta_entry_tabs)):
+            if self.meta_entry_tabs[i].name == name:
+                self.removeTab(i+1) # +1 because first tab is for importing/deleting
+                self.meta_entry_tabs.pop(i)
+                break
+
     # TODO
     def connect_widgets(self, controller):
         self.btn_template_browse.clicked.connect(controller.btn_template_browse_clicked)

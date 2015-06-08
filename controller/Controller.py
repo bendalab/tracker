@@ -3,6 +3,7 @@ import cv2
 import copy
 import ConfigParser
 import os
+import odml
 
 class Controller(object):
     def __init__(self, ui):
@@ -12,6 +13,9 @@ class Controller(object):
         # self.preset_options()
         self.track_file = ""
         self.last_selected_folder = "/home"
+
+        self.template_file = ""
+        self.last_selected_template_folder = "/home"
 
         self.output_directory = ""
         self.output_is_input = False
@@ -171,8 +175,32 @@ class Controller(object):
         self.ui.tab_meta.add_tab_meta_entry(meta_entry)
         return
 
+    # TODO
     def metadata_entry_removed(self, name):
+        self.ui.tab_meta.remove_tab_meta_entry(name)
         return
+
+    def btn_template_browse_clicked(self):
+        self.template_file = QtGui.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
+        if self.template_file != "":
+            self.last_selected_template_folder = "/".join(str(self.template_file).split("/")[:-1])
+            print self.last_selected_template_folder
+        self.ui.tab_meta.ln_edit_browse_template.setText(self.template_file)
+
+    def btn_template_add_clicked(self):
+        path = self.ui.tab_meta.ln_edit_browse_template.text()
+        name = path.split("/")[-1].split(".")[0]
+        try:
+            odml.tools.xmlparser.load(path)
+        except Exception as e:
+            print "odml error: {0:s}".format(str(e))
+            self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit.text())))
+            return
+        self.tracker.mm.add_meta_entry(name, self.template_file, self)
+
+    def btn_template_remove_clicked(self):
+        template = str(self.ui.tab_meta.ln_edit_remove_template.text())
+        self.tracker.mm.remove_meta_entry(template, self)
 
     def browse_output_directory(self):
         if self.output_is_input:
