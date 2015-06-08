@@ -175,7 +175,6 @@ class Controller(object):
         self.ui.tab_meta.add_tab_meta_entry(meta_entry)
         return
 
-    # TODO
     def metadata_entry_removed(self, name):
         self.ui.tab_meta.remove_tab_meta_entry(name)
         return
@@ -188,7 +187,7 @@ class Controller(object):
         self.ui.tab_meta.ln_edit_browse_template.setText(self.template_file)
 
     def btn_template_add_clicked(self):
-        path = self.ui.tab_meta.ln_edit_browse_template.text()
+        path = str(self.ui.tab_meta.ln_edit_browse_template.text())
         name = path.split("/")[-1].split(".")[0]
         try:
             odml.tools.xmlparser.load(path)
@@ -196,7 +195,7 @@ class Controller(object):
             print "odml error: {0:s}".format(str(e))
             self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit.text())))
             return
-        self.tracker.mm.add_meta_entry(name, self.template_file, self)
+        self.tracker.mm.add_meta_entry(name, path, self)
 
     def btn_template_remove_clicked(self):
         template = str(self.ui.tab_meta.ln_edit_remove_template.text())

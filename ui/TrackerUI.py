@@ -153,6 +153,7 @@ class TrackerUserInterface(QtGui.QWidget):
 
     def set_new_tracker(self, controller):
         self.tab_roi.clear()
+        self.tab_meta.clear_tabs()
         self.tracker = Tracker(controller=controller)
         return
 

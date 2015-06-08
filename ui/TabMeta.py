@@ -73,7 +73,11 @@ class TabMeta(QtGui.QTabWidget):
                 self.meta_entry_tabs.pop(i)
                 break
 
-    # TODO
+    def clear_tabs(self):
+        for i in range(len(self.meta_entry_tabs)):
+            self.removeTab(1)
+            self.meta_entry_tabs.pop()
+
     def connect_widgets(self, controller):
         self.btn_template_browse.clicked.connect(controller.btn_template_browse_clicked)
         self.btn_template_add.clicked.connect(controller.btn_template_add_clicked)
