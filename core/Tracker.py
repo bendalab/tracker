@@ -109,7 +109,7 @@ class Tracker(object):
         if not self.config_file_present:
             return
         # meta manager values
-        # self.mm.import_cfg_values(cfg)
+        self.mm.import_cfg_values(self.read_cfg, self.controller)
 
         # image manager values
         self.im.import_cfg_values(self.read_cfg)
@@ -162,14 +162,6 @@ class Tracker(object):
 
         with open("tracker.cnf", 'w') as cfg_file:
             cfg.write(cfg_file)
-        return
-
-    # def show_imgs(self, roi_bg_sub, mo_roi_bg_sub):
-    #     if self.im.show_bg_sub_img:
-    #         cv2.imshow("bgsub", roi_bg_sub)
-    #     if self.im.show_morphed_img:
-    #         cv2.imshow("morphed_bgsub", mo_roi_bg_sub)
-    #     return
 
     # sets video file to terminal-attribute path to video file
     def set_video_file(self):

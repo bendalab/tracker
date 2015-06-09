@@ -116,6 +116,7 @@ class TrackerUserInterface(QtGui.QWidget):
 
     def connect_controller_to_tabs(self):
         self.tab_roi.connect_to_controller(self.controller)
+        self.tab_meta.connect_to_controller(self.controller)
         # TODO connect to other tabs
 
     def retranslate_ui(self, tracker_main_widget):
@@ -153,6 +154,7 @@ class TrackerUserInterface(QtGui.QWidget):
 
     def set_new_tracker(self, controller):
         self.tab_roi.clear()
+        self.tab_meta.clear_tabs()
         self.tracker = Tracker(controller=controller)
         return
 
@@ -161,6 +163,7 @@ class TrackerUserInterface(QtGui.QWidget):
         self.tab_roi.connect_widgets(self.controller)
         self.tab_adv.connect_widgets(self.controller)
         self.tab_visual.connect_widgets(self.controller)
+        self.tab_meta.connect_widgets(self.controller)
 
         self.btn_start_tracking.clicked.connect(self.controller.start_tracking)
         self.btn_abort_tracking.clicked.connect(self.controller.abort_tracking)

@@ -3,6 +3,7 @@ import cv2
 import copy
 import ConfigParser
 import os
+import odml
 
 class Controller(object):
     def __init__(self, ui):
@@ -12,6 +13,9 @@ class Controller(object):
         # self.preset_options()
         self.track_file = ""
         self.last_selected_folder = "/home"
+
+        self.template_file = ""
+        self.last_selected_template_folder = "/home"
 
         self.output_directory = ""
         self.output_is_input = False
@@ -77,8 +81,8 @@ class Controller(object):
         # self.ui.tab_file.cbx_enable_nix_output.setChecked(self.ui.tracker.nix_io)
 
         # meta
-        self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
-        self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
+        # self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
+        # self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
 
         # frame waittime
         self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
@@ -166,6 +170,42 @@ class Controller(object):
         box.spinBox_roi_y2.setValue(self.tracker.roim.get_roi(roi_name).y2)
         box.spinBox_roi_x1.setValue(self.tracker.roim.get_roi(roi_name).x1)
         box.spinBox_roi_y1.setValue(self.tracker.roim.get_roi(roi_name).y1)
+
+    def metadata_entry_added(self, meta_entry):
+        self.ui.tab_meta.add_tab_meta_entry(meta_entry)
+        return
+
+    def metadata_entry_removed(self, name):
+        self.ui.tab_meta.remove_tab_meta_entry(name)
+        return
+
+    def btn_template_browse_clicked(self):
+        self.template_file = QtGui.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
+        if self.template_file != "":
+            self.last_selected_template_folder = "/".join(str(self.template_file).split("/")[:-1])
+            print self.last_selected_template_folder
+        self.ui.tab_meta.ln_edit_browse_template.setText(self.template_file)
+
+    def btn_template_add_clicked(self):
+        path = str(self.ui.tab_meta.ln_edit_browse_template.text())
+        name = path.split("/")[-1].split(".")[0]
+        try:
+            odml.tools.xmlparser.load(path)
+        except Exception as e:
+            print "odml error: {0:s}".format(str(e))
+            self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit.text())))
+            return
+        self.tracker.mm.add_meta_entry(name, path, self)
+
+    def btn_template_remove_clicked(self):
+        template = str(self.ui.tab_meta.ln_edit_remove_template.text())
+        self.tracker.mm.remove_meta_entry(template, self)
+
+    def btn_remove_self_clicked(self):
+        for entry in self.ui.tab_meta.meta_entry_tabs:
+            if entry.delete_me:
+                self.tracker.mm.remove_meta_entry(entry.name, self)
+                break
 
     def browse_output_directory(self):
         if self.output_is_input:

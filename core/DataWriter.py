@@ -1,6 +1,7 @@
 import collections
 import numpy as np
 import nix
+import odml
 
 
 class DataWriter(object):
@@ -61,7 +62,6 @@ class DataWriter(object):
         if entity is not None and hasattr(entity, "sources"):
             entity.sources.extend(sources)
 
-    # TODO ajdust to rois!!!
     @staticmethod
     def write_nix(file_name, times, data_manager, roi_manager, meta_manager, parameters):
         name = file_name.split('/')[-1].split('.')[0]
@@ -69,10 +69,6 @@ class DataWriter(object):
         block = nix_file.create_block(name, 'nix.tracking')
 
         # some metadata
-        recording = nix_file.create_section('recording', 'recording')
-        recording['Date'] = name.split('_')[0]
-        recording['Experimenter'] = meta_manager.experimenter
-
         tracker = nix_file.create_section('Tracker', 'software.tracker')
         tracker['Version'] = 1.5
         tracker['Source location'] = 'https://github.com/bendalab/tracker'
@@ -88,45 +84,56 @@ class DataWriter(object):
             settings['ROI {0:s} WIDTH'.format(roi.name)] = roi.x2 - roi.x1
             settings['ROI {0:s} HEIGHT'.format(roi.name)] = roi.y2 - roi.y1
 
-        movie = nix_file.create_section('Movie', 'recording.movie')
-        movie['Filename'] = parameters['source file']
-
-        camera = movie.create_section('Camera', 'hardware.camera')
-        # camera['Model'] = 'Guppy F-038B NIR'
-        # camera['Vendor'] = 'Allied Vision Technologies'
-        # camera['Model'] = 'NA'
-        # camera['Vendor'] = 'NA'
-
-        # create sources and link entities to metadata
-        block.metadata = recording
-        movie_source = block.create_source('Original movie', 'nix.source.movie')
-        movie_source.metadata = movie
-        tracking_source = block.create_source('Video tracking', 'nix.source.analysis')
-        tracking_source.metadata = tracker
+        # write meta data to nix
+        for entry in meta_manager.meta_entries:
+            try:
+                meta_odml = odml.tools.xmlparser.load(entry.path)
+            except Exception as e:
+                print e
+                print "could not read meta file {0:s} from {1:s}".format(entry.name, entry.path)
+                continue
+            section = nix_file.create_section(entry.name, "metadata")
+            DataWriter.save_subsections(section, meta_odml, "metadata")
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
-        a = DataWriter.save_trace(time_stamps, data_manager.all_pos_original, block, 'positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, data_manager.estimated_pos_original, block, 'estimated positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block, 'estimated_orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block, 'object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
-        DataWriter.append_sources(a, [movie_source, tracking_source])
-
-        a = DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame, block, 'fish object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
-        DataWriter.append_sources(a, [movie_source, tracking_source])
+        DataWriter.save_trace(time_stamps, data_manager.all_pos_original, block, 'positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
+        DataWriter.save_trace(time_stamps, data_manager.estimated_pos_original, block, 'estimated positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
+        DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
+        DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block, 'estimated_orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
+        DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block, 'object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
+        DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame, block, 'fish object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
 
         for roi in roi_manager.roi_list:
-            a = DataWriter.save_trace(time_stamps, roi.frame_data["{0:s}_mean_colors".format(roi.name)], block, 'ROI {0:s} mean colors'.format(roi.name), 'nix.irregular_sampled', data_label='count', set_labels=['r', 'g', 'b'])
-            DataWriter.append_sources(a, [movie_source, tracking_source])
+            DataWriter.save_trace(time_stamps, roi.frame_data["{0:s}_mean_colors".format(roi.name)], block, 'ROI {0:s} mean colors'.format(roi.name), 'nix.irregular_sampled', data_label='count', set_labels=['r', 'g', 'b'])
 
-        # TODO import of recording metadata from file
         nix_file.close()
+
+    @staticmethod
+    def save_subsections(nix_section, template_section, info_type):
+        if template_section.sections is not None and len(template_section.sections) > 0:
+            for s in template_section.sections:
+                nix_subsection = nix_section.create_section(s.name, info_type)
+                for p in s.properties:
+                    if isinstance(p.value, list):
+                        nix_subsection[p.name] = str(p.value)
+                    elif isinstance(p.value.value, unicode):
+                        nix_subsection[p.name] = str(p.value.value)
+                    elif p.value.value is None:
+                        nix_subsection[p.name] = ""
+                    else:
+                        nix_subsection[p.name] = p.value.value
+                DataWriter.save_subsections(nix_subsection, s, info_type)
+
+if __name__ == "__main__":
+    from DataManager import DataManager
+    from MetaManager import MetaManager
+    from ROIManager import ROIManager
+
+    dm = DataManager()
+    mm = MetaManager()
+    rm = ROIManager()
+    file_name = "test_file_name"
+    mm.metadata_path = "/home/madai/Tracker/meta_templates/chripChamber_template.xml"
+
+    DataWriter.write_nix(file_name, None, dm, rm, mm, None)
