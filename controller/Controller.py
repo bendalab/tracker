@@ -326,13 +326,17 @@ class Controller(object):
             if not os.path.exists(self.output_directory):
                 self.ui.tab_file.lnEdit_output_path.setText(self.ui.tab_file.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
                 return
+        self.ui.btn_abort_tracking.setDisabled(False)
+        self.ui.btn_start_tracking.setDisabled(True)
         self.ui.tracker.run()
         self.ui.set_new_tracker(self)
-        self.ui.controller.preset_options()  # make sure options match tracker-object (esp. nix-output option)
+        self.ui.controller.preset_options()
 
     def abort_tracking(self):
         self.ui.tracker.ui_abort_button_pressed = True
         self.ui.set_new_tracker(self)
+        self.ui.btn_abort_tracking.setDisabled(True)
+        self.ui.btn_start_tracking.setDisabled(False)
 
     @property
     def ui(self):
