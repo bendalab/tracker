@@ -44,7 +44,8 @@ class ROIManager(object):
         for roi in self._roi_list:
             roi.check_and_adjust_values(cap)
 
-        controller.set_all_roi_input_boxes()
+        if controller is not None:
+            controller.set_all_roi_input_boxes()
 
     def add_cfg_values(self, cfg):
         for entry in self._roi_list:
