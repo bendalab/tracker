@@ -199,7 +199,7 @@ class Controller(object):
             odml.tools.xmlparser.load(path)
         except Exception as e:
             print "odml error: {0:s}".format(str(e))
-            self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit.text())))
+            self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit_browse_template.text())))
             return
         self.tracker.mm.add_meta_entry(name, path, self)
 
