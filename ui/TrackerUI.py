@@ -92,6 +92,11 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_start_tracking.setMinimumSize(QtCore.QSize(0, 50))
         self.btn_start_tracking.setObjectName(_fromUtf8("btn_start_tracking"))
         self.hoLO_bot_buttons.addWidget(self.btn_start_tracking)
+        # progress label
+        self.lbl_progress = QtGui.QLabel()
+        self.lbl_progress.setObjectName(_fromUtf8("lbl_progress"))
+        self.lbl_progress.setText("Progress: [not started]")
+        self.hoLO_bot_buttons.addWidget(self.lbl_progress)
         # button abort tracking
         self.btn_abort_tracking = QtGui.QPushButton(self)
         self.btn_abort_tracking.setMinimumSize(QtCore.QSize(0, 50))

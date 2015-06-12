@@ -75,6 +75,11 @@ class Controller(object):
         self.roi_preview_displayed = True
         self.ui.tab_roi.adjust_all_sizes()
 
+    def update_progress(self, cap, frame_counter):
+        max_frames = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
+        progress = "{0:s} %".format(str(frame_counter/max_frames*100)[0:6])
+        self.ui.lbl_progress.setText("Progress: {0:s}".format(progress))
+
     def preset_options(self):
         # video file
         # self.lnEdit_file_path.setText(self.tracker.video_file)
