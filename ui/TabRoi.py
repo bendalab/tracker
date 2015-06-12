@@ -93,6 +93,11 @@ class TabRoi(QtGui.QWidget):
     def connect_to_controller(self, controller):
         self.controller = controller
 
+    def get_roi_input_box(self, name):
+        for r in self.roi_input_boxes:
+            if r.name == name:
+                return r
+
     def add_roi_input_box(self, roi, controller):
         new_box = RoiInputBox(roi)
         self.roi_input_boxes.append(new_box)
