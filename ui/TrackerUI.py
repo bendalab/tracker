@@ -91,11 +91,18 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_start_tracking = QtGui.QPushButton(self)
         self.btn_start_tracking.setMinimumSize(QtCore.QSize(0, 50))
         self.btn_start_tracking.setObjectName(_fromUtf8("btn_start_tracking"))
+        self.btn_start_tracking.setDisabled(False)
         self.hoLO_bot_buttons.addWidget(self.btn_start_tracking)
+        # progress label
+        self.lbl_progress = QtGui.QLabel()
+        self.lbl_progress.setObjectName(_fromUtf8("lbl_progress"))
+        self.lbl_progress.setText("Progress: [not started]")
+        self.hoLO_bot_buttons.addWidget(self.lbl_progress)
         # button abort tracking
         self.btn_abort_tracking = QtGui.QPushButton(self)
         self.btn_abort_tracking.setMinimumSize(QtCore.QSize(0, 50))
         self.btn_abort_tracking.setObjectName(_fromUtf8("btn_abort_tracking"))
+        self.btn_abort_tracking.setDisabled(True)
         self.hoLO_bot_buttons.addWidget(self.btn_abort_tracking)
         # add button layout to main widget layout
         self.vertLO_main.addLayout(self.hoLO_bot_buttons)

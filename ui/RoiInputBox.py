@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+import random
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -21,8 +22,9 @@ class RoiInputBox(QtGui.QWidget):
 
         self.setMinimumHeight(100)
 
-        self.name = "roi_{0:s}".format(roi.name)
+        self.name = roi.name  #"roi_{0:s}".format(roi.name)
         self.roi_name = roi.name
+        self.color = (random.randint(25, 200), random.randint(25, 200), random.randint(25, 200))
 
         self.setObjectName(_fromUtf8(self.name))
 
@@ -31,6 +33,10 @@ class RoiInputBox(QtGui.QWidget):
 
         self.lbl_name = QtGui.QLabel(self)
         self.lbl_name.setObjectName(_fromUtf8("lbl_name"))
+        self.lbl_name.setAutoFillBackground(True)
+        color_string = "rgb({0:s},{1:s},{2:s})".format(str(self.color[0]), str(self.color[1]), str(self.color[2]))
+        print color_string
+        self.lbl_name.setStyleSheet("QLabel {{color: {0:s}; }}".format(color_string))
         self.vertLO_input_box.addWidget(self.lbl_name)
 
         self.gridLO_set_roi = QtGui.QGridLayout()
@@ -94,7 +100,7 @@ class RoiInputBox(QtGui.QWidget):
 
     def retranslate_roi_input_box(self):
         # self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
-        self.lbl_name.setText(_translate("tracker_main_widget", "_".join(self.name.split("_")[1:]), None))
+        self.lbl_name.setText(_translate("tracker_main_widget", self.name, None))
         self.lbl_roi_y_end.setText(_translate("tracker_main_widget", "Y End", None))
         self.lbl_roi_x_end.setText(_translate("tracker_main_widget", "X End", None))
         self.lbl_roi_x_start.setText(_translate("tracker_main_widget", "X Start", None))

@@ -337,6 +337,9 @@ class Tracker(object):
             # if not self.ui_mode_on:
             #     cv2.imshow("contours", roi_img)
 
+            if self.controller is not None:
+                self.controller.update_progress(self.cap, self.dm.frame_counter)
+
             if cv2.waitKey(self.frame_waittime) & 0xFF == 27:
                 break
             if self.ui_abort_button_pressed:
