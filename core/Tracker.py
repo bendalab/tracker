@@ -363,7 +363,7 @@ class Tracker(object):
 
         
     def run(self):
-        self.set_video_file()
+        # self.set_video_file()
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
@@ -461,15 +461,14 @@ class Tracker(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
-    parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
-    parser.add_argument('-n', '--nix_output', type=bool, default=False,
-                        help="output tracking results to nix file")
-    parser.add_argument('-w', '--wait_time', type=int, default=50,
-                        help="display time of wach frame in ms.")
-    
+    parser.add_argument('paths', type=str, nargs="*", help="absolute file paths to video including file name and file extension")
+    parser.add_argument('-w', '--wait_time', type=int, default=1,
+                        help="display time of watch frame in ms.")
+
     args = parser.parse_args()
-    if not os.path.exists(args.path):
-        print('File does not exist!')
-        exit()
-    tr = Tracker(args.path, args.nix_output, args.wait_time)
-    tr.run()
+    for path in args.paths:
+        if not os.path.exists(path):
+            print('File does not exist!')
+            continue
+        tr = Tracker(path=path, wait_time=args.wait_time)
+        tr.run()
