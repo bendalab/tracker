@@ -15,6 +15,7 @@ class Controller(object):
         # self.preset_options()
         self.track_file = ""
         self.track_directory = ""
+        self.batch_files = []
         self.last_selected_folder = "/home"
 
         self.template_file = ""
@@ -77,7 +78,7 @@ class Controller(object):
         file_dialog = QtGui.QFileDialog()
         file_dialog.setFileMode(QtGui.QFileDialog.Directory)
         if file_dialog.exec_():
-            self.track_directory = file_dialog.selectedFiles()[0]
+            self.track_directory = str(file_dialog.selectedFiles()[0])
         if self.track_directory == "":
             return
         self.ui.tab_file.lnEdit_file_path.setText(self.track_directory)
@@ -351,6 +352,12 @@ class Controller(object):
         self.ui.tracker.mm.fish_id = value
 
     def start_tracking(self):
+        if not self.ui.batch_tracking_enabled:
+            self.single_tracking()
+        else:
+            self.batch_tracking()
+
+    def single_tracking(self):
         self.set_tracker_video_file()
         self.set_output_directory()
         if self.track_file == "":
@@ -369,9 +376,41 @@ class Controller(object):
                 return
         self.ui.btn_abort_tracking.setDisabled(False)
         self.ui.btn_start_tracking.setDisabled(True)
+        self.ui.btn_to_batch.setDisabled(True)
         self.ui.tracker.run()
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
+        self.ui.btn_to_batch.setDisabled(False)
+
+    # TODO recursively get files with fitting suffix from track directory
+    def set_batch_files(self, path):
+        suffix = ".".join(["", str(self.ui.tab_file.lnEdit_file_suffix.text()).split(".")[-1]])
+        path_content = os.listdir(path)
+        path_files = ["/".join([path, ff]) for ff in [f for f in path_content if os.path.isfile("/".join([path, f]))] if ff[-len(suffix):] == suffix]
+        path_directories = ["/".join([path, d]) for d in path_content if not os.path.isfile("/".join([path, d]))]
+        print path_content
+        print path_files
+        print path_directories
+        print "batcha  batcha  batcha  fiiiiiiiiles"
+
+    # TODO track all files in batch_files
+    def batch_tracking(self):
+        if self.track_directory == "":
+            self.ui.tab_file.lnEdit_file_path.setText("--- NO DIRECTORY SELECTED ---")
+            return
+        if not self.output_is_input:
+            if self.output_directory == "":
+                self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
+                return
+        if not os.path.exists(self.track_directory):
+            self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+            return
+
+        self.ui.tab_file.btn_to_single.setEnabled(False)
+
+        self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
+
+        print "HONEY BATCHER"
 
     def abort_tracking(self):
         self.ui.tracker.ui_abort_button_pressed = True
