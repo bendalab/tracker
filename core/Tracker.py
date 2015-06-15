@@ -55,6 +55,7 @@ class Tracker(object):
         self.controller = controller
         if controller is not None:
             self.controller.connect_to_tracker(self)
+            self.ui_mode_on = True
 
         # image morphing data
         self._erosion_iterations = 1
@@ -96,13 +97,21 @@ class Tracker(object):
     def init_read_cfg(self):
         self.read_cfg = ConfigParser.ConfigParser()
 
-        if not os.path.exists('tracker.cnf'):
+        if self.ui_mode_on:
+            cfg_path = "tracker.cnf"
+        else:
+            cfg_path = "../tracker.cnf"
+
+        if not os.path.exists(cfg_path):
             print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
             self.config_file_present = False
             print "set to false"
             return
 
-        cfg_file = open('tracker.cnf')
+        if self.ui_mode_on:
+            cfg_file = open('tracker.cnf')
+        else:
+            cfg_file = open('../tracker.cnf')
         self.read_cfg.readfp(cfg_file)
 
     def import_config_values(self):
