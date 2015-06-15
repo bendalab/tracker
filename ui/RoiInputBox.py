@@ -35,7 +35,6 @@ class RoiInputBox(QtGui.QWidget):
         self.lbl_name.setObjectName(_fromUtf8("lbl_name"))
         self.lbl_name.setAutoFillBackground(True)
         color_string = "rgb({0:s},{1:s},{2:s})".format(str(self.color[0]), str(self.color[1]), str(self.color[2]))
-        print color_string
         self.lbl_name.setStyleSheet("QLabel {{color: {0:s}; }}".format(color_string))
         self.vertLO_input_box.addWidget(self.lbl_name)
 
