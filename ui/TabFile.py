@@ -98,7 +98,6 @@ class TabFile(QtGui.QWidget):
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
 
         self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), controller.change_output_is_input)
-        return
 
     def retranslate_tab_file(self):
         self.btn_to_batch.setText(_translate(self.name, "Switch to Batch Tracking", None))
