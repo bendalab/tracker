@@ -4,6 +4,8 @@ import copy
 import ConfigParser
 import os
 import odml
+from ui.TabFileBatch import TabFileBatch
+from ui.TabFile import TabFile
 
 class Controller(object):
     def __init__(self, ui):
@@ -31,9 +33,22 @@ class Controller(object):
         self.tracker = tracker
 
     def btn_to_batch_clicked(self):
-        print "yyyeeeeeehaaaaawwwww"
+        batch_tab = TabFileBatch()
+        batch_tab.retranslate_tab_file_batch()
+        batch_tab.connect_widgets(self)
+
+        self.ui.tab_widget_options.removeTab(0)
+        self.ui.tab_widget_options.insertTab(0, batch_tab, "File")
+        self.ui.tab_widget_options.setCurrentWidget(batch_tab)
 
     def btn_to_single_clicked(self):
+        file_tab = TabFile()
+        file_tab.retranslate_tab_file()
+        file_tab.connect_widgets(self)
+
+        self.ui.tab_widget_options.removeTab(0)
+        self.ui.tab_widget_options.insertTab(0, file_tab, "File")
+        self.ui.tab_widget_options.setCurrentWidget(file_tab)
         return
 
     def browse_file(self):
