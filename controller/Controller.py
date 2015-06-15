@@ -41,6 +41,8 @@ class Controller(object):
         self.ui.tab_widget_options.insertTab(0, batch_tab, "File")
         self.ui.tab_widget_options.setCurrentWidget(batch_tab)
 
+        self.ui.batch_tracking_enabled = True
+
     def btn_to_single_clicked(self):
         file_tab = TabFile()
         file_tab.retranslate_tab_file()
@@ -49,7 +51,8 @@ class Controller(object):
         self.ui.tab_widget_options.removeTab(0)
         self.ui.tab_widget_options.insertTab(0, file_tab, "File")
         self.ui.tab_widget_options.setCurrentWidget(file_tab)
-        return
+
+        self.ui.batch_tracking_enabled = False
 
     def browse_file(self):
         self.roi_preview_displayed = False
