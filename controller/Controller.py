@@ -30,6 +30,12 @@ class Controller(object):
     def connect_to_tracker(self, tracker):
         self.tracker = tracker
 
+    def btn_to_batch_clicked(self):
+        print "yyyeeeeeehaaaaawwwww"
+
+    def btn_to_single_clicked(self):
+        return
+
     def browse_file(self):
         self.roi_preview_displayed = False
 
