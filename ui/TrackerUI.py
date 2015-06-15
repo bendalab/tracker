@@ -36,6 +36,8 @@ class TrackerUserInterface(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
+        self.batch_tracking_enabled = False
+
         #main widget
         self.setObjectName(_fromUtf8("self"))
         self.resize(1000, 835)
