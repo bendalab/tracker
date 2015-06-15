@@ -29,6 +29,11 @@ class TabFile(QtGui.QWidget):
         self.vertLO_tab_file = QtGui.QVBoxLayout(self)
         self.vertLO_tab_file.setObjectName(_fromUtf8("vertLO_tab_file"))
 
+        # change to batch button
+        self.btn_to_batch = QtGui.QPushButton()
+        self.btn_to_batch.setObjectName("btn_to_batch")
+        self.vertLO_tab_file.addWidget(self.btn_to_batch)
+
         # spacer
         spacer_item = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_file.addItem(spacer_item)
