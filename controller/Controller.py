@@ -14,6 +14,7 @@ class Controller(object):
 
         # self.preset_options()
         self.track_file = ""
+        self.track_directory = ""
         self.last_selected_folder = "/home"
 
         self.template_file = ""
@@ -41,6 +42,8 @@ class Controller(object):
         self.ui.tab_widget_options.insertTab(0, batch_tab, "File")
         self.ui.tab_widget_options.setCurrentWidget(batch_tab)
 
+        self.ui.tab_file = batch_tab
+
         self.ui.batch_tracking_enabled = True
 
     def btn_to_single_clicked(self):
@@ -51,6 +54,8 @@ class Controller(object):
         self.ui.tab_widget_options.removeTab(0)
         self.ui.tab_widget_options.insertTab(0, file_tab, "File")
         self.ui.tab_widget_options.setCurrentWidget(file_tab)
+
+        self.ui.tab_file = file_tab
 
         self.ui.batch_tracking_enabled = False
 
@@ -65,6 +70,18 @@ class Controller(object):
         self.set_first_frame_numpy()
         self.display_roi_preview()
         # self.display_starting_area_preview()
+
+    def btn_browse_directory_clicked(self):
+        self.roi_preview_displayed = False
+
+        file_dialog = QtGui.QFileDialog()
+        file_dialog.setFileMode(QtGui.QFileDialog.Directory)
+        if file_dialog.exec_():
+            self.track_directory = file_dialog.selectedFiles()[0]
+        if self.track_directory == "":
+            return
+        self.ui.tab_file.lnEdit_file_path.setText(self.track_directory)
+
 
     def set_first_frame_numpy(self):
         cap = cv2.VideoCapture(str(self.track_file))
