@@ -86,18 +86,7 @@ class Controller(object):
         self.ui.tab_file.lnEdit_file_path.setText(self.track_directory)
 
     def btn_set_roi_preview_clicked(self):
-        if self.track_directory == "":
-            self.ui.tab_file.lnEdit_file_path.setText("--- NO DIRECTORY SELECTED ---")
-            return
-        if not self.output_is_input:
-            if self.output_directory == "":
-                self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
-                return
-        if str(self.ui.tab_file.lnEdit_file_suffix.text()) == "":
-            self.ui.tab_file.lnEdit_file_suffix.setText("--- NO SUFFIXES ENTERED ---")
-            return
-        if not os.path.exists(self.track_directory):
-            self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+        if not self.check_if_batch_info_entered():
             return
 
         self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
@@ -438,20 +427,26 @@ class Controller(object):
             path = path_directories.pop()
             self.get_files_from_path_and_subdirs(path, suffixes, suffix_lengths)
 
-    # TODO track all files in batch_files
-    def batch_tracking(self):
+    def check_if_batch_info_entered(self):
         if self.track_directory == "":
             self.ui.tab_file.lnEdit_file_path.setText("--- NO DIRECTORY SELECTED ---")
-            return
+            return False
         if not self.output_is_input:
             if self.output_directory == "":
                 self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
-                return
+                return False
         if str(self.ui.tab_file.lnEdit_file_suffix.text()) == "":
             self.ui.tab_file.lnEdit_file_suffix.setText("--- NO SUFFIXES ENTERED ---")
-            return
+            return False
         if not os.path.exists(self.track_directory):
             self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+            return False
+
+        return True
+
+    # TODO track all files in batch_files
+    def batch_tracking(self):
+        if not self.check_if_batch_info_entered():
             return
 
         self.ui.tab_file.btn_to_single.setEnabled(False)
