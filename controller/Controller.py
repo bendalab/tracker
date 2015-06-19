@@ -17,6 +17,7 @@ class Controller(object):
         self.track_directory = ""
         self.batch_files = []
         self.last_selected_folder = "/home"
+        self.abort_batch_tracking = False
 
         self.template_file = ""
         self.last_selected_template_folder = "/home"
@@ -381,6 +382,8 @@ class Controller(object):
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
         self.ui.btn_to_batch.setDisabled(False)
+        self.ui.btn_abort_tracking.setDisabled(True)
+        self.ui.btn_start_tracking.setDisabled(False)
 
     # TODO recursively get files with fitting suffix from track directory
     def set_batch_files(self, path):
@@ -427,11 +430,32 @@ class Controller(object):
 
         self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
 
-    def abort_tracking(self):
-        self.ui.tracker.ui_abort_button_pressed = True
-        self.ui.set_new_tracker(self)
+        self.ui.btn_abort_tracking.setDisabled(False)
+        self.ui.btn_start_tracking.setDisabled(True)
+
+        while not self.abort_batch_tracking and not (self.batch_files is None or len(self.batch_files) == 0):
+            self.tracker.video_file = self.batch_files.pop(0)
+            self.set_output_directory()
+            self.ui.tracker.run()
+            self.ui.set_new_tracker(self)
+            self.ui.controller.preset_options()
+
+        self.abort_batch_tracking = False
+
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
+
+
+    def abort_tracking(self):
+        if self.ui.batch_tracking_enabled:
+            self.abort_batch_tracking = True
+        self.ui.tracker.ui_abort_button_pressed = True
+        self.ui.set_new_tracker(self)
+        self.ui.controller.preset_options()
+        self.ui.btn_abort_tracking.setDisabled(True)
+        self.ui.btn_start_tracking.setDisabled(False)
+
+
 
     @property
     def ui(self):
