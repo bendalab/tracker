@@ -164,7 +164,10 @@ class TrackerUserInterface(QtGui.QWidget):
     def set_new_tracker(self, controller):
         self.tab_roi.clear()
         self.tab_meta.clear_tabs()
-        self.tracker = Tracker(controller=controller)
+        if self.batch_tracking_enabled:
+            self.tracker = Tracker(controller=controller, batch_mode_on=True)
+        else:
+            self.tracker = Tracker(controller=controller)
         return
 
     def connect_widgets(self):
