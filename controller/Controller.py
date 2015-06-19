@@ -46,6 +46,7 @@ class Controller(object):
 
         self.ui.tab_file = batch_tab
 
+        self.remove_all_meta_entries()
         self.ui.batch_tracking_enabled = True
 
     def btn_to_single_clicked(self):
@@ -84,9 +85,32 @@ class Controller(object):
             return
         self.ui.tab_file.lnEdit_file_path.setText(self.track_directory)
 
+    def btn_set_roi_preview_clicked(self):
+        if self.track_directory == "":
+            self.ui.tab_file.lnEdit_file_path.setText("--- NO DIRECTORY SELECTED ---")
+            return
+        if not self.output_is_input:
+            if self.output_directory == "":
+                self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
+                return
+        if str(self.ui.tab_file.lnEdit_file_suffix.text()) == "":
+            self.ui.tab_file.lnEdit_file_suffix.setText("--- NO SUFFIXES ENTERED ---")
+            return
+        if not os.path.exists(self.track_directory):
+            self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+            return
+
+        self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
+        self.set_first_frame_numpy()
+        self.display_roi_preview()
 
     def set_first_frame_numpy(self):
-        cap = cv2.VideoCapture(str(self.track_file))
+        if not self.ui.batch_tracking_enabled:
+            cap = cv2.VideoCapture(str(self.track_file))
+        else:
+            if self.batch_files is None or len(self.batch_files) == 0:
+                return
+            cap = cv2.VideoCapture(str(self.batch_files[0]))
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -100,6 +124,8 @@ class Controller(object):
 
     def display_roi_preview(self):
         if not self.preview_is_set:
+            return
+        if self.first_frame_numpy is None:
             return
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
         for roi in self.tracker.roim.roi_list:
@@ -232,7 +258,7 @@ class Controller(object):
         self.template_file = QtGui.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
         if self.template_file != "":
             self.last_selected_template_folder = "/".join(str(self.template_file).split("/")[:-1])
-            print self.last_selected_template_folder
+            # print self.last_selected_template_folder
         self.ui.tab_meta.ln_edit_browse_template.setText(self.template_file)
 
     def btn_template_add_clicked(self):
@@ -255,6 +281,10 @@ class Controller(object):
             if entry.delete_me:
                 self.tracker.mm.remove_meta_entry(entry.name, self)
                 break
+
+    def remove_all_meta_entries(self):
+        for i in range(len(self.ui.tab_meta.meta_entry_tabs)):
+            self.tracker.mm.remove_meta_entry(self.ui.tab_meta.meta_entry_tabs[0].name, self)
 
     def browse_output_directory(self):
         if self.output_is_input:
@@ -397,8 +427,6 @@ class Controller(object):
         suffix_lengths = [len(s) for s in suffixes]
         self.get_files_from_path_and_subdirs(path, suffixes, suffix_lengths)
 
-        print self.batch_files
-
     def get_files_from_path_and_subdirs(self, path, suffixes, suffix_lengths):
         path_content = os.listdir(path)
         for l in suffix_lengths:
@@ -442,9 +470,10 @@ class Controller(object):
 
         self.abort_batch_tracking = False
 
+        self.ui.tab_file.btn_to_single.setEnabled(True)
+
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
-
 
     def abort_tracking(self):
         if self.ui.batch_tracking_enabled:
