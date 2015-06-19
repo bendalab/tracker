@@ -29,6 +29,11 @@ class TabFile(QtGui.QWidget):
         self.vertLO_tab_file = QtGui.QVBoxLayout(self)
         self.vertLO_tab_file.setObjectName(_fromUtf8("vertLO_tab_file"))
 
+        # change to batch button
+        self.btn_to_batch = QtGui.QPushButton()
+        self.btn_to_batch.setObjectName("btn_to_batch")
+        self.vertLO_tab_file.addWidget(self.btn_to_batch)
+
         # spacer
         spacer_item = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_file.addItem(spacer_item)
@@ -88,13 +93,14 @@ class TabFile(QtGui.QWidget):
         # self.tab_widget_options.addTab(self, _fromUtf8(""))
 
     def connect_widgets(self, controller):
+        self.btn_to_batch.clicked.connect(controller.btn_to_batch_clicked)
         self.btn_browse_file.clicked.connect(controller.browse_file)
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
 
         self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), controller.change_output_is_input)
-        return
 
     def retranslate_tab_file(self):
+        self.btn_to_batch.setText(_translate(self.name, "Switch to Batch Tracking", None))
         self.lbl_file_path.setText(_translate(self.name, "File Path", None))
         self.cbx_output_is_input.setText(_translate(self.name, "Save in Input Directory", None))
         self.btn_browse_file.setText(_translate(self.name, "Browse File", None))

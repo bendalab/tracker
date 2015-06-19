@@ -26,9 +26,10 @@ except ImportError as e:
     quit()
 
 class Tracker(object):
-    def __init__(self, path=None, wait_time=50, controller=None):
+    def __init__(self, path=None, wait_time=50, controller=None, batch_mode_on=False):
         # program data
         self.ui_mode_on = False
+        self.batch_mode_on = batch_mode_on
         self.ui_abort_button_pressed = False
         
         if path is not None:
@@ -36,11 +37,6 @@ class Tracker(object):
 
         self.output_directory = ""
         self.output_path_isset = False
-
-        self.read_cfg = None
-        self.config_file_present = True
-        self.init_read_cfg()
-        self.write_cfg = ConfigParser.SafeConfigParser()
         
         self.cap = None
 
@@ -55,6 +51,12 @@ class Tracker(object):
         self.controller = controller
         if controller is not None:
             self.controller.connect_to_tracker(self)
+            self.ui_mode_on = True
+
+        self.read_cfg = None
+        self.config_file_present = True
+        self.init_read_cfg()
+        self.write_cfg = ConfigParser.SafeConfigParser()
 
         # image morphing data
         self._erosion_iterations = 1
@@ -96,20 +98,30 @@ class Tracker(object):
     def init_read_cfg(self):
         self.read_cfg = ConfigParser.ConfigParser()
 
-        if not os.path.exists('tracker.cnf'):
+        if self.ui_mode_on:
+            cfg_path = "tracker.cnf"
+        else:
+            cfg_path = "../tracker.cnf"
+
+        if not os.path.exists(cfg_path):
             print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
             self.config_file_present = False
             print "set to false"
             return
 
-        cfg_file = open('tracker.cnf')
+        if self.ui_mode_on:
+            cfg_file = open('tracker.cnf')
+        else:
+            cfg_file = open('../tracker.cnf')
         self.read_cfg.readfp(cfg_file)
 
     def import_config_values(self):
         if not self.config_file_present:
             return
+
         # meta manager values
-        self.mm.import_cfg_values(self.read_cfg, self.controller)
+        if not self.batch_mode_on:
+            self.mm.import_cfg_values(self.read_cfg, self.controller)
 
         # image manager values
         self.im.import_cfg_values(self.read_cfg)
@@ -363,7 +375,7 @@ class Tracker(object):
 
         
     def run(self):
-        self.set_video_file()
+        # self.set_video_file()
         self.check_if_necessary_files_exist()
         self.set_video_capture()
 
@@ -385,6 +397,7 @@ class Tracker(object):
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
         output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
 
+        # TODO add video size
         params = {}
         params['source file'] = self.video_file
         params['fish_min_size'] = self._fish_size_threshold
@@ -461,15 +474,14 @@ class Tracker(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='tracking fish in video file')
-    parser.add_argument('path', type=str, help="absolute file path to video including file name and file extension")
-    parser.add_argument('-n', '--nix_output', type=bool, default=False,
-                        help="output tracking results to nix file")
-    parser.add_argument('-w', '--wait_time', type=int, default=50,
-                        help="display time of wach frame in ms.")
-    
+    parser.add_argument('paths', type=str, nargs="*", help="absolute file paths to video including file name and file extension")
+    parser.add_argument('-w', '--wait_time', type=int, default=1,
+                        help="display time of watch frame in ms.")
+
     args = parser.parse_args()
-    if not os.path.exists(args.path):
-        print('File does not exist!')
-        exit()
-    tr = Tracker(args.path, args.nix_output, args.wait_time)
-    tr.run()
+    for path in args.paths:
+        if not os.path.exists(path):
+            print('File does not exist!')
+            continue
+        tr = Tracker(path=path, wait_time=args.wait_time)
+        tr.run()

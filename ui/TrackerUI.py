@@ -36,6 +36,8 @@ class TrackerUserInterface(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
+        self.batch_tracking_enabled = False
+
         #main widget
         self.setObjectName(_fromUtf8("self"))
         self.resize(1000, 835)
@@ -93,11 +95,19 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_start_tracking.setObjectName(_fromUtf8("btn_start_tracking"))
         self.btn_start_tracking.setDisabled(False)
         self.hoLO_bot_buttons.addWidget(self.btn_start_tracking)
+        # vertical layout file label and progress label
+        self.vert_lo_file_progress = QtGui.QVBoxLayout()
+        # file bel
+        self.lbl_file = QtGui.QLabel()
+        self.lbl_file.setObjectName(_fromUtf8("lbl_file"))
+        self.lbl_file.setText(_fromUtf8("no file started"))
+        self.vert_lo_file_progress.addWidget(self.lbl_file)
         # progress label
         self.lbl_progress = QtGui.QLabel()
         self.lbl_progress.setObjectName(_fromUtf8("lbl_progress"))
-        self.lbl_progress.setText("Progress: [not started]")
-        self.hoLO_bot_buttons.addWidget(self.lbl_progress)
+        self.lbl_progress.setText(_fromUtf8("Progress:"))
+        self.vert_lo_file_progress.addWidget(self.lbl_progress)
+        self.hoLO_bot_buttons.addLayout(self.vert_lo_file_progress)
         # button abort tracking
         self.btn_abort_tracking = QtGui.QPushButton(self)
         self.btn_abort_tracking.setMinimumSize(QtCore.QSize(0, 50))
@@ -162,7 +172,10 @@ class TrackerUserInterface(QtGui.QWidget):
     def set_new_tracker(self, controller):
         self.tab_roi.clear()
         self.tab_meta.clear_tabs()
-        self.tracker = Tracker(controller=controller)
+        if self.batch_tracking_enabled:
+            self.tracker = Tracker(controller=controller, batch_mode_on=True)
+        else:
+            self.tracker = Tracker(controller=controller)
         return
 
     def connect_widgets(self):

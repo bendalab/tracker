@@ -4,6 +4,8 @@ import copy
 import ConfigParser
 import os
 import odml
+from ui.TabFileBatch import TabFileBatch
+from ui.TabFile import TabFile
 
 class Controller(object):
     def __init__(self, ui):
@@ -12,7 +14,10 @@ class Controller(object):
 
         # self.preset_options()
         self.track_file = ""
+        self.track_directory = ""
+        self.batch_files = []
         self.last_selected_folder = "/home"
+        self.abort_batch_tracking = False
 
         self.template_file = ""
         self.last_selected_template_folder = "/home"
@@ -30,6 +35,35 @@ class Controller(object):
     def connect_to_tracker(self, tracker):
         self.tracker = tracker
 
+    def btn_to_batch_clicked(self):
+        batch_tab = TabFileBatch()
+        batch_tab.retranslate_tab_file_batch()
+        batch_tab.connect_widgets(self)
+
+        self.ui.tab_widget_options.removeTab(0)
+        self.ui.tab_widget_options.insertTab(0, batch_tab, "File")
+        self.ui.tab_widget_options.setCurrentWidget(batch_tab)
+
+        self.ui.tab_file = batch_tab
+
+        self.remove_all_meta_entries()
+        self.ui.batch_tracking_enabled = True
+        self.tracker.batch_mode_on = True
+
+    def btn_to_single_clicked(self):
+        file_tab = TabFile()
+        file_tab.retranslate_tab_file()
+        file_tab.connect_widgets(self)
+
+        self.ui.tab_widget_options.removeTab(0)
+        self.ui.tab_widget_options.insertTab(0, file_tab, "File")
+        self.ui.tab_widget_options.setCurrentWidget(file_tab)
+
+        self.ui.tab_file = file_tab
+
+        self.ui.batch_tracking_enabled = False
+        self.tracker.batch_mode_on = False
+
     def browse_file(self):
         self.roi_preview_displayed = False
 
@@ -42,8 +76,32 @@ class Controller(object):
         self.display_roi_preview()
         # self.display_starting_area_preview()
 
+    def btn_browse_directory_clicked(self):
+        self.roi_preview_displayed = False
+
+        file_dialog = QtGui.QFileDialog()
+        file_dialog.setFileMode(QtGui.QFileDialog.Directory)
+        if file_dialog.exec_():
+            self.track_directory = str(file_dialog.selectedFiles()[0])
+        if self.track_directory == "":
+            return
+        self.ui.tab_file.lnEdit_file_path.setText(self.track_directory)
+
+    def btn_set_roi_preview_clicked(self):
+        if not self.check_if_batch_info_entered():
+            return
+
+        self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
+        self.set_first_frame_numpy()
+        self.display_roi_preview()
+
     def set_first_frame_numpy(self):
-        cap = cv2.VideoCapture(str(self.track_file))
+        if not self.ui.batch_tracking_enabled:
+            cap = cv2.VideoCapture(str(self.track_file))
+        else:
+            if self.batch_files is None or len(self.batch_files) == 0:
+                return
+            cap = cv2.VideoCapture(str(self.batch_files[0]))
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -57,6 +115,8 @@ class Controller(object):
 
     def display_roi_preview(self):
         if not self.preview_is_set:
+            return
+        if self.first_frame_numpy is None:
             return
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
         for roi in self.tracker.roim.roi_list:
@@ -189,7 +249,7 @@ class Controller(object):
         self.template_file = QtGui.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
         if self.template_file != "":
             self.last_selected_template_folder = "/".join(str(self.template_file).split("/")[:-1])
-            print self.last_selected_template_folder
+            # print self.last_selected_template_folder
         self.ui.tab_meta.ln_edit_browse_template.setText(self.template_file)
 
     def btn_template_add_clicked(self):
@@ -199,7 +259,7 @@ class Controller(object):
             odml.tools.xmlparser.load(path)
         except Exception as e:
             print "odml error: {0:s}".format(str(e))
-            self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit.text())))
+            self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit_browse_template.text())))
             return
         self.tracker.mm.add_meta_entry(name, path, self)
 
@@ -212,6 +272,35 @@ class Controller(object):
             if entry.delete_me:
                 self.tracker.mm.remove_meta_entry(entry.name, self)
                 break
+
+    def remove_all_meta_entries(self):
+        """
+        Removes all metadata entries from the Tracker
+        """
+        for i in range(len(self.ui.tab_meta.meta_entry_tabs)):
+            self.tracker.mm.remove_meta_entry(self.ui.tab_meta.meta_entry_tabs[0].name, self)
+
+    def add_metadata_templates_dynamic(self, path):
+        """
+        Adds all properly formatted xml-odml files as metadata to the Tracker
+        ONLY IF the file name of given path is part of the xml-odml-file.
+        :param path: Path to file to which metadata is supposed to belong
+        """
+        file_name = path.split("/")[-1].split(".")[0]
+        file_directory = "/".join(path.split("/")[:-1])
+        files_in_path = ["/".join([file_directory, f]) for f in os.listdir(file_directory)]
+        for f in files_in_path:
+            if not file_name in f or f[-1] == "~":
+                continue
+            try:
+                odml.tools.xmlparser.load(f)
+            except:
+                continue
+            try:
+                self.tracker.mm.add_meta_entry(f.split("/")[-1], f, self)
+            except Exception as e:
+                print "ODML ERROR while importing from file {0:s}".format(f)
+                print "ERROR MESSAGE: {0:s}".format(e)
 
     def browse_output_directory(self):
         if self.output_is_input:
@@ -249,6 +338,10 @@ class Controller(object):
             self.ui.tracker.unset_output_path()
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
+
+    # def cbx_add_metadata_changed(self):
+    #     checked = self.ui.tab_file.cbx_add_metadata.isChecked()
+    #     print checked
 
     def change_roi_values(self):
         for box in self.ui.tab_roi.roi_input_boxes:
@@ -310,6 +403,12 @@ class Controller(object):
         self.ui.tracker.mm.fish_id = value
 
     def start_tracking(self):
+        if not self.ui.batch_tracking_enabled:
+            self.single_tracking()
+        else:
+            self.batch_tracking()
+
+    def single_tracking(self):
         self.set_tracker_video_file()
         self.set_output_directory()
         if self.track_file == "":
@@ -326,17 +425,107 @@ class Controller(object):
             if not os.path.exists(self.output_directory):
                 self.ui.tab_file.lnEdit_output_path.setText(self.ui.tab_file.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
                 return
+
+        self.ui.lbl_file.setText(self.track_file.split("/")[-1])
+
         self.ui.btn_abort_tracking.setDisabled(False)
         self.ui.btn_start_tracking.setDisabled(True)
-        self.ui.tracker.run()
+        self.ui.tab_file.btn_to_batch.setDisabled(True)
+        try:
+            self.ui.tracker.run()
+        except Exception as e:
+            print "ERROR WHILE TRACKING in file: {0:s}".format(self.track_file)
+            print "ERROR MESSAGE: {0:s}".format(e)
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
-
-    def abort_tracking(self):
-        self.ui.tracker.ui_abort_button_pressed = True
-        self.ui.set_new_tracker(self)
+        self.ui.tab_file.btn_to_batch.setDisabled(False)
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
+
+    # TODO recursively get files with fitting suffix from track directory
+    def set_batch_files(self, path):
+        self.batch_files = []
+
+        # get entered suffixes and convert them to text only (no dots, no spaces)
+        suffix_list = [suffix.replace(".", "").replace(" ", "") for suffix in str(self.ui.tab_file.lnEdit_file_suffix.text()).split(",")]
+        # add a dot to suffixes
+        suffixes = [".".join(["", suffix]) for suffix in suffix_list]
+        # save length of suffixes (may vary, i.e. "avi" "mpeg")
+        suffix_lengths = [len(s) for s in suffixes]
+        self.get_files_from_path_and_subdirs(path, suffixes, suffix_lengths)
+
+    def get_files_from_path_and_subdirs(self, path, suffixes, suffix_lengths):
+        path_content = os.listdir(path)
+        for l in suffix_lengths:
+            files = ["/".join([path, ff]) for ff in [f for f in path_content if os.path.isfile("/".join([path, f]))] if ff[-l:] in suffixes]
+            self.batch_files += files
+
+        path_directories = ["/".join([path, d]) for d in path_content if not os.path.isfile("/".join([path, d]))]
+        while path_directories is not None and len(path_directories) != 0:
+            path = path_directories.pop()
+            self.get_files_from_path_and_subdirs(path, suffixes, suffix_lengths)
+
+    def check_if_batch_info_entered(self):
+        if self.track_directory == "":
+            self.ui.tab_file.lnEdit_file_path.setText("--- NO DIRECTORY SELECTED ---")
+            return False
+        if not self.output_is_input:
+            if self.output_directory == "":
+                self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
+                return False
+        if str(self.ui.tab_file.lnEdit_file_suffix.text()) == "":
+            self.ui.tab_file.lnEdit_file_suffix.setText("--- NO SUFFIXES ENTERED ---")
+            return False
+        if not os.path.exists(self.track_directory):
+            self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- DIRECTORY DOES NOT EXIST")
+            return False
+
+        return True
+
+    def batch_tracking(self):
+        if not self.check_if_batch_info_entered():
+            return
+
+        self.ui.tab_file.btn_to_single.setEnabled(False)
+
+        self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
+
+        self.ui.btn_abort_tracking.setDisabled(False)
+        self.ui.btn_start_tracking.setDisabled(True)
+
+        while not self.abort_batch_tracking and not (self.batch_files is None or len(self.batch_files) == 0):
+            track_path = self.batch_files.pop(0)
+            self.tracker.video_file = track_path
+            if self.ui.tab_file.cbx_add_metadata.isChecked():
+                self.add_metadata_templates_dynamic(track_path)
+            self.set_output_directory()
+            self.ui.lbl_file.setText(track_path.split("/")[-1])
+            try:
+                self.ui.tracker.run()
+            except Exception as e:
+                print "ERROR WHILE TRACKING in file: {0:s}".format(track_path)
+                print "ERROR MESSAGE: {0:s}".format(e)
+            self.ui.set_new_tracker(self)
+            self.remove_all_meta_entries()
+            self.ui.controller.preset_options()
+
+        self.abort_batch_tracking = False
+
+        self.ui.tab_file.btn_to_single.setEnabled(True)
+
+        self.ui.btn_abort_tracking.setDisabled(True)
+        self.ui.btn_start_tracking.setDisabled(False)
+
+    def abort_tracking(self):
+        if self.ui.batch_tracking_enabled:
+            self.abort_batch_tracking = True
+        self.ui.tracker.ui_abort_button_pressed = True
+        self.ui.set_new_tracker(self)
+        self.ui.controller.preset_options()
+        self.ui.btn_abort_tracking.setDisabled(True)
+        self.ui.btn_start_tracking.setDisabled(False)
+
+
 
     @property
     def ui(self):
