@@ -48,6 +48,7 @@ class Controller(object):
 
         self.remove_all_meta_entries()
         self.ui.batch_tracking_enabled = True
+        self.tracker.batch_mode_on = True
 
     def btn_to_single_clicked(self):
         file_tab = TabFile()
@@ -61,6 +62,7 @@ class Controller(object):
         self.ui.tab_file = file_tab
 
         self.ui.batch_tracking_enabled = False
+        self.tracker.batch_mode_on = False
 
     def browse_file(self):
         self.roi_preview_displayed = False
@@ -275,6 +277,23 @@ class Controller(object):
         for i in range(len(self.ui.tab_meta.meta_entry_tabs)):
             self.tracker.mm.remove_meta_entry(self.ui.tab_meta.meta_entry_tabs[0].name, self)
 
+    def add_metadata_templates_dynamic(self, path):
+        file_name = path.split("/")[-1].split(".")[0]
+        file_directory = "/".join(path.split("/")[:-1])
+        files_in_path = ["/".join([file_directory, f]) for f in os.listdir(file_directory)]
+        for f in files_in_path:
+            if not file_name in f or f[-1] == "~":
+                continue
+            try:
+                odml.tools.xmlparser.load(f)
+            except:
+                continue
+            try:
+                self.tracker.mm.add_meta_entry(f.split("/")[-1], f, self)
+            except Exception as e:
+                print "ODML ERROR while importing from file {0:s}".format(f)
+                print "ERROR MESSAGE: {0:s}".format(e)
+
     def browse_output_directory(self):
         if self.output_is_input:
             self.ui.tab_file.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
@@ -311,6 +330,10 @@ class Controller(object):
             self.ui.tracker.unset_output_path()
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
+
+    # def cbx_add_metadata_changed(self):
+    #     checked = self.ui.tab_file.cbx_add_metadata.isChecked()
+    #     print checked
 
     def change_roi_values(self):
         for box in self.ui.tab_roi.roi_input_boxes:
@@ -444,7 +467,6 @@ class Controller(object):
 
         return True
 
-    # TODO track all files in batch_files
     def batch_tracking(self):
         if not self.check_if_batch_info_entered():
             return
@@ -457,10 +479,14 @@ class Controller(object):
         self.ui.btn_start_tracking.setDisabled(True)
 
         while not self.abort_batch_tracking and not (self.batch_files is None or len(self.batch_files) == 0):
-            self.tracker.video_file = self.batch_files.pop(0)
+            track_path = self.batch_files.pop(0)
+            self.tracker.video_file = track_path
+            if self.ui.tab_file.cbx_add_metadata.isChecked():
+                self.add_metadata_templates_dynamic(track_path)
             self.set_output_directory()
             self.ui.tracker.run()
             self.ui.set_new_tracker(self)
+            self.remove_all_meta_entries()
             self.ui.controller.preset_options()
 
         self.abort_batch_tracking = False
