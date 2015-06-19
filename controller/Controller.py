@@ -428,7 +428,11 @@ class Controller(object):
         self.ui.btn_abort_tracking.setDisabled(False)
         self.ui.btn_start_tracking.setDisabled(True)
         self.ui.btn_to_batch.setDisabled(True)
-        self.ui.tracker.run()
+        try:
+            self.ui.tracker.run()
+        except Exception as e:
+            print "ERROR WHILE TRACKING in file: {0:s}".format(self.track_file)
+            print "ERROR MESSAGE: {0:s}".format(e)
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
         self.ui.btn_to_batch.setDisabled(False)
@@ -492,7 +496,11 @@ class Controller(object):
             if self.ui.tab_file.cbx_add_metadata.isChecked():
                 self.add_metadata_templates_dynamic(track_path)
             self.set_output_directory()
-            self.ui.tracker.run()
+            try:
+                self.ui.tracker.run()
+            except Exception as e:
+                print "ERROR WHILE TRACKING in file: {0:s}".format(track_path)
+                print "ERROR MESSAGE: {0:s}".format(e)
             self.ui.set_new_tracker(self)
             self.remove_all_meta_entries()
             self.ui.controller.preset_options()
