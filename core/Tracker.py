@@ -26,9 +26,10 @@ except ImportError as e:
     quit()
 
 class Tracker(object):
-    def __init__(self, path=None, wait_time=50, controller=None):
+    def __init__(self, path=None, wait_time=50, controller=None, batch_mode_on=False):
         # program data
         self.ui_mode_on = False
+        self.batch_mode_on = batch_mode_on
         self.ui_abort_button_pressed = False
         
         if path is not None:
@@ -119,8 +120,10 @@ class Tracker(object):
     def import_config_values(self):
         if not self.config_file_present:
             return
+
         # meta manager values
-        self.mm.import_cfg_values(self.read_cfg, self.controller)
+        if not self.batch_mode_on:
+            self.mm.import_cfg_values(self.read_cfg, self.controller)
 
         # image manager values
         self.im.import_cfg_values(self.read_cfg)
@@ -396,6 +399,7 @@ class Tracker(object):
         times = self.load_frame_times(file_directory + file_name + "_times.dat")
         output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
 
+        # TODO add video size
         params = {}
         params['source file'] = self.video_file
         params['fish_min_size'] = self._fish_size_threshold
