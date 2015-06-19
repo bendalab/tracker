@@ -95,11 +95,19 @@ class TrackerUserInterface(QtGui.QWidget):
         self.btn_start_tracking.setObjectName(_fromUtf8("btn_start_tracking"))
         self.btn_start_tracking.setDisabled(False)
         self.hoLO_bot_buttons.addWidget(self.btn_start_tracking)
+        # vertical layout file label and progress label
+        self.vert_lo_file_progress = QtGui.QVBoxLayout()
+        # file bel
+        self.lbl_file = QtGui.QLabel()
+        self.lbl_file.setObjectName(_fromUtf8("lbl_file"))
+        self.lbl_file.setText(_fromUtf8("no file started"))
+        self.vert_lo_file_progress.addWidget(self.lbl_file)
         # progress label
         self.lbl_progress = QtGui.QLabel()
         self.lbl_progress.setObjectName(_fromUtf8("lbl_progress"))
-        self.lbl_progress.setText("Progress: [not started]")
-        self.hoLO_bot_buttons.addWidget(self.lbl_progress)
+        self.lbl_progress.setText(_fromUtf8("Progress:"))
+        self.vert_lo_file_progress.addWidget(self.lbl_progress)
+        self.hoLO_bot_buttons.addLayout(self.vert_lo_file_progress)
         # button abort tracking
         self.btn_abort_tracking = QtGui.QPushButton(self)
         self.btn_abort_tracking.setMinimumSize(QtCore.QSize(0, 50))
