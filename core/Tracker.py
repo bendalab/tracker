@@ -103,8 +103,6 @@ class Tracker(object):
         else:
             cfg_path = "../tracker.cnf"
 
-        print "cfg_path:  {0}".format(cfg_path)
-
         if not os.path.exists(cfg_path):
             print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
             self.config_file_present = False
