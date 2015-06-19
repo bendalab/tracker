@@ -106,6 +106,11 @@ class TabFileBatch(QtGui.QWidget):
         spacer_item_1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vert_lo_tab_file_batch.addItem(spacer_item_1)
 
+        # button set roi preview
+        self.btn_set_roi_preview = QtGui.QPushButton()
+        self.btn_set_roi_preview.setObjectName("btn_set_roi_preview")
+        self.vert_lo_tab_file_batch.addWidget(self.btn_set_roi_preview)
+
     def retranslate_tab_file_batch(self):
         self.btn_to_single.setText("Switch to single tracking")
         self.lbl_file_path.setText(_translate(self.name, "Directory Path", None))
@@ -115,6 +120,7 @@ class TabFileBatch(QtGui.QWidget):
         self.btn_browse_output.setText(_translate(self.name, "Browse Output Folder", None))
         self.lbl_file_suffix.setText(_translate(self.name, "Video File Suffix", None))
         self.cbx_add_metadata.setText(_translate(self.name, "Add Metadata in File Folder containing File Name", None))
+        self.btn_set_roi_preview.setText(_translate(self.name, "Set ROI tab with current setting", None))
 
     def connect_widgets(self, controller):
         self.btn_to_single.clicked.connect(controller.btn_to_single_clicked)
@@ -122,3 +128,5 @@ class TabFileBatch(QtGui.QWidget):
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
 
         self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"), controller.change_output_is_input)
+
+        self.btn_set_roi_preview.clicked.connect(controller.btn_set_roi_preview_clicked)
