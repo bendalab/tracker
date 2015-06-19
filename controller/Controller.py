@@ -274,10 +274,18 @@ class Controller(object):
                 break
 
     def remove_all_meta_entries(self):
+        """
+        Removes all metadata entries from the Tracker
+        """
         for i in range(len(self.ui.tab_meta.meta_entry_tabs)):
             self.tracker.mm.remove_meta_entry(self.ui.tab_meta.meta_entry_tabs[0].name, self)
 
     def add_metadata_templates_dynamic(self, path):
+        """
+        Adds all properly formatted xml-odml files as metadata to the Tracker
+        ONLY IF the file name of given path is part of the xml-odml-file.
+        :param path: Path to file to which metadata is supposed to belong
+        """
         file_name = path.split("/")[-1].split(".")[0]
         file_directory = "/".join(path.split("/")[:-1])
         files_in_path = ["/".join([file_directory, f]) for f in os.listdir(file_directory)]
