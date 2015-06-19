@@ -425,9 +425,12 @@ class Controller(object):
             if not os.path.exists(self.output_directory):
                 self.ui.tab_file.lnEdit_output_path.setText(self.ui.tab_file.lnEdit_output_path.text() + " <-- DIRECTORY DOES NOT EXIST")
                 return
+
+        self.ui.lbl_file.setText(self.track_file.split("/")[-1])
+
         self.ui.btn_abort_tracking.setDisabled(False)
         self.ui.btn_start_tracking.setDisabled(True)
-        self.ui.btn_to_batch.setDisabled(True)
+        self.ui.tab_file.btn_to_batch.setDisabled(True)
         try:
             self.ui.tracker.run()
         except Exception as e:
@@ -435,7 +438,7 @@ class Controller(object):
             print "ERROR MESSAGE: {0:s}".format(e)
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
-        self.ui.btn_to_batch.setDisabled(False)
+        self.ui.tab_file.btn_to_batch.setDisabled(False)
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
 
@@ -496,6 +499,7 @@ class Controller(object):
             if self.ui.tab_file.cbx_add_metadata.isChecked():
                 self.add_metadata_templates_dynamic(track_path)
             self.set_output_directory()
+            self.ui.lbl_file.setText(track_path.split("/")[-1])
             try:
                 self.ui.tracker.run()
             except Exception as e:
