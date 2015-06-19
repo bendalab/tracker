@@ -384,14 +384,28 @@ class Controller(object):
 
     # TODO recursively get files with fitting suffix from track directory
     def set_batch_files(self, path):
-        suffix = ".".join(["", str(self.ui.tab_file.lnEdit_file_suffix.text()).split(".")[-1]])
+        self.batch_files = []
+
+        # get entered suffixes and convert them to text only (no dots, no spaces)
+        suffix_list = [suffix.replace(".", "").replace(" ", "") for suffix in str(self.ui.tab_file.lnEdit_file_suffix.text()).split(",")]
+        # add a dot to suffixes
+        suffixes = [".".join(["", suffix]) for suffix in suffix_list]
+        # save length of suffixes (may vary, i.e. "avi" "mpeg")
+        suffix_lengths = [len(s) for s in suffixes]
+        self.get_files_from_path_and_subdirs(path, suffixes, suffix_lengths)
+
+        print self.batch_files
+
+    def get_files_from_path_and_subdirs(self, path, suffixes, suffix_lengths):
         path_content = os.listdir(path)
-        path_files = ["/".join([path, ff]) for ff in [f for f in path_content if os.path.isfile("/".join([path, f]))] if ff[-len(suffix):] == suffix]
+        for l in suffix_lengths:
+            files = ["/".join([path, ff]) for ff in [f for f in path_content if os.path.isfile("/".join([path, f]))] if ff[-l:] in suffixes]
+            self.batch_files += files
+
         path_directories = ["/".join([path, d]) for d in path_content if not os.path.isfile("/".join([path, d]))]
-        print path_content
-        print path_files
-        print path_directories
-        print "batcha  batcha  batcha  fiiiiiiiiles"
+        while path_directories is not None and len(path_directories) != 0:
+            path = path_directories.pop()
+            self.get_files_from_path_and_subdirs(path, suffixes, suffix_lengths)
 
     # TODO track all files in batch_files
     def batch_tracking(self):
@@ -402,6 +416,9 @@ class Controller(object):
             if self.output_directory == "":
                 self.ui.tab_file.lnEdit_output_path.setText("--- NO DIRECTORY SELECTED ---")
                 return
+        if str(self.ui.tab_file.lnEdit_file_suffix.text()) == "":
+            self.ui.tab_file.lnEdit_file_suffix.setText("--- NO SUFFIXES ENTERED ---")
+            return
         if not os.path.exists(self.track_directory):
             self.ui.tab_file.lnEdit_file_path.setText(self.ui.tab_file.lnEdit_file_path.text() + " <-- DIRECTORY DOES NOT EXIST")
             return
@@ -409,8 +426,6 @@ class Controller(object):
         self.ui.tab_file.btn_to_single.setEnabled(False)
 
         self.set_batch_files(str(self.ui.tab_file.lnEdit_file_path.text()))
-
-        print "HONEY BATCHER"
 
     def abort_tracking(self):
         self.ui.tracker.ui_abort_button_pressed = True
