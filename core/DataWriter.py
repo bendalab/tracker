@@ -84,6 +84,10 @@ class DataWriter(object):
             settings['ROI {0:s} WIDTH'.format(roi.name)] = roi.x2 - roi.x1
             settings['ROI {0:s} HEIGHT'.format(roi.name)] = roi.y2 - roi.y1
 
+        tracker_extracted_video_data = tracker.create_section('tracker_extracted_video_data', 'metadata.video')
+        tracker_extracted_video_data['Video width'] = data_manager.video_resolution[0]
+        tracker_extracted_video_data['Video height'] = data_manager.video_resolution[1]
+
         # write meta data to nix
         for entry in meta_manager.meta_entries:
             try:
