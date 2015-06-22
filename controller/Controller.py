@@ -6,6 +6,7 @@ import os
 import odml
 from ui.TabFileBatch import TabFileBatch
 from ui.TabFile import TabFile
+import traceback
 
 class Controller(object):
     def __init__(self, ui):
@@ -436,6 +437,8 @@ class Controller(object):
         except Exception as e:
             print "ERROR WHILE TRACKING in file: {0:s}".format(self.track_file)
             print "ERROR MESSAGE: {0:s}".format(e)
+            print "DETAILS:"
+            print(traceback.format_exc())
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
         self.ui.tab_file.btn_to_batch.setDisabled(False)
@@ -505,6 +508,8 @@ class Controller(object):
             except Exception as e:
                 print "ERROR WHILE TRACKING in file: {0:s}".format(track_path)
                 print "ERROR MESSAGE: {0:s}".format(e)
+                print "DETAILS:"
+                print(traceback.format_exc())
             self.ui.set_new_tracker(self)
             self.remove_all_meta_entries()
             self.ui.controller.preset_options()
