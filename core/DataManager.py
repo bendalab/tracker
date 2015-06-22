@@ -3,6 +3,8 @@ class DataManager(object):
     def __init__(self):
         self._frame_counter = 0
 
+        self._video_resolution = None
+
         self._last_pos = None
         self._all_pos_roi = []
         self._all_pos_original = []
@@ -221,6 +223,13 @@ class DataManager(object):
     @frame_counter.setter
     def frame_counter(self, value):
         self._frame_counter = value
+
+    @property
+    def video_resolution(self):
+        return self._video_resolution
+    @video_resolution.setter
+    def video_resolution(self, tuple):
+        self._video_resolution = tuple
 
     @property
     def last_pos(self):
