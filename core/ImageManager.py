@@ -79,6 +79,9 @@ class ImageManager(object):
                     point = positions[i]
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
 
+            if data_manager.mean_mid is not None:
+                cv2.circle(self.current_frame, (int(data_manager.mean_mid[0]), int(data_manager.mean_mid[1])), self._circle_size, (0, 0, 255))
+
         # draw travel orientation  # needed??
         # if self.draw_travel_orientation:
         #     for coordinates in data_manager.all_pos_original:

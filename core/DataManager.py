@@ -1,9 +1,13 @@
+import numpy as np
+
 class DataManager(object):
 
     def __init__(self):
         self._frame_counter = 0
 
         self._video_resolution = None
+
+        self.mean_mid = None
 
         self._last_pos = None
         self._all_pos_roi = []
@@ -34,6 +38,15 @@ class DataManager(object):
             return
         else:
             self.last_pos = ellipse[0]
+
+    def set_last_mean_mid(self, ellipse, clist, roim):
+        if ellipse is None:
+            self.mean_mid = None
+        else:
+            self.mean_mid = np.mean(clist[0], 0)[0]
+            roi = roim.get_roi("tracking_area")
+            # self.mean_mid = (self.mean_mid[0] + roi.x1, self.mean_mid[1] + roi.y1)
+            self.last_pos = self.mean_mid
 
     def save_fish_positions(self, roi):
         self.all_pos_roi.append(self.last_pos)

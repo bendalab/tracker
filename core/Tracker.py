@@ -130,12 +130,14 @@ class Tracker(object):
         roi_sections = [sec for sec in self.read_cfg.sections() if "roi" == sec.split("_")[0]]
         for roi_sec in roi_sections:
             add_roi_name = "_".join(roi_sec.split("_")[1:])
-            if add_roi_name not in [roi.name for roi in self.roim._roi_list]:
+            if add_roi_name not in [roi.name for roi in self.roim.roi_list]:
                 x1 = self.read_cfg.getint(roi_sec, "x1")
                 y1 = self.read_cfg.getint(roi_sec, "x2")
                 x2 = self.read_cfg.getint(roi_sec, "y1")
                 y2 = self.read_cfg.getint(roi_sec, "y2")
                 self.roim.add_roi(x1, y1, x2, y2, add_roi_name, self.controller)
+            else:
+                self.roim.get_roi(add_roi_name).import_cfg_values(self.read_cfg)
 
         # tracker values
         self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
@@ -228,7 +230,8 @@ class Tracker(object):
         di_img = cv2.dilate(er_img, di_kernel, iterations=self._dilation_iterations)
         # thresholding to black-white
         ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
-        return ret, morphed_img
+        # return ret, di_img
+        return ret, img
 
     # check if fish started from the right side
     def check_if_fish_started(self):
@@ -258,6 +261,7 @@ class Tracker(object):
 
     def extract_data(self):
         # create BG subtractor
+        bg_sub = cv2.BackgroundSubtractorMOG(100, 5, 0.5, 0)
         bg_sub = cv2.BackgroundSubtractorMOG()
 
         self.roim.check_and_adjust_rois(self.cap, self.controller)
@@ -327,6 +331,7 @@ class Tracker(object):
 
             # set last_pos to ellipse center
             self.dm.set_last_pos(self.ellipse)
+            self.dm.set_last_mean_mid(self.ellipse, self.cm.contour_list, self.roim)
 
             # save fish positions
             self.dm.save_fish_positions(self.roim.get_roi("tracking_area"))
