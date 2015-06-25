@@ -223,15 +223,14 @@ class Tracker(object):
     # # morph given img by erosion/dilation
     def morph_img(self, img):
         # erode img
-        er_kernel = np.ones((4, 4), np.uint8)
+        er_kernel = np.ones((1, 1), np.uint8)
         er_img = cv2.erode(img, er_kernel, iterations=self._erosion_iterations)
         # dilate img
-        di_kernel = np.ones((4, 4), np.uint8)
+        di_kernel = np.ones((2, 2), np.uint8)
         di_img = cv2.dilate(er_img, di_kernel, iterations=self._dilation_iterations)
         # thresholding to black-white
         ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
-        # return ret, di_img
-        return ret, img
+        return ret, morphed_img
 
     # check if fish started from the right side
     def check_if_fish_started(self):
@@ -261,7 +260,7 @@ class Tracker(object):
 
     def extract_data(self):
         # create BG subtractor
-        bg_sub = cv2.BackgroundSubtractorMOG(100, 5, 0.5, 0)
+        # bg_sub = cv2.BackgroundSubtractorMOG(100, 5, 0.5, 0)
         bg_sub = cv2.BackgroundSubtractorMOG()
 
         self.roim.check_and_adjust_rois(self.cap, self.controller)
@@ -292,7 +291,7 @@ class Tracker(object):
             ret, self.im.current_morphed = self.morph_img(self.im.current_bg_sub)
 
             # getting contours (of the morphed img)
-            self.cm.contour_list, hierarchy = cv2.findContours(self.im.current_morphed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            self.cm.contour_list, hierarchy = cv2.findContours(copy.copy(self.im.current_morphed), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
             # save amount of contours
             self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_contours_per_frame)
@@ -330,8 +329,8 @@ class Tracker(object):
                 self.im.get_line_from_ellipse(self.ellipse)
 
             # set last_pos to ellipse center
-            self.dm.set_last_pos(self.ellipse)
-            self.dm.set_last_mean_mid(self.ellipse, self.cm.contour_list, self.roim)
+            self.dm.set_last_pos(self.cm.contour_list)
+            # self.dm.set_last_mean_mid(self.ellipse, self.cm.contour_list, self.roim)
 
             # save fish positions
             self.dm.save_fish_positions(self.roim.get_roi("tracking_area"))
