@@ -25,6 +25,78 @@ class TabAdv(QtGui.QWidget):
         # vertical layout adv tab
         self.vertLO_tab_adv = QtGui.QVBoxLayout(self)
         self.vertLO_tab_adv.setObjectName(_fromUtf8("vertLO_tab_adv"))
+
+        # spacer
+        spacerItem11 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.vertLO_tab_adv.addItem(spacerItem11)
+
+        # line
+        self.line_7 = MyQLine(self, "line_7")
+        self.vertLO_tab_adv.addWidget(self.line_7)
+
+        # label image morphing
+        self.lbl_img_morphing = QtGui.QLabel(self)
+        self.lbl_img_morphing.setObjectName(_fromUtf8("lbl_img_morphing"))
+        self.vertLO_tab_adv.addWidget(self.lbl_img_morphing)
+        # grid layout image morphing
+        self.gridLO_img_morphing = QtGui.QGridLayout()
+        self.gridLO_img_morphing.setObjectName(_fromUtf8("gridLO_img_morphing"))
+        # label erosion factor
+        self.lbl_erosion = QtGui.QLabel(self)
+        self.lbl_erosion.setObjectName(_fromUtf8("lbl_erosion"))
+        self.gridLO_img_morphing.addWidget(self.lbl_erosion, 1, 1, 1, 1)
+        # label dilation factor
+        self.lbl_dilation = QtGui.QLabel(self)
+        self.lbl_dilation.setObjectName(_fromUtf8("lbl_dilation"))
+        self.gridLO_img_morphing.addWidget(self.lbl_dilation, 4, 1, 1, 1)
+        # spinbox set erosion factor
+        self.spinBox_erosion = QtGui.QSpinBox(self)
+        self.spinBox_erosion.setMinimum(0)
+        self.spinBox_erosion.setObjectName(_fromUtf8("spinBox_erosion"))
+        self.gridLO_img_morphing.addWidget(self.spinBox_erosion, 1, 2, 1, 1)
+        # spinbox set dilation factor
+        self.spinBox_dilation = QtGui.QSpinBox(self)
+        self.spinBox_dilation.setMinimum(0)
+        self.spinBox_dilation.setObjectName(_fromUtf8("spinBox_dilation"))
+        self.gridLO_img_morphing.addWidget(self.spinBox_dilation, 4, 2, 1, 1)
+        # add grid layout image morphing
+        self.vertLO_tab_adv.addLayout(self.gridLO_img_morphing)
+
+        # line
+        self.line_8 = MyQLine(self, "line_8")
+        self.vertLO_tab_adv.addWidget(self.line_8)
+        # spacer
+        self.vertLO_tab_adv.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+        # erosion and dilation matrices
+        # label image morphing
+        self.lbl_morph_matrices = QtGui.QLabel(self)
+        self.lbl_morph_matrices.setObjectName(_fromUtf8("lbl_morph_matrices"))
+        self.vertLO_tab_adv.addWidget(self.lbl_morph_matrices)
+        # grid layout image morphing
+        self.gridLO_morph_matrices = QtGui.QGridLayout()
+        self.gridLO_morph_matrices.setObjectName(_fromUtf8("gridLO_morph_matrices"))
+        # label erosion factor
+        self.lbl_erosion_matrix = QtGui.QLabel(self)
+        self.lbl_erosion_matrix.setObjectName(_fromUtf8("lbl_erosion_matrix"))
+        self.gridLO_morph_matrices.addWidget(self.lbl_erosion_matrix, 1, 1, 1, 1)
+        # label dilation factor
+        self.lbl_dilation_matrix = QtGui.QLabel(self)
+        self.lbl_dilation_matrix.setObjectName(_fromUtf8("lbl_dilation"))
+        self.gridLO_morph_matrices.addWidget(self.lbl_dilation_matrix, 4, 1, 1, 1)
+        # spinbox set erosion factor
+        self.spinBox_erosion_matrix = QtGui.QSpinBox(self)
+        self.spinBox_erosion_matrix.setMinimum(1)
+        self.spinBox_erosion_matrix.setObjectName(_fromUtf8("spinBox_erosion"))
+        self.gridLO_morph_matrices.addWidget(self.spinBox_erosion_matrix, 1, 2, 1, 1)
+        # spinbox set dilation factor
+        self.spinBox_dilation_matrix = QtGui.QSpinBox(self)
+        self.spinBox_dilation_matrix.setMinimum(1)
+        self.spinBox_dilation_matrix.setObjectName(_fromUtf8("spinBox_dilation"))
+        self.gridLO_morph_matrices.addWidget(self.spinBox_dilation_matrix, 4, 2, 1, 1)
+        # add grid layout image morphing
+        self.vertLO_tab_adv.addLayout(self.gridLO_morph_matrices)
+
         # spacer
         spacerItem4 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem4)
@@ -54,61 +126,7 @@ class TabAdv(QtGui.QWidget):
         # line
         self.line_5 = MyQLine(self, "line_5")
         self.vertLO_tab_adv.addWidget(self.line_5)
-        # # label start area
-        # self.lbl_start_area = QtGui.QLabel(self)
-        # self.lbl_start_area.setObjectName(_fromUtf8("lbl_start_area"))
-        # self.vertLO_tab_adv.addWidget(self.lbl_start_area)
-        # graphics view starting area
-        #  # roi preview output
-        # self.lbl_starting_area_preview_label = QtGui.QLabel(self)
-        # self.lbl_starting_area_preview_label.setObjectName(_fromUtf8("lbl_starting_area_preview_label"))
-        # self.lbl_starting_area_preview_label.setAlignment(QtCore.Qt.AlignCenter)
-        # self.vertLO_tab_adv.addWidget(self.lbl_starting_area_preview_label)
-        # # grid layout set starting area
-        # self.gridLO_start_area = QtGui.QGridLayout()
-        # self.gridLO_start_area.setObjectName(_fromUtf8("gridLO_start_area"))
-        # # spinbox starting_x start
-        # self.spinBox_starting_x1_factor = QtGui.QSpinBox(self)
-        # self.spinBox_starting_x1_factor.setMaximum(10000)
-        # self.spinBox_starting_x1_factor.setObjectName(_fromUtf8("spinBox_starting_x_start"))
-        # self.gridLO_start_area.addWidget(self.spinBox_starting_x1_factor, 0, 1, 1, 1)
-        # # spinbox starting_x end
-        # self.spinBox_starting_x2_factor = QtGui.QSpinBox(self)
-        # self.spinBox_starting_x2_factor.setMaximum(10000)
-        # self.spinBox_starting_x2_factor.setObjectName(_fromUtf8("spinBox_starting_x_end"))
-        # self.gridLO_start_area.addWidget(self.spinBox_starting_x2_factor, 0, 3, 1, 1)
-        # # spinbox starting_y start
-        # self.spinBox_starting_y1_factor = QtGui.QSpinBox(self)
-        # self.spinBox_starting_y1_factor.setMaximum(10000)
-        # self.spinBox_starting_y1_factor.setObjectName(_fromUtf8("spinBox_starting_y_start"))
-        # self.gridLO_start_area.addWidget(self.spinBox_starting_y1_factor, 1, 1, 1, 1)
-        # # spinbox starting_y end
-        # self.spinBox_starting_y2_factor = QtGui.QSpinBox(self)
-        # self.spinBox_starting_y2_factor.setMaximum(10000)
-        # self.spinBox_starting_y2_factor.setObjectName(_fromUtf8("spinBox_starting_y_end"))
-        # self.gridLO_start_area.addWidget(self.spinBox_starting_y2_factor, 1, 3, 1, 1)
-        # # label starting_x start
-        # self.lbl_start_x_start = QtGui.QLabel(self)
-        # self.lbl_start_x_start.setObjectName(_fromUtf8("lbl_start_x_start"))
-        # self.gridLO_start_area.addWidget(self.lbl_start_x_start, 0, 0, 1, 1)
-        # # label starting_x end
-        # self.lbl_start_x_end = QtGui.QLabel(self)
-        # self.lbl_start_x_end.setObjectName(_fromUtf8("lbl_start_x_end"))
-        # self.gridLO_start_area.addWidget(self.lbl_start_x_end, 0, 2, 1, 1)
-        # # label starting_y start
-        # self.lbl_start_y_start = QtGui.QLabel(self)
-        # self.lbl_start_y_start.setObjectName(_fromUtf8("lbl_start_y_start"))
-        # self.gridLO_start_area.addWidget(self.lbl_start_y_start, 1, 0, 1, 1)
-        # # label starting_y end
-        # self.lbl_start_y_end = QtGui.QLabel(self)
-        # self.lbl_start_y_end.setObjectName(_fromUtf8("lbl_start_y_end"))
-        # self.gridLO_start_area.addWidget(self.lbl_start_y_end, 1, 2, 1, 1)
-        # # add starting are selection grid layout to tab layout
-        # self.vertLO_tab_adv.addLayout(self.gridLO_start_area)
-        # # line
-        # self.line_6 = MyQLine(self, "line_6")
-        # self.vertLO_tab_adv.addWidget(self.line_6)
-        # spacer
+
         spacerItem7 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem7)
         # horizontal layout set start orientation
@@ -170,6 +188,11 @@ class TabAdv(QtGui.QWidget):
         # self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
         # self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
         # self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
+        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), controller.change_erosion_factor)
+        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_factor)
+
+        self.connect(self.spinBox_erosion_matrix, QtCore.SIGNAL("valueChanged(int)"), controller.change_erosion_matrix)
+        self.connect(self.spinBox_dilation_matrix, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_matrix)
 
         self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), controller.change_frame_waittime)
 
@@ -181,6 +204,12 @@ class TabAdv(QtGui.QWidget):
         return
 
     def retranslate_tab_adv(self):
+        self.lbl_img_morphing.setText(_translate("tracker_main_widget", "Image Morphing", None))
+        self.lbl_erosion.setText(_translate("tracker_main_widget", "Erosion Faktor", None))
+        self.lbl_dilation.setText(_translate("tracker_main_widget", "Dilation Faktor", None))
+        self.lbl_morph_matrices.setText(_translate("tracker_main_widget", "Image Morphing Matrices", None))
+        self.lbl_erosion_matrix.setText(_translate("tracker_main_widget", "Erosion Matrix", None))
+        self.lbl_dilation_matrix.setText(_translate("tracker_main_widget", "Dilation Matrix", None))
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))
         # self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))
         # self.lbl_start_x_end.setText(_translate("tracker_main_widget", "X End", None))

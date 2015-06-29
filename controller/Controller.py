@@ -162,8 +162,10 @@ class Controller(object):
         self.ui.tab_adv.cbx_enable_max_size_thresh.setChecked(self.ui.tracker.enable_max_size_threshold)
 
         # image morphing
-        self.ui.tab_visual.spinBox_erosion.setValue(self.ui.tracker.erosion_iterations)
-        self.ui.tab_visual.spinBox_dilation.setValue(self.ui.tracker.dilation_iterations)
+        self.ui.tab_adv.spinBox_erosion.setValue(self.ui.tracker.erosion_iterations)
+        self.ui.tab_adv.spinBox_dilation.setValue(self.ui.tracker.dilation_iterations)
+        self.ui.tab_adv.spinBox_erosion_matrix.setValue(self.tracker.erosion_matrix_value)
+        self.ui.tab_adv.spinBox_dilation_matrix.setValue(self.tracker.dilation_matrix_value)
 
         # image processing steps
         self.ui.tab_visual.cbx_show_bgsub_img.setChecked(self.ui.tracker.im.show_bg_sub_img)
@@ -378,6 +380,12 @@ class Controller(object):
 
     def change_dilation_factor(self, value):
         self.ui.tracker.dilation_iterations = value
+
+    def change_erosion_matrix(self, value):
+        self.tracker.erosion_matrix_value = value
+
+    def change_dilation_matrix(self, value):
+        self.tracker.dilation_matrix_value = value
 
     def change_show_bg_sub_img(self):
         self.ui.tracker.im.show_bg_sub_img = self.ui.tab_visual.cbx_show_bgsub_img.isChecked()

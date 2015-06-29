@@ -1,3 +1,5 @@
+import numpy as np
+
 class DataManager(object):
 
     def __init__(self):
@@ -28,12 +30,18 @@ class DataManager(object):
         else:
             number_cnt_list.append(len(cnt_list))
 
-    def set_last_pos(self, ellipse):
-        if ellipse is None:
+    # def set_last_pos(self, ellipse):
+    #     if ellipse is None:
+    #         self.last_pos = None
+    #         return
+    #     else:
+    #         self.last_pos = ellipse[0]
+
+    def set_last_pos(self, clist):
+        if clist is None or len(clist) == 0:
             self.last_pos = None
-            return
         else:
-            self.last_pos = ellipse[0]
+            self.last_pos = np.mean(clist[0], 0)[0]
 
     def save_fish_positions(self, roi):
         self.all_pos_roi.append(self.last_pos)

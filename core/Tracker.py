@@ -62,6 +62,10 @@ class Tracker(object):
         self._erosion_iterations = 1
         self._dilation_iterations = 4
 
+        # morphing matrix values
+        self._erosion_matrix_value = 2
+        self._dilation_matrix_value = 2
+
         # fish size thresholds
         self._fish_size_threshold = 700
         self._fish_max_size_threshold = 4000
@@ -130,16 +134,23 @@ class Tracker(object):
         roi_sections = [sec for sec in self.read_cfg.sections() if "roi" == sec.split("_")[0]]
         for roi_sec in roi_sections:
             add_roi_name = "_".join(roi_sec.split("_")[1:])
-            if add_roi_name not in [roi.name for roi in self.roim._roi_list]:
+            if add_roi_name not in [roi.name for roi in self.roim.roi_list]:
                 x1 = self.read_cfg.getint(roi_sec, "x1")
                 y1 = self.read_cfg.getint(roi_sec, "x2")
                 x2 = self.read_cfg.getint(roi_sec, "y1")
                 y2 = self.read_cfg.getint(roi_sec, "y2")
                 self.roim.add_roi(x1, y1, x2, y2, add_roi_name, self.controller)
+            else:
+                self.roim.get_roi(add_roi_name).import_cfg_values(self.read_cfg)
 
         # tracker values
         self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
+        try:
+            self._erosion_matrix_value = self.read_cfg.getint('image_morphing', 'erosion_matrix_value')
+            self._dilation_matrix_value = self.read_cfg.getint('image_morphing', 'dilation_matrix_value')
+        except:
+            print "no entry for erosion or dilation matrix value. will be created at next tracking"
 
         self._start_ori = self.read_cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = self.read_cfg.getint('detection_values', 'min_area_threshold')
@@ -148,8 +159,8 @@ class Tracker(object):
 
         self.frame_waittime = self.read_cfg.getint('system', 'frame_waittime')
 
-        self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
-        self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
+        # self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
+        # self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
 
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
@@ -169,6 +180,8 @@ class Tracker(object):
         cfg.add_section('image_morphing')
         cfg.set('image_morphing', 'erosion_factor', str(self.erosion_iterations))
         cfg.set('image_morphing', 'dilation_factor', str(self.dilation_iterations))
+        cfg.set('image_morphing', 'erosion_matrix_value', str(self.erosion_matrix_value))
+        cfg.set('image_morphing', 'dilation_matrix_value', str(self.dilation_matrix_value))
 
         self.im.add_cfg_values(cfg)
 
@@ -221,10 +234,10 @@ class Tracker(object):
     # # morph given img by erosion/dilation
     def morph_img(self, img):
         # erode img
-        er_kernel = np.ones((4, 4), np.uint8)
+        er_kernel = np.ones((self._erosion_matrix_value, self._erosion_matrix_value), np.uint8)
         er_img = cv2.erode(img, er_kernel, iterations=self._erosion_iterations)
         # dilate img
-        di_kernel = np.ones((4, 4), np.uint8)
+        di_kernel = np.ones((self._dilation_matrix_value, self._dilation_matrix_value), np.uint8)
         di_img = cv2.dilate(er_img, di_kernel, iterations=self._dilation_iterations)
         # thresholding to black-white
         ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
@@ -258,6 +271,7 @@ class Tracker(object):
 
     def extract_data(self):
         # create BG subtractor
+        # bg_sub = cv2.BackgroundSubtractorMOG(100, 5, 0.5, 0)
         bg_sub = cv2.BackgroundSubtractorMOG()
 
         self.roim.check_and_adjust_rois(self.cap, self.controller)
@@ -288,7 +302,7 @@ class Tracker(object):
             ret, self.im.current_morphed = self.morph_img(self.im.current_bg_sub)
 
             # getting contours (of the morphed img)
-            self.cm.contour_list, hierarchy = cv2.findContours(self.im.current_morphed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            self.cm.contour_list, hierarchy = cv2.findContours(copy.copy(self.im.current_morphed), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
             # save amount of contours
             self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_contours_per_frame)
@@ -326,7 +340,8 @@ class Tracker(object):
                 self.im.get_line_from_ellipse(self.ellipse)
 
             # set last_pos to ellipse center
-            self.dm.set_last_pos(self.ellipse)
+            self.dm.set_last_pos(self.cm.contour_list)
+            # self.dm.set_last_mean_mid(self.ellipse, self.cm.contour_list, self.roim)
 
             # save fish positions
             self.dm.save_fish_positions(self.roim.get_roi("tracking_area"))
@@ -407,6 +422,8 @@ class Tracker(object):
         params['fish_start_orientation'] = self._start_ori
         params['erosion_iterations'] = self._erosion_iterations
         params['dilation_iterations'] = self._dilation_iterations
+        params['erosion_matrix_value'] = self._erosion_matrix_value
+        params['dilation_matrix_value'] = self._dilation_matrix_value
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -437,6 +454,20 @@ class Tracker(object):
     @dilation_iterations.setter
     def dilation_iterations(self, value):
         self._dilation_iterations = value
+
+    @property
+    def erosion_matrix_value(self):
+        return self._erosion_matrix_value
+    @erosion_matrix_value.setter
+    def erosion_matrix_value(self, value):
+        self._erosion_matrix_value = value
+
+    @property
+    def dilation_matrix_value(self):
+        return self._dilation_matrix_value
+    @dilation_matrix_value.setter
+    def dilation_matrix_value(self, value):
+        self._dilation_matrix_value = value
 
     @property
     def fish_size_threshold(self):

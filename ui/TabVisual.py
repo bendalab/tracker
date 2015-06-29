@@ -26,43 +26,6 @@ class TabVisual(QtGui.QWidget):
         self.vertLO_tab_visual = QtGui.QVBoxLayout(self)
         self.vertLO_tab_visual.setObjectName(_fromUtf8("vertLO_tab_visual"))
         # spacer
-        spacerItem11 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_visual.addItem(spacerItem11)
-        # line
-        self.line_7 = MyQLine(self, "line_7")
-        self.vertLO_tab_visual.addWidget(self.line_7)
-        # label image morphing
-        self.lbl_img_morphing = QtGui.QLabel(self)
-        self.lbl_img_morphing.setObjectName(_fromUtf8("lbl_img_morphing"))
-        self.vertLO_tab_visual.addWidget(self.lbl_img_morphing)
-        # grid layout image morphing
-        self.gridLO_img_morphing = QtGui.QGridLayout()
-        self.gridLO_img_morphing.setObjectName(_fromUtf8("gridLO_img_morphing"))
-        # label erosion factor
-        self.lbl_erosion = QtGui.QLabel(self)
-        self.lbl_erosion.setObjectName(_fromUtf8("lbl_erosion"))
-        self.gridLO_img_morphing.addWidget(self.lbl_erosion, 1, 1, 1, 1)
-        # label dilation factor
-        self.lbl_dilation = QtGui.QLabel(self)
-        self.lbl_dilation.setObjectName(_fromUtf8("lbl_dilation"))
-        self.gridLO_img_morphing.addWidget(self.lbl_dilation, 4, 1, 1, 1)
-        # spinbox set erosion factor
-        self.spinBox_erosion = QtGui.QSpinBox(self)
-        self.spinBox_erosion.setMinimum(0)
-        self.spinBox_erosion.setObjectName(_fromUtf8("spinBox_erosion"))
-        self.gridLO_img_morphing.addWidget(self.spinBox_erosion, 1, 2, 1, 1)
-        # spinbox set dilation factor
-        self.spinBox_dilation = QtGui.QSpinBox(self)
-        self.spinBox_dilation.setMinimum(0)
-        self.spinBox_dilation.setObjectName(_fromUtf8("spinBox_dilation"))
-        self.gridLO_img_morphing.addWidget(self.spinBox_dilation, 4, 2, 1, 1)
-        # add grid layout image morphing
-        self.vertLO_tab_visual.addLayout(self.gridLO_img_morphing)
-
-        # line
-        self.line_8 = MyQLine(self, "line_8")
-        self.vertLO_tab_visual.addWidget(self.line_8)
-        # spacer
         spacerItem12 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_visual.addItem(spacerItem12)
         # line
@@ -97,6 +60,7 @@ class TabVisual(QtGui.QWidget):
         # spacer
         spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_visual.addItem(spacerItem13)
+
         # line
         self.line_11 = MyQLine(self, "line_11")
         self.vertLO_tab_visual.addWidget(self.line_11)
@@ -138,8 +102,6 @@ class TabVisual(QtGui.QWidget):
         self.vertLO_tab_visual.addItem(spacerItem14)
 
     def connect_widgets(self, controller):
-        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), controller.change_erosion_factor)
-        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_factor)
 
         self.connect(self.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"), controller.change_show_bg_sub_img)
         self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), controller.change_show_morphed_img)
@@ -151,9 +113,6 @@ class TabVisual(QtGui.QWidget):
         return
 
     def retranslate_tab_visual(self):
-        self.lbl_img_morphing.setText(_translate("tracker_main_widget", "Image Morphing", None))
-        self.lbl_erosion.setText(_translate("tracker_main_widget", "Erosion Faktor", None))
-        self.lbl_dilation.setText(_translate("tracker_main_widget", "Dilation Faktor", None))
         self.lbl_img_proc_steps.setText(_translate("tracker_main_widget", "Image Processing Steps", None))
         self.cbx_show_bgsub_img.setText(_translate("tracker_main_widget", "Show Background-subtracted Image", None))
         self.cbx_show_morph_img.setText(_translate("tracker_main_widget", "Show Morphed Image", None))
