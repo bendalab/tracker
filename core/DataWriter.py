@@ -76,6 +76,10 @@ class DataWriter(object):
         settings['Fish min size threshold'] = parameters['fish_min_size']
         settings['Fish max size threshold'] = parameters['fish_max_size']
         settings['Fish max size enabled'] = parameters['fish_max_size_enabled']
+        settings['Erosion iterations'] = parameters['erosion_iterations']
+        settings['Dilation iterations'] = parameters['dilation_iterations']
+        settings['Erosion matrix value'] = parameters['erosion_matrix_value']
+        settings['Dilation matrix value'] = parameters['dilation_matrix_value']
         settings['Start orientation'] = parameters['fish_start_orientation']
 
         for roi in roi_manager.roi_list:

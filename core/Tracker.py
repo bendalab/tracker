@@ -422,6 +422,8 @@ class Tracker(object):
         params['fish_start_orientation'] = self._start_ori
         params['erosion_iterations'] = self._erosion_iterations
         params['dilation_iterations'] = self._dilation_iterations
+        params['erosion_matrix_value'] = self._erosion_matrix_value
+        params['dilation_matrix_value'] = self._dilation_matrix_value
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
