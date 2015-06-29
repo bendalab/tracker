@@ -7,8 +7,6 @@ class DataManager(object):
 
         self._video_resolution = None
 
-        self.mean_mid = None
-
         self._last_pos = None
         self._all_pos_roi = []
         self._all_pos_original = []
@@ -41,7 +39,7 @@ class DataManager(object):
 
     def set_last_pos(self, clist):
         if clist is None or len(clist) == 0:
-            self.mean_mid = None
+            self.last_pos = None
         else:
             self.last_pos = np.mean(clist[0], 0)[0]
 
