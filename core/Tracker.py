@@ -62,6 +62,10 @@ class Tracker(object):
         self._erosion_iterations = 1
         self._dilation_iterations = 4
 
+        # morphing matrix values
+        self._erosion_matrix_value = 2
+        self._dilation_matrix_value = 2
+
         # fish size thresholds
         self._fish_size_threshold = 700
         self._fish_max_size_threshold = 4000
@@ -142,6 +146,11 @@ class Tracker(object):
         # tracker values
         self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
         self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
+        try:
+            self._erosion_matrix_value = self.read_cfg.getint('image_morphing', 'erosion_matrix_value')
+            self._dilation_matrix_value = self.read_cfg.getint('image_morphing', 'dilation_matrix_value')
+        except:
+            print "no entry for erosion or dilation matrix value. will be created at next tracking"
 
         self._start_ori = self.read_cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = self.read_cfg.getint('detection_values', 'min_area_threshold')
@@ -150,8 +159,8 @@ class Tracker(object):
 
         self.frame_waittime = self.read_cfg.getint('system', 'frame_waittime')
 
-        self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
-        self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
+        # self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
+        # self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
 
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
@@ -171,6 +180,8 @@ class Tracker(object):
         cfg.add_section('image_morphing')
         cfg.set('image_morphing', 'erosion_factor', str(self.erosion_iterations))
         cfg.set('image_morphing', 'dilation_factor', str(self.dilation_iterations))
+        cfg.set('image_morphing', 'erosion_matrix_value', str(self.erosion_matrix_value))
+        cfg.set('image_morphing', 'dilation_matrix_value', str(self.dilation_matrix_value))
 
         self.im.add_cfg_values(cfg)
 
@@ -223,10 +234,10 @@ class Tracker(object):
     # # morph given img by erosion/dilation
     def morph_img(self, img):
         # erode img
-        er_kernel = np.ones((1, 1), np.uint8)
+        er_kernel = np.ones((self._erosion_matrix_value, self._erosion_matrix_value), np.uint8)
         er_img = cv2.erode(img, er_kernel, iterations=self._erosion_iterations)
         # dilate img
-        di_kernel = np.ones((2, 2), np.uint8)
+        di_kernel = np.ones((self._dilation_matrix_value, self._dilation_matrix_value), np.uint8)
         di_img = cv2.dilate(er_img, di_kernel, iterations=self._dilation_iterations)
         # thresholding to black-white
         ret, morphed_img = cv2.threshold(di_img, 127, 255, cv2.THRESH_BINARY)
@@ -441,6 +452,20 @@ class Tracker(object):
     @dilation_iterations.setter
     def dilation_iterations(self, value):
         self._dilation_iterations = value
+
+    @property
+    def erosion_matrix_value(self):
+        return self._erosion_matrix_value
+    @erosion_matrix_value.setter
+    def erosion_matrix_value(self, value):
+        self._erosion_matrix_value = value
+
+    @property
+    def dilation_matrix_value(self):
+        return self._dilation_matrix_value
+    @dilation_matrix_value.setter
+    def dilation_matrix_value(self, value):
+        self._dilation_matrix_value = value
 
     @property
     def fish_size_threshold(self):
