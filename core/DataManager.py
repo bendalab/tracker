@@ -84,6 +84,8 @@ class DataManager(object):
                 dx = int(round((b[1][1]/2)*math.cos(angle)))
                 dy = int(round((b[1][1]/2)*math.sin(angle)))
                 print "x > y"
+                print "x/dx = " + str(b[0][0]/dx)
+                print "y/dy = " + str(b[0][1]/dy)
                 center1 = tuple((map(operator.add, b[0], (int(dx*2), int(dy*2)))))
                 self._front_box = (center1, (int(b[1][0]), b[1][1]), b[2])
                 center2 = tuple((map(operator.sub, b[0], (int(dx*2), int(dy*2)))))
@@ -92,9 +94,11 @@ class DataManager(object):
                 grade_angle = -1 * b[2]
                 angle_prop = grade_angle/180
                 angle = math.pi*angle_prop
-                print "x < y"
                 dx = int(round((b[1][1]/2)*math.sin(angle)))
                 dy = int(round((b[1][1]/2)*math.cos(angle)))
+                print "x < y"
+                print "x/dx = " + str(b[0][0]/dx)
+                print "y/dy = " + str(b[0][1]/dy)
                 center1 = tuple((map(operator.add, b[0], (int(dx*2), int(dy*2)))))
                 self._front_box = (center1, (int(b[1][0]), b[1][1]), b[2])
                 center2 = tuple((map(operator.sub, b[0], (int(dx*2), int(dy*2)))))
