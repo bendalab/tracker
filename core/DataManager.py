@@ -1,4 +1,6 @@
 import numpy as np
+import operator
+import math
 import cv2
 
 class DataManager(object):
@@ -25,8 +27,11 @@ class DataManager(object):
         self._estimated_oris = []
 
         self._fish_box = None
+        self.fish_box_points = None
         self._front_box = None
         self._back_box = None
+        self.front_box_points = None
+        self.back_box_points = None
 
     @staticmethod
     def save_number_of_contours(cnt_list, number_cnt_list):
@@ -57,9 +62,60 @@ class DataManager(object):
             original_y = self.last_pos[1] + roi.y1
             self.all_pos_original.append((original_x, original_y))
 
-    def calc_ori_boxes(self, cnt):
+    def calc_ori_boxes(self, cnt, tracking_area):
         if cnt is not None and len(cnt) > 0:
+            # put rectangle on contour
             self._fish_box = cv2.minAreaRect(cnt[0])
+            f = self._fish_box
+            self._fish_box = (f[0], f[1], f[2])
+            # box[0] -> center
+            # box[1] -> size
+            # box[2] -> angle
+            b = self._fish_box
+
+
+            # if grade_angle > -45:
+            #     dx, dy = dy, dx
+
+            if b[1][0] > b[1][1]:
+                grade_angle = -1 * b[2]
+                angle_prop = (180 - grade_angle)/180
+                angle = math.pi*angle_prop
+                dx = int(round((b[1][1]/2)*math.cos(angle)))
+                dy = int(round((b[1][1]/2)*math.sin(angle)))
+                print "x > y"
+                center1 = tuple((map(operator.add, b[0], (int(dx*2), int(dy*2)))))
+                self._front_box = (center1, (int(b[1][0]), b[1][1]), b[2])
+                center2 = tuple((map(operator.sub, b[0], (int(dx*2), int(dy*2)))))
+                self._back_box = (center2, (int(b[1][0]), b[1][1]), b[2])
+            else:
+                grade_angle = -1 * b[2]
+                angle_prop = grade_angle/180
+                angle = math.pi*angle_prop
+                print "x < y"
+                dx = int(round((b[1][1]/2)*math.sin(angle)))
+                dy = int(round((b[1][1]/2)*math.cos(angle)))
+                center1 = tuple((map(operator.add, b[0], (int(dx*2), int(dy*2)))))
+                self._front_box = (center1, (int(b[1][0]), b[1][1]), b[2])
+                center2 = tuple((map(operator.sub, b[0], (int(dx*2), int(dy*2)))))
+                self._back_box = (center2, (int(b[1][0]), b[1][1]), b[2])
+
+
+
+            # offset = [tracking_area.x1, tracking_area.y1]
+            # fish_box_list = list(self._fish_box)
+            # fish_box_list[0] = tuple(map(operator.add, fish_box_list[0], offset))
+            # self._fish_box = tuple(fish_box_list)
+
+            # get points of rectangle
+            self.fish_box_points = cv2.cv.BoxPoints(self.fish_box)
+            self.fish_box_points = np.int0(self.fish_box_points)
+            self.front_box_points = cv2.cv.BoxPoints(self._front_box)
+            self.front_box_points = np.int0(self.front_box_points)
+            self.back_box_points = cv2.cv.BoxPoints(self._back_box)
+            self.back_box_points = np.int0(self.back_box_points)
+
+
 
     def set_last_orientation(self, ellipse, bool_fish_started, start_ori):
         if not bool_fish_started or ellipse is None:

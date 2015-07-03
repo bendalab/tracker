@@ -349,7 +349,7 @@ class Tracker(object):
             # set last orientation
             self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
 
-            self.dm.calc_ori_boxes(self.cm.contour_list)
+            self.dm.calc_ori_boxes(self.cm.contour_list, self.roim.get_roi("tracking_area"))
 
             # save orientations
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)

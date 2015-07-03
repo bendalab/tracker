@@ -37,8 +37,8 @@ class ImageManager(object):
         angle_prop = grade_angle/180
         angle = math.pi*angle_prop
 
-        x_dif = math.sin(angle)
-        y_dif = math.cos(angle)
+        x_dif = math.cos(angle)
+        y_dif = math.sin(angle)
 
         self.lx1 = int(round(center_x - self.lineend_offset*x_dif))
         self.ly1 = int(round(center_y - self.lineend_offset*y_dif))
@@ -82,16 +82,11 @@ class ImageManager(object):
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
 
         if data_manager.fish_box is not None:
-            box = cv2.cv.BoxPoints(data_manager.fish_box)
-            box = np.int0(box)
-            offset = [roi.y1, roi.x1]
-            for row in box:
-                for i in range(len(row)):
-                    print "--"
-                    print box[i]
-                    box[i] = map(operator.add, box[i], offset)
-                    print box[i]
-            cv2.drawContours(self.current_frame, [box], 0, (0, 0, 255), 2)
+            cv2.drawContours(self.current_frame, [data_manager.fish_box_points], 0, (0, 0, 255), 2, offset=(roi.x1, roi.y1))
+            cv2.drawContours(self.current_frame, [data_manager.front_box_points], 0, (0, 255, 255), 2, offset=(roi.x1, roi.y1))
+            cv2.drawContours(self.current_frame, [data_manager.back_box_points], 0, (255, 255, 0), 2, offset=(roi.x1, roi.y1))
+
+            # cv2.circle(self.current_frame, (int(data_manager.fish_box[0][0]), int(data_manager.fish_box[0][1])), 3, (200, 200, 200))
 
 
         # draw travel orientation  # needed??
