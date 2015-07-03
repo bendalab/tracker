@@ -84,7 +84,7 @@ class ImageManager(object):
         if data_manager.fish_box is not None:
             box = cv2.cv.BoxPoints(data_manager.fish_box)
             box = np.int0(box)
-            offset = [roi.x1, roi.y1]
+            offset = [roi.y1, roi.x1]
             for row in box:
                 for i in range(len(row)):
                     print "--"
