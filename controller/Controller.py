@@ -51,6 +51,10 @@ class Controller(object):
         self.ui.batch_tracking_enabled = True
         self.tracker.batch_mode_on = True
 
+        self.ui.tab_meta.btn_template_browse.setDisabled(True)
+        self.ui.tab_meta.btn_template_add.setDisabled(True)
+        self.ui.tab_meta.btn_template_remove.setDisabled(True)
+
     def btn_to_single_clicked(self):
         file_tab = TabFile()
         file_tab.retranslate_tab_file()
@@ -64,6 +68,10 @@ class Controller(object):
 
         self.ui.batch_tracking_enabled = False
         self.tracker.batch_mode_on = False
+
+        self.ui.tab_meta.btn_template_browse.setEnabled(True)
+        self.ui.tab_meta.btn_template_add.setEnabled(True)
+        self.ui.tab_meta.btn_template_remove.setEnabled(True)
 
     def browse_file(self):
         self.roi_preview_displayed = False
