@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 class DataManager(object):
 
@@ -22,6 +23,10 @@ class DataManager(object):
         self._estimated_pos_roi = []
         self._estimated_pos_original = []
         self._estimated_oris = []
+
+        self._fish_box = None
+        self._front_box = None
+        self._back_box = None
 
     @staticmethod
     def save_number_of_contours(cnt_list, number_cnt_list):
@@ -51,6 +56,10 @@ class DataManager(object):
             original_x = self.last_pos[0] + roi.x1
             original_y = self.last_pos[1] + roi.y1
             self.all_pos_original.append((original_x, original_y))
+
+    def calc_ori_boxes(self, cnt):
+        if cnt is not None and len(cnt) > 0:
+            self._fish_box = cv2.minAreaRect(cnt[0])
 
     def set_last_orientation(self, ellipse, bool_fish_started, start_ori):
         if not bool_fish_started or ellipse is None:
@@ -291,3 +300,15 @@ class DataManager(object):
     @property
     def estimated_oris(self):
         return self._estimated_oris
+
+    @property
+    def front_box(self):
+        return self._front_box
+
+    @property
+    def back_box(self):
+        return self._back_box
+
+    @property
+    def fish_box(self):
+        return self._fish_box

@@ -1,5 +1,7 @@
 import cv2
+import numpy as np
 import math
+import operator
 from copy import copy
 
 
@@ -78,6 +80,19 @@ class ImageManager(object):
                 if i >= 0 and positions[i] is not None:
                     point = positions[i]
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
+
+        if data_manager.fish_box is not None:
+            box = cv2.cv.BoxPoints(data_manager.fish_box)
+            box = np.int0(box)
+            offset = [roi.x1, roi.y1]
+            for row in box:
+                for i in range(len(row)):
+                    print "--"
+                    print box[i]
+                    box[i] = map(operator.add, box[i], offset)
+                    print box[i]
+            cv2.drawContours(self.current_frame, [box], 0, (0, 0, 255), 2)
+
 
         # draw travel orientation  # needed??
         # if self.draw_travel_orientation:
