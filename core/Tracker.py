@@ -288,6 +288,10 @@ class Tracker(object):
             self.im.current_frame = frame
 
             self.dm.frame_counter += 1
+            #
+            # # TODO REMOVE AFTER TESTING
+            # if self.dm.frame_counter < 400:
+            #     continue
 
             # set region of interest ROI
             roi_img = copy.copy(frame[roi.y1:roi.y2, roi.x1:roi.x2])
@@ -349,7 +353,7 @@ class Tracker(object):
             # set last orientation
             self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
 
-            self.dm.calc_ori_boxes(self.cm.contour_list, self.roim.get_roi("tracking_area"))
+            self.dm.calc_ori_boxes(self.cm.contour_list, self.im)
 
             # save orientations
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)

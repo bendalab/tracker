@@ -62,7 +62,7 @@ class DataManager(object):
             original_y = self.last_pos[1] + roi.y1
             self.all_pos_original.append((original_x, original_y))
 
-    def calc_ori_boxes(self, cnt, tracking_area):
+    def calc_ori_boxes(self, cnt, image_manager):
         if cnt is not None and len(cnt) > 0:
             # put rectangle on contour
             self._fish_box = cv2.minAreaRect(cnt[0])
@@ -87,6 +87,8 @@ class DataManager(object):
                 center2 = tuple((map(operator.sub, b[0], (int(dx*fac), int(dy*fac)))))
                 self._back_box = (center2, (int(b[1][0]*fac), int(b[1][1])), b[2])
 
+                switched =  True
+
             else:
                 grade_angle = -1 * b[2]
                 angle_prop = grade_angle/180
@@ -99,13 +101,6 @@ class DataManager(object):
                 center2 = tuple((map(operator.sub, b[0], (int(dx*fac), int(dy*fac)))))
                 self._back_box = (center2, (int(b[1][0]), int(b[1][1]*fac)), b[2])
 
-
-
-            # offset = [tracking_area.x1, tracking_area.y1]
-            # fish_box_list = list(self._fish_box)
-            # fish_box_list[0] = tuple(map(operator.add, fish_box_list[0], offset))
-            # self._fish_box = tuple(fish_box_list)
-
             # get points of rectangle
             self.fish_box_points = cv2.cv.BoxPoints(self.fish_box)
             self.fish_box_points = np.int0(self.fish_box_points)
@@ -113,6 +108,44 @@ class DataManager(object):
             self.front_box_points = np.int0(self.front_box_points)
             self.back_box_points = cv2.cv.BoxPoints(self._back_box)
             self.back_box_points = np.int0(self.back_box_points)
+
+            # check where front and back is
+            # counters for white pixels
+            front_counter = 0
+            back_counter = 0
+            # determine edges for front-back checking
+            # offset = 100
+            # height = len(image_manager.current_bg_sub)
+            # width = len(image_manager.current_bg_sub[0])
+            # y1 = self._last_pos[1] - offset
+            # y2 = self._last_pos[1] + offset
+            # x1 = self._last_pos[0] - offset
+            # x2 = self._last_pos[0] + offset
+            # for y in range(len(image_manager.current_bg_sub[max(y1, 0):min(y2, height)])):
+            #     for x in range(len(image_manager.current_bg_sub[max(y1, 0):min(y2, height)][y])):
+
+            # np.set_printoptions(threshold=np.nan)
+            # print image_manager.current_bg_sub
+
+            for y in range(len(image_manager.current_bg_sub)):
+                for x in range(len(image_manager.current_bg_sub[y])):
+                    # point = (x+x1, y+y1)
+                    point = (x, y)
+                    if image_manager.current_bg_sub[y][x] == 255:
+                        if cv2.pointPolygonTest(self.front_box_points, point, False) > 0:
+                            front_counter += 1
+                        if cv2.pointPolygonTest(self.back_box_points, point, False) > 0:
+                            back_counter += 1
+                        # print "---"
+                        # print cv2.pointPolygonTest(self.front_box_points, point, False)
+                        # print cv2.pointPolygonTest(self.back_box_points, point, False)
+
+            if back_counter > front_counter:
+                self.front_box_points, self.back_box_points = self.back_box_points, self.front_box_points
+                print "switched"
+            else:
+                print "ok"
+
 
 
 
