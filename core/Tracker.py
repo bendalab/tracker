@@ -288,7 +288,7 @@ class Tracker(object):
             self.im.current_frame = frame
 
             self.dm.frame_counter += 1
-            #
+
             # # TODO REMOVE AFTER TESTING
             # if self.dm.frame_counter < 400:
             #     continue

@@ -83,11 +83,9 @@ class DataManager(object):
                 dy = -int(round((b[1][0]/2)*math.sin(angle)))
 
                 center1 = tuple((map(operator.add, b[0], (int(dx*fac), int(dy*fac)))))
-                self._front_box = (center1, (int(b[1][0]*fac), int(b[1][1])), b[2])
+                self._back_box = (center1, (int(b[1][0]*fac), int(b[1][1])), b[2])
                 center2 = tuple((map(operator.sub, b[0], (int(dx*fac), int(dy*fac)))))
-                self._back_box = (center2, (int(b[1][0]*fac), int(b[1][1])), b[2])
-
-                switched =  True
+                self._front_box = (center2, (int(b[1][0]*fac), int(b[1][1])), b[2])
 
             else:
                 grade_angle = -1 * b[2]
@@ -97,9 +95,9 @@ class DataManager(object):
                 dy = int(round((b[1][1]/2)*math.cos(angle)))
 
                 center1 = tuple((map(operator.add, b[0], (int(dx*fac), int(dy*fac)))))
-                self._front_box = (center1, (int(b[1][0]), int(b[1][1]*fac)), b[2])
+                self._back_box = (center1, (int(b[1][0]), int(b[1][1]*fac)), b[2])
                 center2 = tuple((map(operator.sub, b[0], (int(dx*fac), int(dy*fac)))))
-                self._back_box = (center2, (int(b[1][0]), int(b[1][1]*fac)), b[2])
+                self._front_box = (center2, (int(b[1][0]), int(b[1][1]*fac)), b[2])
 
             # get points of rectangle
             self.fish_box_points = cv2.cv.BoxPoints(self.fish_box)
@@ -113,41 +111,26 @@ class DataManager(object):
             # counters for white pixels
             front_counter = 0
             back_counter = 0
-            # determine edges for front-back checking
-            # offset = 100
-            # height = len(image_manager.current_bg_sub)
-            # width = len(image_manager.current_bg_sub[0])
-            # y1 = self._last_pos[1] - offset
-            # y2 = self._last_pos[1] + offset
-            # x1 = self._last_pos[0] - offset
-            # x2 = self._last_pos[0] + offset
-            # for y in range(len(image_manager.current_bg_sub[max(y1, 0):min(y2, height)])):
-            #     for x in range(len(image_manager.current_bg_sub[max(y1, 0):min(y2, height)][y])):
 
-            # np.set_printoptions(threshold=np.nan)
-            # print image_manager.current_bg_sub
+            y_list, x_list = np.nonzero(image_manager.current_bg_sub)
 
-            for y in range(len(image_manager.current_bg_sub)):
-                for x in range(len(image_manager.current_bg_sub[y])):
-                    # point = (x+x1, y+y1)
-                    point = (x, y)
-                    if image_manager.current_bg_sub[y][x] == 255:
-                        if cv2.pointPolygonTest(self.front_box_points, point, False) > 0:
-                            front_counter += 1
-                        if cv2.pointPolygonTest(self.back_box_points, point, False) > 0:
-                            back_counter += 1
-                        # print "---"
-                        # print cv2.pointPolygonTest(self.front_box_points, point, False)
-                        # print cv2.pointPolygonTest(self.back_box_points, point, False)
+            for i in range(len(x_list)):
+                point = (x_list[i], y_list[i])
+                # print point
+                if cv2.pointPolygonTest(self.front_box_points, point, False) > 0:
+                    front_counter += 1
+                if cv2.pointPolygonTest(self.back_box_points, point, False) > 0:
+                    back_counter += 1
+
+            print "===="
+            print front_counter
+            print back_counter
 
             if back_counter > front_counter:
                 self.front_box_points, self.back_box_points = self.back_box_points, self.front_box_points
                 print "switched"
             else:
                 print "ok"
-
-
-
 
     def set_last_orientation(self, ellipse, bool_fish_started, start_ori):
         if not bool_fish_started or ellipse is None:

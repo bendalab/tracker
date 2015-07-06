@@ -82,9 +82,10 @@ class ImageManager(object):
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
 
         if data_manager.fish_box is not None:
-            cv2.drawContours(self.current_frame, [data_manager.fish_box_points], 0, (0, 0, 255), 2, offset=(roi.x1, roi.y1))
+            # cv2.drawContours(self.current_frame, [data_manager.fish_box_points], 0, (0, 0, 255), 2, offset=(roi.x1, roi.y1))
             cv2.drawContours(self.current_frame, [data_manager.front_box_points], 0, (0, 255, 255), 2, offset=(roi.x1, roi.y1))
             cv2.drawContours(self.current_frame, [data_manager.back_box_points], 0, (255, 255, 0), 2, offset=(roi.x1, roi.y1))
+            cv2.circle(self.current_frame, tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])), 3, (255, 0, 127), thickness=3)
 
             # cv2.circle(self.current_frame, (int(data_manager.fish_box[0][0]), int(data_manager.fish_box[0][1])), 3, (200, 200, 200))
 
