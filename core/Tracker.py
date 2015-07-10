@@ -205,7 +205,7 @@ class Tracker(object):
 
     def check_if_necessary_files_exist(self):
         if not os.path.exists(self.video_file):
-            sys.exit("ERROR: Video File does not exist - Tracking aborted")
+            raise Exception("ERROR: Video File <<{0:s}>> does not exist - Tracking aborted".format(self.video_file))
 
     def extract_video_file_name_and_path(self):
         parts = self.video_file.split('/')
@@ -388,7 +388,7 @@ class Tracker(object):
             print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
                   "in the tools folder."
-            sys.exit("ERROR: times file missing - data saving abortet")
+            raise Exception("ERROR: times file missing - data saving abortet")
         
         with open(file_name, 'r') as f:
             times = map(lambda x: x.strip(), f)
