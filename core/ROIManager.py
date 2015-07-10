@@ -31,6 +31,9 @@ class ROIManager(object):
                 break
 
     def get_roi(self, name):
+        print len(self._roi_list)
+        for entry in self._roi_list:
+            print entry.name
         for entry in self._roi_list:
             if entry.name == name:
                 return entry
@@ -41,6 +44,8 @@ class ROIManager(object):
                 entry.set_values(x1, y1, x2, y2)
 
     def check_and_adjust_rois(self, cap, controller):
+        for roi in self._roi_list:
+            print roi.name
         for roi in self._roi_list:
             roi.check_and_adjust_values(cap)
 

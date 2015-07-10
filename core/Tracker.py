@@ -359,6 +359,7 @@ class Tracker(object):
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)
 
             # calculate roi data
+            # self.roim.check_and_adjust_rois(self.cap, self.controller)
             self.roim.calc_roi_data(frame)
 
             # draw current preview
@@ -383,8 +384,13 @@ class Tracker(object):
         cv2.destroyAllWindows()
 
     def load_frame_times(self, file_name):
-        times_file = None
+        print "debug"
+        print file_name
+        # times_file = None
+        if os.path.exists(file_name):
+            print "exists oO"
         if not os.path.exists(file_name):
+            print "doesnt exist oO"
             print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
                   "in the tools folder."

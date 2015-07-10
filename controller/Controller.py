@@ -360,6 +360,10 @@ class Controller(object):
             self.display_roi_preview()
             # self.display_starting_area_preview()
 
+    # TODO finish this!
+    def change_roi_value(self, roi_name, coordinate_string):
+        return
+
     def change_frame_waittime(self, value):
         self.ui.tracker.frame_waittime = value
 
