@@ -351,12 +351,12 @@ class Tracker(object):
             self.dm.save_fish_positions(self.roim.get_roi("tracking_area"))
 
             # set last orientation
-            self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
-            self.dm.calc_ori_boxes(self.cm.contour_list, self.im)
+            # self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
+            self.dm.set_last_orientation(self.cm.contour_list, self.im)
 
             # save orientations
+            # self.dm.save_fish_orientations(self.ellipse, self.fish_started)
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)
-            self.dm.save_fish_orientations_2(self.ellipse, self.fish_started)
 
             # calculate roi data
             # self.roim.check_and_adjust_rois(self.cap, self.controller)
@@ -384,8 +384,6 @@ class Tracker(object):
         cv2.destroyAllWindows()
 
     def load_frame_times(self, file_name):
-        print "debug"
-        print file_name
         if not os.path.exists(file_name):
             print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \

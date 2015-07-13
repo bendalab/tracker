@@ -16,8 +16,8 @@ class DataManager(object):
 
         self._last_ori = None
         self._all_oris = []
-        self._last_ori_2 = None
-        self._all_oris_2 = []
+        self._last_ori_ratio = None
+        self._all_oris_ratio = []
 
         self._fish_not_detected_count = 0
 
@@ -64,7 +64,7 @@ class DataManager(object):
             original_y = self.last_pos[1] + roi.y1
             self.all_pos_original.append((original_x, original_y))
 
-    def calc_ori_boxes(self, cnt, image_manager):
+    def set_last_orientation(self, cnt, image_manager):
         if cnt is not None and len(cnt) > 0:
             # put rectangle on contour
             self._fish_box = cv2.minAreaRect(cnt[0])
@@ -127,73 +127,28 @@ class DataManager(object):
             if back_counter > front_counter:
                 self.front_box_points, self.back_box_points = self.back_box_points, self.front_box_points
 
-            print float(front_counter)/float(back_counter)
-
             front_center = np.mean(self.front_box_points, 0).astype(int)
             back_center = np.mean(self.back_box_points, 0).astype(int)
-            self.set_last_orientation_2(front_center, back_center)
 
-    def set_last_orientation_2(self, front, back):
-        dx = front[0] - back[0]
-        dy = -1*(front[1] - back[1])
+            dx = front_center[0] - back_center[0]
+            dy = -1*(front_center[1] - back_center[1])
 
-        pi_angle = math.atan2(dx, dy)
-        if pi_angle < 0:
-            pi_angle += math.pi*2
+            pi_angle = math.atan2(dx, dy)
+            if pi_angle < 0:
+                pi_angle += math.pi*2
 
-        rel = pi_angle/(2*math.pi)
-        self._last_ori_2 = rel*360
-
-    def save_fish_orientations_2(self, ellipse, bool_fish_started):
-        if not bool_fish_started:
-            self._all_oris_2.append(None)
-            return
-
-        if ellipse is None:
-            self._all_oris_2.append(None)
-            return
-
-        self._all_oris_2.append(self._last_ori_2)
-
-        print "box ori: {0}".format(self._last_ori_2)
-        print "est ori: {0}".format(self._last_ori)
-
-    def set_last_orientation(self, ellipse, bool_fish_started, start_ori):
-        if not bool_fish_started or ellipse is None:
-            return
-
-        if self.last_ori is None:
-            self.last_ori = start_ori
-
-        if ellipse is None:
-            return
-
-        ell_ori = ellipse[2]
-        if self.last_ori > ell_ori:
-            ori_diff = self.last_ori - ell_ori
-            if ori_diff > 270:
-                self.last_ori = ell_ori
-            elif ori_diff < 90:
-                self.last_ori = ell_ori
-            else:
-                self.last_ori = (ell_ori + 180) % 360
-        if self.last_ori < ell_ori:
-            ori_diff = ell_ori - self.last_ori
-            if ori_diff < 90:
-                self.last_ori = ell_ori
-            else:
-                self.last_ori = (ell_ori + 180) % 360
+            rel = pi_angle/(2*math.pi)
+            self._last_ori = rel*360
+            self._last_ori_ratio = float(front_counter)/back_counter
 
     def save_fish_orientations(self, ellipse, bool_fish_started):
-        if not bool_fish_started:
-            self.all_oris.append(None)
+        if not bool_fish_started or ellipse is None:
+            self._all_oris.append(None)
+            self._all_oris_ratio.append(None)
             return
 
-        if ellipse is None:
-            self.all_oris.append(None)
-            return
-
-        self.all_oris.append(self.last_ori)
+        self._all_oris.append(self._last_ori)
+        self._all_oris_ratio.append(self._last_ori_ratio)
 
     def estimate_missing_pos(self, roi):
         # init length of estimated-lists to amount of frames
@@ -313,7 +268,7 @@ class DataManager(object):
         print "number of fish-size contours: " + str(self.number_relevant_contours_per_frame)
 
     def check_data_integrity(self):
-        if not len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == len(self._all_oris_2) == self.frame_counter:
+        if not len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == self.frame_counter:
             print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
 
         print "All lists consistent with frame count: " + str(len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == len(self.number_contours_per_frame) == len(self.number_relevant_contours_per_frame) == self.frame_counter)
