@@ -172,6 +172,7 @@ class Controller(object):
         self.ui.tab_visual.cbx_show_morph_img.setChecked(self.ui.tracker.im.show_morphed_img)
         self.ui.tab_visual.cbx_show_contour.setChecked(self.ui.tracker.im.draw_contour)
         self.ui.tab_visual.cbx_show_ellipse.setChecked(self.ui.tracker.im.draw_ellipse)
+        self.ui.tab_visual.cbx_show_orientation.setChecked(self.tracker.im.show_orientation)
 
         # visualization
         self.ui.tab_visual.spinBox_circle_size.setValue(self.ui.tracker.im.circle_size)
@@ -415,6 +416,9 @@ class Controller(object):
 
     def change_draw_ellipse(self):
         self.ui.tracker.im.draw_ellipse = self.ui.tab_visual.cbx_show_ellipse.isChecked()
+
+    def change_show_orientation(self):
+        self.tracker.im.show_orientation = self.ui.tab_visual.cbx_show_orientation.isChecked()
 
     def change_lineend_offset(self, value):
         self.ui.tracker.im.lineend_offset = value

@@ -53,6 +53,10 @@ class TabVisual(QtGui.QWidget):
         self.cbx_show_ellipse = QtGui.QCheckBox(self)
         self.cbx_show_ellipse.setObjectName(_fromUtf8("cbx_show_ellipse"))
         self.vertLO_tab_visual.addWidget(self.cbx_show_ellipse)
+        # checkbox show ellipse
+        self.cbx_show_orientation = QtGui.QCheckBox(self)
+        self.cbx_show_orientation.setObjectName(_fromUtf8("cbx_show_orientation"))
+        self.vertLO_tab_visual.addWidget(self.cbx_show_orientation)
 
         # line
         self.line_14 = MyQLine(self, "line_14")
@@ -80,6 +84,7 @@ class TabVisual(QtGui.QWidget):
         self.spinBox_lineend_offset = QtGui.QSpinBox(self)
         self.spinBox_lineend_offset.setMinimum(0)
         self.spinBox_lineend_offset.setMaximum(20)
+        self.spinBox_lineend_offset.setEnabled(False)
         self.spinBox_lineend_offset.setObjectName(_fromUtf8("spinBox_lineend_offset"))
         self.gridLO_data_visual.addWidget(self.spinBox_lineend_offset, 1, 1, 1, 1)
         # label circle size
@@ -107,6 +112,7 @@ class TabVisual(QtGui.QWidget):
         self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"), controller.change_show_morphed_img)
         self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"), controller.change_draw_contour)
         self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"), controller.change_draw_ellipse)
+        self.connect(self.cbx_show_orientation, QtCore.SIGNAL("stateChanged(int)"), controller.change_show_orientation)
 
         self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"), controller.change_lineend_offset)
         self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"), controller.change_circle_size)
@@ -118,6 +124,7 @@ class TabVisual(QtGui.QWidget):
         self.cbx_show_morph_img.setText(_translate("tracker_main_widget", "Show Morphed Image", None))
         self.cbx_show_contour.setText(_translate("tracker_main_widget", "Show Contours", None))
         self.cbx_show_ellipse.setText(_translate("tracker_main_widget", "Show fitted Ellipse", None))
+        self.cbx_show_orientation.setText(_translate("tracker_main_widget", "Show Fish Orientation", None))
         self.lbl_circle_size.setText(_translate("tracker_main_widget", "Circle Size", None))
         self.lbl_line_offset.setText(_translate("tracker_main_widget", "Lineend Offset", None))
         self.lbl_data_visualisation.setText(_translate("tracker_main_widget", "Data Visualisation", None))

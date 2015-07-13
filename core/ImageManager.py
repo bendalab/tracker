@@ -16,8 +16,8 @@ class ImageManager(object):
         self._lineend_offset = 5
         self._circle_size = 2
 
-        self._draw_contour = False
-        self._draw_ellipse = True
+        self._draw_contour = True
+        self._draw_ellipse = False
         self._draw_line = True
         self._lx1 = 0
         self._ly1 = 0
@@ -221,6 +221,13 @@ class ImageManager(object):
     @show_morphed_img.setter
     def show_morphed_img(self, boo):
         self._show_morphed_img = boo
+
+    @property
+    def show_orientation(self):
+        return self._show_orientation
+    @show_orientation.setter
+    def show_orientation(self, boo):
+        self._show_orientation = boo
 
     @property
     def lx1(self):
