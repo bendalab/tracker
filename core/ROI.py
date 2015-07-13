@@ -34,35 +34,27 @@ class ROI(object):
             return
 
     def check_and_adjust_values(self, cap):
-        print "adjusting {0:s}".format(self.name)
         width = cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
         height = cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
-        print self._x_1, self._x_2, self._y_1, self._y_2
-        print width, height
         if self._x_1 < 0:
             self._x_1 = 0
         if self._x_1 > width:
-            self._x_1 = width-10
+            self._x_1 = int(width-2)
         if self._x_2 < 0:
             self._x_2 = 2
         if self._x_2 > width:
-            self._x_2 = width-1
+            self._x_2 = int(width-1)
         if self._y_1 < 0:
             self._y_1 = 0
         if self._y_1 > height:
-            self._y_1 = height-10
+            self._y_1 = int(height-2)
         if self._y_2 < 0:
             self._y_2 = 2
         if self._y_2 > height:
-            self._y_2 = height-1
-
-        print self._x_1, self._x_2, self._y_1, self._y_2
+            self._y_2 = int(height-1)
 
     def calc_mean_color(self, img):
-        print self.name
-        print self._y_1, self._y_2, self._x_1, self._x_2
         img_roi = img[self._y_1:self._y_2, self._x_1:self._x_2]
-        print img_roi
         mean_color = tuple([int(entry) for entry in np.mean(np.mean(img_roi, 0), 0)])
         self._frame_data["{0:s}_mean_colors".format(self._name)].append(mean_color)
         return

@@ -346,23 +346,36 @@ class Controller(object):
     #     checked = self.ui.tab_file.cbx_add_metadata.isChecked()
     #     print checked
 
-    def change_roi_values(self):
+    # def change_roi_values(self):
+    #     for box in self.ui.tab_roi.roi_input_boxes:
+    #         x1, y1, x2, y2 = box.get_values()
+    #         area_name = box.name
+    #         self.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
+    #         box.spinBox_roi_x1.setMaximum(box.spinBox_roi_x2.value()-1)
+    #         box.spinBox_roi_x2.setMinimum(box.spinBox_roi_x1.value()+1)
+    #         box.spinBox_roi_y1.setMaximum(box.spinBox_roi_y2.value()-1)
+    #         box.spinBox_roi_y2.setMinimum(box.spinBox_roi_y1.value()+1)
+    #
+    #     if self.preview_is_set:
+    #         self.display_roi_preview()
+    #         # self.display_starting_area_preview()
+
+    # TODO finish this!
+    def change_roi_value(self, roi_input_box, coordinate_string):
         for box in self.ui.tab_roi.roi_input_boxes:
-            x1, y1, x2, y2 = box.get_values()
-            area_name = box.name
-            self.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
-            box.spinBox_roi_x1.setMaximum(box.spinBox_roi_x2.value()-1)
-            box.spinBox_roi_x2.setMinimum(box.spinBox_roi_x1.value()+1)
-            box.spinBox_roi_y1.setMaximum(box.spinBox_roi_y2.value()-1)
-            box.spinBox_roi_y2.setMinimum(box.spinBox_roi_y1.value()+1)
+            if box.name == roi_input_box.name:
+                if coordinate_string == "x1":
+                    self.tracker.roim.get_roi(roi_input_box.name).x1 = roi_input_box.spinBox_roi_x1.value()
+                if coordinate_string == "x2":
+                    self.tracker.roim.get_roi(roi_input_box.name).x2 = roi_input_box.spinBox_roi_x2.value()
+                if coordinate_string == "y1":
+                    self.tracker.roim.get_roi(roi_input_box.name).y1 = roi_input_box.spinBox_roi_y1.value()
+                if coordinate_string == "y2":
+                    self.tracker.roim.get_roi(roi_input_box.name).y2 = roi_input_box.spinBox_roi_y2.value()
 
         if self.preview_is_set:
             self.display_roi_preview()
             # self.display_starting_area_preview()
-
-    # TODO finish this!
-    def change_roi_value(self, roi_name, coordinate_string):
-        return
 
     def change_frame_waittime(self, value):
         self.ui.tracker.frame_waittime = value
