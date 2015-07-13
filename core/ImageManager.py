@@ -131,6 +131,10 @@ class ImageManager(object):
         self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
         self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
         self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
+        try:
+            self._show_orientation = cfg.getboolean('image_processing', 'show_orientation')
+        except:
+            pass
 
         self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
         self.circle_size = cfg.getint('visualization', 'circle_size')
@@ -141,6 +145,7 @@ class ImageManager(object):
         cfg.set('image_processing', 'show_morphed_img', str(self.show_morphed_img))
         cfg.set('image_processing', 'draw_contour', str(self.draw_contour))
         cfg.set('image_processing', 'draw_ellipse', str(self.draw_ellipse))
+        cfg.set('image_processing', 'show_orientation', str(self._show_orientation))
         cfg.add_section('visualization')
         cfg.set('visualization', 'lineend_offset', str(self.lineend_offset))
         cfg.set('visualization', 'circle_size', str(self.circle_size))
