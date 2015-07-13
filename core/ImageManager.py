@@ -28,6 +28,7 @@ class ImageManager(object):
         self._draw_travel_route = True
         self._show_bg_sub_img = False
         self._show_morphed_img = False
+        self._show_orientation = False
 
         # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
     def get_line_from_ellipse(self, ellipse):
@@ -81,16 +82,21 @@ class ImageManager(object):
                     point = positions[i]
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
 
-        if data_manager.fish_box is not None:
-            # cv2.drawContours(self.current_frame, [data_manager.fish_box_points], 0, (0, 0, 255), 2, offset=(roi.x1, roi.y1))
-            cv2.drawContours(self.current_frame, [data_manager.front_box_points], 0, (0, 255, 255), 2, offset=(roi.x1, roi.y1))
-            cv2.drawContours(self.current_frame, [data_manager.back_box_points], 0, (255, 255, 0), 2, offset=(roi.x1, roi.y1))
+        if data_manager.fish_box is not None and self._show_orientation:
             cv2.circle(self.current_frame, tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])), 3, (255, 0, 127), thickness=3)
+            cv2.line(self.current_frame,
+                     tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])),
+                     tuple(np.add(np.mean(data_manager.back_box_points, 0).astype(int), [roi.x1, roi.y1])),
+                    (255, 0, 127), thickness=3)
 
-            # cv2.circle(self.current_frame, (int(data_manager.fish_box[0][0]), int(data_manager.fish_box[0][1])), 3, (200, 200, 200))
+        # draws front and back box of fish, maybe add as option
+        # if data_manager.fish_box is not None:
+        #     # cv2.drawContours(self.current_frame, [data_manager.fish_box_points], 0, (0, 0, 255), 2, offset=(roi.x1, roi.y1))
+        #     cv2.drawContours(self.current_frame, [data_manager.front_box_points], 0, (0, 255, 255), 2, offset=(roi.x1, roi.y1))
+        #     cv2.drawContours(self.current_frame, [data_manager.back_box_points], 0, (255, 255, 0), 2, offset=(roi.x1, roi.y1))
+        #     cv2.circle(self.current_frame, tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])), 3, (255, 0, 127), thickness=3)
 
-
-        # draw travel orientation  # needed??
+        # draws travel orientation
         # if self.draw_travel_orientation:
         #     for coordinates in data_manager.all_pos_original:
         #         if coordinates is not None:
