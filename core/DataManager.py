@@ -126,6 +126,7 @@ class DataManager(object):
 
             if back_counter > front_counter:
                 self.front_box_points, self.back_box_points = self.back_box_points, self.front_box_points
+                back_counter, front_counter = front_counter, back_counter
 
             front_center = np.mean(self.front_box_points, 0).astype(int)
             back_center = np.mean(self.back_box_points, 0).astype(int)
@@ -352,6 +353,10 @@ class DataManager(object):
     @property
     def estimated_oris(self):
         return self._estimated_oris
+
+    @property
+    def all_oris_ratio(self):
+        return self._all_oris_ratio
 
     @property
     def front_box(self):
