@@ -1,4 +1,7 @@
 import numpy as np
+import operator
+import math
+import cv2
 
 class DataManager(object):
 
@@ -13,6 +16,8 @@ class DataManager(object):
 
         self._last_ori = None
         self._all_oris = []
+        self._last_ori_ratio = None
+        self._all_oris_ratio = []
 
         self._fish_not_detected_count = 0
 
@@ -22,6 +27,13 @@ class DataManager(object):
         self._estimated_pos_roi = []
         self._estimated_pos_original = []
         self._estimated_oris = []
+
+        self._fish_box = None
+        self.fish_box_points = None
+        self._front_box = None
+        self._back_box = None
+        self.front_box_points = None
+        self.back_box_points = None
 
     @staticmethod
     def save_number_of_contours(cnt_list, number_cnt_list):
@@ -52,42 +64,92 @@ class DataManager(object):
             original_y = self.last_pos[1] + roi.y1
             self.all_pos_original.append((original_x, original_y))
 
-    def set_last_orientation(self, ellipse, bool_fish_started, start_ori):
-        if not bool_fish_started or ellipse is None:
-            return
+    def set_last_orientation(self, cnt, image_manager):
+        if cnt is not None and len(cnt) > 0:
+            # put rectangle on contour
+            self._fish_box = cv2.minAreaRect(cnt[0])
+            f = self._fish_box
+            self._fish_box = (f[0], f[1], f[2])
+            # box[0] -> center
+            # box[1] -> size
+            # box[2] -> angle
+            b = self._fish_box
 
-        if self.last_ori is None:
-            self.last_ori = start_ori
+            fac = 0.5
 
-        if ellipse is None:
-            return
+            if b[1][0] > b[1][1]:
+                grade_angle = -1 * b[2]
+                angle_prop = grade_angle/180
+                angle = math.pi*angle_prop
+                dx = int(round((b[1][0]/2)*math.cos(angle)))
+                dy = -int(round((b[1][0]/2)*math.sin(angle)))
 
-        ell_ori = ellipse[2]
-        if self.last_ori > ell_ori:
-            ori_diff = self.last_ori - ell_ori
-            if ori_diff > 270:
-                self.last_ori = ell_ori
-            elif ori_diff < 90:
-                self.last_ori = ell_ori
+                center1 = tuple((map(operator.add, b[0], (int(dx*fac), int(dy*fac)))))
+                self._back_box = (center1, (int(b[1][0]*fac), int(b[1][1])), b[2])
+                center2 = tuple((map(operator.sub, b[0], (int(dx*fac), int(dy*fac)))))
+                self._front_box = (center2, (int(b[1][0]*fac), int(b[1][1])), b[2])
+
             else:
-                self.last_ori = (ell_ori + 180) % 360
-        if self.last_ori < ell_ori:
-            ori_diff = ell_ori - self.last_ori
-            if ori_diff < 90:
-                self.last_ori = ell_ori
-            else:
-                self.last_ori = (ell_ori + 180) % 360
+                grade_angle = -1 * b[2]
+                angle_prop = grade_angle/180
+                angle = math.pi*angle_prop
+                dx = int(round((b[1][1]/2)*math.sin(angle)))
+                dy = int(round((b[1][1]/2)*math.cos(angle)))
+
+                center1 = tuple((map(operator.add, b[0], (int(dx*fac), int(dy*fac)))))
+                self._back_box = (center1, (int(b[1][0]), int(b[1][1]*fac)), b[2])
+                center2 = tuple((map(operator.sub, b[0], (int(dx*fac), int(dy*fac)))))
+                self._front_box = (center2, (int(b[1][0]), int(b[1][1]*fac)), b[2])
+
+            # get points of rectangle
+            self.fish_box_points = cv2.cv.BoxPoints(self.fish_box)
+            self.fish_box_points = np.int0(self.fish_box_points)
+            self.front_box_points = cv2.cv.BoxPoints(self._front_box)
+            self.front_box_points = np.int0(self.front_box_points)
+            self.back_box_points = cv2.cv.BoxPoints(self._back_box)
+            self.back_box_points = np.int0(self.back_box_points)
+
+            # check where front and back is
+            # counters for white pixels
+            front_counter = 0
+            back_counter = 0
+
+            y_list, x_list = np.nonzero(image_manager.current_bg_sub)
+
+            for i in range(len(x_list)):
+                point = (x_list[i], y_list[i])
+                # print point
+                if cv2.pointPolygonTest(self.front_box_points, point, False) > 0:
+                    front_counter += 1
+                if cv2.pointPolygonTest(self.back_box_points, point, False) > 0:
+                    back_counter += 1
+
+            if back_counter > front_counter:
+                self.front_box_points, self.back_box_points = self.back_box_points, self.front_box_points
+                back_counter, front_counter = front_counter, back_counter
+
+            front_center = np.mean(self.front_box_points, 0).astype(int)
+            back_center = np.mean(self.back_box_points, 0).astype(int)
+
+            dx = front_center[0] - back_center[0]
+            dy = -1*(front_center[1] - back_center[1])
+
+            pi_angle = math.atan2(dx, dy)
+            if pi_angle < 0:
+                pi_angle += math.pi*2
+
+            rel = pi_angle/(2*math.pi)
+            self._last_ori = rel*360
+            self._last_ori_ratio = float(front_counter)/back_counter
 
     def save_fish_orientations(self, ellipse, bool_fish_started):
-        if not bool_fish_started:
-            self.all_oris.append(None)
+        if not bool_fish_started or ellipse is None:
+            self._all_oris.append(None)
+            self._all_oris_ratio.append(None)
             return
 
-        if ellipse is None:
-            self.all_oris.append(None)
-            return
-
-        self.all_oris.append(self.last_ori)
+        self._all_oris.append(self._last_ori)
+        self._all_oris_ratio.append(self._last_ori_ratio)
 
     def estimate_missing_pos(self, roi):
         # init length of estimated-lists to amount of frames
@@ -291,3 +353,19 @@ class DataManager(object):
     @property
     def estimated_oris(self):
         return self._estimated_oris
+
+    @property
+    def all_oris_ratio(self):
+        return self._all_oris_ratio
+
+    @property
+    def front_box(self):
+        return self._front_box
+
+    @property
+    def back_box(self):
+        return self._back_box
+
+    @property
+    def fish_box(self):
+        return self._fish_box

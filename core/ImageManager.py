@@ -1,5 +1,7 @@
 import cv2
+import numpy as np
 import math
+import operator
 from copy import copy
 
 
@@ -14,8 +16,8 @@ class ImageManager(object):
         self._lineend_offset = 5
         self._circle_size = 2
 
-        self._draw_contour = False
-        self._draw_ellipse = True
+        self._draw_contour = True
+        self._draw_ellipse = False
         self._draw_line = True
         self._lx1 = 0
         self._ly1 = 0
@@ -26,6 +28,7 @@ class ImageManager(object):
         self._draw_travel_route = True
         self._show_bg_sub_img = False
         self._show_morphed_img = False
+        self._show_orientation = False
 
         # calculates start and endpoint for a line displaying the orientation of given ellipse (thus of the fish)
     def get_line_from_ellipse(self, ellipse):
@@ -35,8 +38,8 @@ class ImageManager(object):
         angle_prop = grade_angle/180
         angle = math.pi*angle_prop
 
-        x_dif = math.sin(angle)
-        y_dif = math.cos(angle)
+        x_dif = math.cos(angle)
+        y_dif = math.sin(angle)
 
         self.lx1 = int(round(center_x - self.lineend_offset*x_dif))
         self.ly1 = int(round(center_y - self.lineend_offset*y_dif))
@@ -79,7 +82,21 @@ class ImageManager(object):
                     point = positions[i]
                     cv2.circle(self.current_frame, (int(point[0]), int(point[1])), self._circle_size, (255, 0, 0))
 
-        # draw travel orientation  # needed??
+        if data_manager.fish_box is not None and self._show_orientation:
+            cv2.circle(self.current_frame, tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])), 3, (255, 0, 127), thickness=3)
+            cv2.line(self.current_frame,
+                     tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])),
+                     tuple(np.add(np.mean(data_manager.back_box_points, 0).astype(int), [roi.x1, roi.y1])),
+                    (255, 0, 127), thickness=3)
+
+        # draws front and back box of fish, maybe add as option
+        # if data_manager.fish_box is not None:
+        #     # cv2.drawContours(self.current_frame, [data_manager.fish_box_points], 0, (0, 0, 255), 2, offset=(roi.x1, roi.y1))
+        #     cv2.drawContours(self.current_frame, [data_manager.front_box_points], 0, (0, 255, 255), 2, offset=(roi.x1, roi.y1))
+        #     cv2.drawContours(self.current_frame, [data_manager.back_box_points], 0, (255, 255, 0), 2, offset=(roi.x1, roi.y1))
+        #     cv2.circle(self.current_frame, tuple(np.add(np.mean(data_manager.front_box_points, 0).astype(int), [roi.x1, roi.y1])), 3, (255, 0, 127), thickness=3)
+
+        # draws travel orientation
         # if self.draw_travel_orientation:
         #     for coordinates in data_manager.all_pos_original:
         #         if coordinates is not None:
@@ -114,6 +131,10 @@ class ImageManager(object):
         self.show_morphed_img = cfg.getboolean('image_processing', 'show_morphed_img')
         self.draw_contour = cfg.getboolean('image_processing', 'draw_contour')
         self.draw_ellipse = cfg.getboolean('image_processing', 'draw_ellipse')
+        try:
+            self._show_orientation = cfg.getboolean('image_processing', 'show_orientation')
+        except:
+            pass
 
         self.lineend_offset = cfg.getint('visualization', 'lineend_offset')
         self.circle_size = cfg.getint('visualization', 'circle_size')
@@ -124,6 +145,7 @@ class ImageManager(object):
         cfg.set('image_processing', 'show_morphed_img', str(self.show_morphed_img))
         cfg.set('image_processing', 'draw_contour', str(self.draw_contour))
         cfg.set('image_processing', 'draw_ellipse', str(self.draw_ellipse))
+        cfg.set('image_processing', 'show_orientation', str(self._show_orientation))
         cfg.add_section('visualization')
         cfg.set('visualization', 'lineend_offset', str(self.lineend_offset))
         cfg.set('visualization', 'circle_size', str(self.circle_size))
@@ -204,6 +226,13 @@ class ImageManager(object):
     @show_morphed_img.setter
     def show_morphed_img(self, boo):
         self._show_morphed_img = boo
+
+    @property
+    def show_orientation(self):
+        return self._show_orientation
+    @show_orientation.setter
+    def show_orientation(self, boo):
+        self._show_orientation = boo
 
     @property
     def lx1(self):

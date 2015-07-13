@@ -109,6 +109,7 @@ class DataWriter(object):
         DataWriter.save_trace(time_stamps, data_manager.estimated_pos_original, block, 'estimated positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
         DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
         DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block, 'estimated_orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
+        DataWriter.save_trace(time_stamps, data_manager.all_oris_ratio, block, 'orientation_ratios', 'nix.irregular_sampled', data_label='orientaion_ratio', set_labels=['front_to_back_ratio'])
         DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block, 'object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
         DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame, block, 'fish object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
 

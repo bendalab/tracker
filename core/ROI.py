@@ -38,12 +38,20 @@ class ROI(object):
         height = cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
         if self._x_1 < 0:
             self._x_1 = 0
+        if self._x_1 > width:
+            self._x_1 = int(width-2)
+        if self._x_2 < 0:
+            self._x_2 = 2
+        if self._x_2 > width:
+            self._x_2 = int(width-1)
         if self._y_1 < 0:
             self._y_1 = 0
-        if self._x_2 > width:
-            self._x_2 = width
+        if self._y_1 > height:
+            self._y_1 = int(height-2)
+        if self._y_2 < 0:
+            self._y_2 = 2
         if self._y_2 > height:
-            self._y_2 = height
+            self._y_2 = int(height-1)
 
     def calc_mean_color(self, img):
         img_roi = img[self._y_1:self._y_2, self._x_1:self._x_2]

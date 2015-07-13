@@ -17,8 +17,10 @@ except AttributeError:
         return QtGui.QApplication.translate(context, text, disambig)
 
 class RoiInputBox(QtGui.QWidget):
-    def __init__(self, roi):
+    def __init__(self, roi, controller):
         super(RoiInputBox, self).__init__()
+
+        self.controller = controller
 
         self.setMinimumHeight(100)
 
@@ -89,13 +91,24 @@ class RoiInputBox(QtGui.QWidget):
     # def send_change_to_controller(self, controller):
     #     controller.change_roi_values(self.name)
 
-
     def connect_widgets(self, controller):
-        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
-        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
-        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
-        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), controller.change_roi_values)
+        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_x1)
+        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_x2)
+        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_y1)
+        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_y2)
         return
+
+    def send_value_change_x1(self):
+        self.controller.change_roi_value(self, "x1")
+
+    def send_value_change_x2(self):
+        self.controller.change_roi_value(self, "x2")
+
+    def send_value_change_y1(self):
+        self.controller.change_roi_value(self, "y1")
+
+    def send_value_change_y2(self):
+        self.controller.change_roi_value(self, "y2")
 
     def retranslate_roi_input_box(self):
         # self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))

@@ -205,7 +205,7 @@ class Tracker(object):
 
     def check_if_necessary_files_exist(self):
         if not os.path.exists(self.video_file):
-            sys.exit("ERROR: Video File does not exist - Tracking aborted")
+            raise Exception("ERROR: Video File <<{0:s}>> does not exist - Tracking aborted".format(self.video_file))
 
     def extract_video_file_name_and_path(self):
         parts = self.video_file.split('/')
@@ -289,6 +289,10 @@ class Tracker(object):
 
             self.dm.frame_counter += 1
 
+            # # TODO REMOVE AFTER TESTING
+            # if self.dm.frame_counter < 400:
+            #     continue
+
             # set region of interest ROI
             roi_img = copy.copy(frame[roi.y1:roi.y2, roi.x1:roi.x2])
 
@@ -347,12 +351,15 @@ class Tracker(object):
             self.dm.save_fish_positions(self.roim.get_roi("tracking_area"))
 
             # set last orientation
-            self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
+            # self.dm.set_last_orientation(self.ellipse, self.fish_started, self.start_ori)
+            self.dm.set_last_orientation(self.cm.contour_list, self.im)
 
             # save orientations
+            # self.dm.save_fish_orientations(self.ellipse, self.fish_started)
             self.dm.save_fish_orientations(self.ellipse, self.fish_started)
 
             # calculate roi data
+            # self.roim.check_and_adjust_rois(self.cap, self.controller)
             self.roim.calc_roi_data(frame)
 
             # draw current preview
@@ -377,19 +384,16 @@ class Tracker(object):
         cv2.destroyAllWindows()
 
     def load_frame_times(self, file_name):
-        times_file = None
         if not os.path.exists(file_name):
             print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
                   "in the tools folder."
-            sys.exit("ERROR: times file missing - data saving abortet")
+            raise Exception("ERROR: times file missing - data saving abortet")
         
         with open(file_name, 'r') as f:
             times = map(lambda x: x.strip(), f)
         return times
 
-
-        
     def run(self):
         # self.set_video_file()
         self.check_if_necessary_files_exist()
