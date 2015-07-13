@@ -387,10 +387,10 @@ class Tracker(object):
         print "debug"
         print file_name
         # times_file = None
-        if os.path.exists(file_name):
-            print "exists oO"
+        # if os.path.exists(file_name):
+        #     print "exists oO"
         if not os.path.exists(file_name):
-            print "doesnt exist oO"
+            # print "doesnt exist oO"
             print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
                   "in the tools folder."
