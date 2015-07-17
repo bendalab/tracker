@@ -80,7 +80,6 @@ class DataWriter(object):
         settings['Dilation iterations'] = parameters['dilation_iterations']
         settings['Erosion matrix value'] = parameters['erosion_matrix_value']
         settings['Dilation matrix value'] = parameters['dilation_matrix_value']
-        settings['Start orientation'] = parameters['fish_start_orientation']
 
         for roi in roi_manager.roi_list:
             settings['ROI {0:s} X'.format(roi.name)] = roi.x1
