@@ -161,10 +161,6 @@ class TabAdv(QtGui.QWidget):
         self.vertLO_tab_adv.addItem(spacerItem10)
 
     def connect_widgets(self, controller):
-        # self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        # self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        # self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        # self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
         self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), controller.change_erosion_factor)
         self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_factor)
 
