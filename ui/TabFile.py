@@ -89,9 +89,6 @@ class TabFile(QtGui.QWidget):
         spacer_item_1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_file.addItem(spacer_item_1)
 
-        # # complete file tab
-        # self.tab_widget_options.addTab(self, _fromUtf8(""))
-
     def connect_widgets(self, controller):
         self.btn_to_batch.clicked.connect(controller.btn_to_batch_clicked)
         self.btn_browse_file.clicked.connect(controller.browse_file)
