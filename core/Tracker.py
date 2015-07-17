@@ -88,8 +88,6 @@ class Tracker(object):
         self.fish_started = False
         # self.starting_area = RelROI(0.85, 0.30, 1.00, 0.70)
 
-        self._start_ori = 270
-
         self.fish_not_detected_threshold = 50
         self.fish_not_detected_threshold_reached = False
 
@@ -152,7 +150,6 @@ class Tracker(object):
         except:
             print "no entry for erosion or dilation matrix value. will be created at next tracking"
 
-        self._start_ori = self.read_cfg.getint('detection_values', 'start_orientation')
         self._fish_size_threshold = self.read_cfg.getint('detection_values', 'min_area_threshold')
         self._fish_max_size_threshold = self.read_cfg.getint('detection_values', 'max_area_threshold')
         self._enable_max_size_threshold = self.read_cfg.getboolean('detection_values', 'enable_max_size_threshold')
@@ -173,7 +170,6 @@ class Tracker(object):
         self.roim.add_cfg_values(cfg)
 
         cfg.add_section('detection_values')
-        cfg.set('detection_values', 'start_orientation', str(self.start_ori))
         cfg.set('detection_values', 'min_area_threshold', str(self.fish_size_threshold))
         cfg.set('detection_values', 'max_area_threshold', str(self.fish_max_size_threshold))
         cfg.set('detection_values', 'enable_max_size_threshold', str(self.enable_max_size_threshold))
@@ -423,7 +419,6 @@ class Tracker(object):
         params['fish_min_size'] = self._fish_size_threshold
         params['fish_max_size'] = self._fish_max_size_threshold
         params['fish_max_size_enabled'] = str(self._enable_max_size_threshold)
-        params['fish_start_orientation'] = self._start_ori
         params['erosion_iterations'] = self._erosion_iterations
         params['dilation_iterations'] = self._dilation_iterations
         params['erosion_matrix_value'] = self._erosion_matrix_value

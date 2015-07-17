@@ -153,9 +153,6 @@ class Controller(object):
         # frame waittime
         self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
 
-        # starting orientation
-        self.ui.tab_adv.spinBox_start_orientation.setValue(self.ui.tracker.start_ori)
-
         # fish size thresholds
         self.ui.tab_adv.spinBox_fish_threshold.setValue(self.ui.tracker.fish_size_threshold)
         self.ui.tab_adv.spinBox_fish_max_threshold.setValue(self.ui.tracker.fish_max_size_threshold)
