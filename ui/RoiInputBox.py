@@ -88,9 +88,6 @@ class RoiInputBox(QtGui.QWidget):
         y2 = self.spinBox_roi_y2.value()
         return x1, y1, x2, y2
 
-    # def send_change_to_controller(self, controller):
-    #     controller.change_roi_values(self.name)
-
     def connect_widgets(self, controller):
         self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_x1)
         self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_x2)
@@ -111,7 +108,6 @@ class RoiInputBox(QtGui.QWidget):
         self.controller.change_roi_value(self, "y2")
 
     def retranslate_roi_input_box(self):
-        # self.lbl_roi.setToolTip(_translate("tracker_main_widget", "<html><head/><body><p>Define the Area in which the Fish shall be detected. Point (0,0) is the upper left corner.</p></body></html>", None))
         self.lbl_name.setText(_translate("tracker_main_widget", self.name, None))
         self.lbl_roi_y_end.setText(_translate("tracker_main_widget", "Y End", None))
         self.lbl_roi_x_end.setText(_translate("tracker_main_widget", "X End", None))
