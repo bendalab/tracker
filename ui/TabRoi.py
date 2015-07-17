@@ -60,10 +60,6 @@ class TabRoi(QtGui.QWidget):
         self.roi_config_widget = QtGui.QWidget()
         self.roi_config_widget.setMinimumHeight(600)
         self.roi_config_widget.setMinimumWidth(280)
-        # pal = QtGui.QPalette()
-        # pal.setColor(QtGui.QPalette.Background, QtCore.Qt.black)
-        # self.roi_config_widget.setAutoFillBackground(True)
-        # self.roi_config_widget.setPalette(pal)
         # vertical layout roi config
         self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
         self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
@@ -106,7 +102,6 @@ class TabRoi(QtGui.QWidget):
         controller.preset_roi_input_box(new_box)
         new_box.connect_widgets(self.controller)
         controller.display_roi_preview()
-        #self.adjust_all_sizes()
 
     def remove_roi_input_box(self, roi_name, controller):
         roi_box_name = "roi_{0:s}".format(roi_name)
@@ -119,8 +114,6 @@ class TabRoi(QtGui.QWidget):
                 break
 
     def adjust_all_sizes(self):
-        # self.roi_config_widget.setMinimumSize(int(self.width()*0.3), int(self.height()*0.85))
-        # self.roi_preview_widget.adjustSize()
         self.roi_config_widget.adjustSize()
         return
 

@@ -150,19 +150,8 @@ class Controller(object):
         self.ui.lbl_progress.setText("Progress: {0:s}".format(progress))
 
     def preset_options(self):
-        # video file
-        # self.lnEdit_file_path.setText(self.tracker.video_file)
-        # self.ui.tab_file.cbx_enable_nix_output.setChecked(self.ui.tracker.nix_io)
-
-        # meta
-        # self.ui.tab_meta.ln_edit_experimenter.setText(self.ui.tracker.mm.experimenter)
-        # self.ui.tab_meta.ln_edit_fish_id.setText(self.ui.tracker.mm.fish_id)
-
         # frame waittime
         self.ui.tab_adv.spinBox_frame_waittime.setValue(self.ui.tracker.frame_waittime)
-
-        # starting orientation
-        self.ui.tab_adv.spinBox_start_orientation.setValue(self.ui.tracker.start_ori)
 
         # fish size thresholds
         self.ui.tab_adv.spinBox_fish_threshold.setValue(self.ui.tracker.fish_size_threshold)
@@ -351,25 +340,6 @@ class Controller(object):
             self.ui.tab_file.lnEdit_output_path.setText("Output = Input Folder")
         self.output_is_input = checked
 
-    # def cbx_add_metadata_changed(self):
-    #     checked = self.ui.tab_file.cbx_add_metadata.isChecked()
-    #     print checked
-
-    # def change_roi_values(self):
-    #     for box in self.ui.tab_roi.roi_input_boxes:
-    #         x1, y1, x2, y2 = box.get_values()
-    #         area_name = box.name
-    #         self.tracker.roim.set_roi(x1, y1, x2, y2, area_name)
-    #         box.spinBox_roi_x1.setMaximum(box.spinBox_roi_x2.value()-1)
-    #         box.spinBox_roi_x2.setMinimum(box.spinBox_roi_x1.value()+1)
-    #         box.spinBox_roi_y1.setMaximum(box.spinBox_roi_y2.value()-1)
-    #         box.spinBox_roi_y2.setMinimum(box.spinBox_roi_y1.value()+1)
-    #
-    #     if self.preview_is_set:
-    #         self.display_roi_preview()
-    #         # self.display_starting_area_preview()
-
-    # TODO finish this!
     def change_roi_value(self, roi_input_box, coordinate_string):
         for box in self.ui.tab_roi.roi_input_boxes:
             if box.name == roi_input_box.name:
@@ -385,6 +355,24 @@ class Controller(object):
         if self.preview_is_set:
             self.display_roi_preview()
             # self.display_starting_area_preview()
+
+    def disable_roi_tab(self):
+        for box in self.ui.tab_roi.roi_input_boxes:
+            box.spinBox_roi_x1.setDisabled(True)
+            box.spinBox_roi_x2.setDisabled(True)
+            box.spinBox_roi_y1.setDisabled(True)
+            box.spinBox_roi_y2.setDisabled(True)
+        self.ui.tab_roi.btn_create_roi.setDisabled(True)
+        self.ui.tab_roi.btn_delete_roi.setDisabled(True)
+
+    def enable_roi_tab(self):
+        for box in self.ui.tab_roi.roi_input_boxes:
+            box.spinBox_roi_x1.setDisabled(False)
+            box.spinBox_roi_x2.setDisabled(False)
+            box.spinBox_roi_y1.setDisabled(False)
+            box.spinBox_roi_y2.setDisabled(False)
+        self.ui.tab_roi.btn_create_roi.setDisabled(False)
+        self.ui.tab_roi.btn_delete_roi.setDisabled(False)
 
     def change_frame_waittime(self, value):
         self.ui.tracker.frame_waittime = value
@@ -469,6 +457,7 @@ class Controller(object):
         self.ui.btn_abort_tracking.setDisabled(False)
         self.ui.btn_start_tracking.setDisabled(True)
         self.ui.tab_file.btn_to_batch.setDisabled(True)
+        self.disable_roi_tab()
         try:
             self.ui.tracker.run()
         except Exception as e:
@@ -481,6 +470,7 @@ class Controller(object):
         self.ui.tab_file.btn_to_batch.setDisabled(False)
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
+        self.enable_roi_tab()
 
     # TODO recursively get files with fitting suffix from track directory
     def set_batch_files(self, path):
@@ -532,6 +522,7 @@ class Controller(object):
 
         self.ui.btn_abort_tracking.setDisabled(False)
         self.ui.btn_start_tracking.setDisabled(True)
+        self.disable_roi_tab()
 
         while not self.abort_batch_tracking and not (self.batch_files is None or len(self.batch_files) == 0):
             track_path = self.batch_files.pop(0)
@@ -557,6 +548,7 @@ class Controller(object):
 
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
+        self.enable_roi_tab()
 
     def abort_tracking(self):
         if self.ui.batch_tracking_enabled:
@@ -566,8 +558,6 @@ class Controller(object):
         self.ui.controller.preset_options()
         self.ui.btn_abort_tracking.setDisabled(True)
         self.ui.btn_start_tracking.setDisabled(False)
-
-
 
     @property
     def ui(self):

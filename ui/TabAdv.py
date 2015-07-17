@@ -121,29 +121,6 @@ class TabAdv(QtGui.QWidget):
         self.hoLO_frame_waittime.addWidget(self.spinBox_frame_waittime)
         self.vertLO_tab_adv.addLayout(self.hoLO_frame_waittime)
         # spacer
-        spacerItem6 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_adv.addItem(spacerItem6)
-        # line
-        self.line_5 = MyQLine(self, "line_5")
-        self.vertLO_tab_adv.addWidget(self.line_5)
-
-        spacerItem7 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.vertLO_tab_adv.addItem(spacerItem7)
-        # horizontal layout set start orientation
-        self.hoLO_start_ori = QtGui.QHBoxLayout()
-        self.hoLO_start_ori.setObjectName(_fromUtf8("hoLO_start_ori"))
-        # label start orientation
-        self.lbl_start_orientation = QtGui.QLabel(self)
-        self.lbl_start_orientation.setObjectName(_fromUtf8("lbl_start_orientation"))
-        self.hoLO_start_ori.addWidget(self.lbl_start_orientation)
-        # spinbox set start orientation
-        self.spinBox_start_orientation = QtGui.QSpinBox(self)
-        self.spinBox_start_orientation.setObjectName(_fromUtf8("spinBox_start_orientation"))
-        self.spinBox_start_orientation.setMaximum(359)
-        self.hoLO_start_ori.addWidget(self.spinBox_start_orientation)
-        # add start orientation layout to tab layout
-        self.vertLO_tab_adv.addLayout(self.hoLO_start_ori)
-        # spacer
         spacerItem8 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.vertLO_tab_adv.addItem(spacerItem8)
         # line
@@ -184,10 +161,6 @@ class TabAdv(QtGui.QWidget):
         self.vertLO_tab_adv.addItem(spacerItem10)
 
     def connect_widgets(self, controller):
-        # self.connect(self.spinBox_starting_x1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        # self.connect(self.spinBox_starting_x2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        # self.connect(self.spinBox_starting_y1_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
-        # self.connect(self.spinBox_starting_y2_factor, QtCore.SIGNAL("valueChanged(int)"), controller.change_starting_area_factors)
         self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"), controller.change_erosion_factor)
         self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_factor)
 
@@ -195,8 +168,6 @@ class TabAdv(QtGui.QWidget):
         self.connect(self.spinBox_dilation_matrix, QtCore.SIGNAL("valueChanged(int)"), controller.change_dilation_matrix)
 
         self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"), controller.change_frame_waittime)
-
-        self.connect(self.spinBox_start_orientation, QtCore.SIGNAL("valueChanged(int)"), controller.change_start_orientation)
 
         self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"), controller.change_min_fish_threshold)
         self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"), controller.change_max_fish_threshold)
@@ -211,12 +182,6 @@ class TabAdv(QtGui.QWidget):
         self.lbl_erosion_matrix.setText(_translate("tracker_main_widget", "Erosion Matrix", None))
         self.lbl_dilation_matrix.setText(_translate("tracker_main_widget", "Dilation Matrix", None))
         self.lbl_frame_waittime.setText(_translate("tracker_main_widget", "Frame Waittime (ms)", None))
-        # self.lbl_start_area.setText(_translate("tracker_main_widget", "Starting Area (calculated in %)", None))
-        # self.lbl_start_x_end.setText(_translate("tracker_main_widget", "X End", None))
-        # self.lbl_start_y_start.setText(_translate("tracker_main_widget", "Y Start", None))
-        # self.lbl_start_y_end.setText(_translate("tracker_main_widget", "Y End", None))
-        # self.lbl_start_x_start.setText(_translate("tracker_main_widget", "X Start", None))
-        self.lbl_start_orientation.setText(_translate("tracker_main_widget", "Starting Orientation", None))
         self.lbl_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection min Size Threshold", None))
         self.lbl_max_fishsize_threshold.setText(_translate("tracker_main_widget", "Fish Detection max Size Threshold", None))
         self.cbx_enable_max_size_thresh.setText(_translate("tracker_main_widget", "Enable max Size Threshold", None))
