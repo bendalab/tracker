@@ -156,9 +156,6 @@ class Tracker(object):
 
         self.frame_waittime = self.read_cfg.getint('system', 'frame_waittime')
 
-        # self._erosion_iterations = self.read_cfg.getint('image_morphing', 'erosion_factor')
-        # self._dilation_iterations = self.read_cfg.getint('image_morphing', 'dilation_factor')
-
     def write_config_file(self):
         cfg = ConfigParser.SafeConfigParser()
 
