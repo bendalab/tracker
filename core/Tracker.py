@@ -291,6 +291,7 @@ class Tracker(object):
 
             if self.dm.frame_counter == 1:
                 self.im.overview_output = copy.copy(frame)
+                self.dm.experiment_setup_img = copy.copy(frame)
 
             # subtract background fro ROI
             self.im.current_bg_sub = bg_sub.apply(roi_img)

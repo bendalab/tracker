@@ -10,6 +10,8 @@ class DataManager(object):
 
         self._video_resolution = None
 
+        self.experiment_setup_img = None
+
         self._last_pos = None
         self._all_pos_roi = []
         self._all_pos_original = []

@@ -2,6 +2,7 @@ import collections
 import numpy as np
 import nix
 import odml
+import cv2
 
 
 class DataWriter(object):
@@ -63,6 +64,17 @@ class DataWriter(object):
             entity.sources.extend(sources)
 
     @staticmethod
+    def save_first_frame(block, data_manager):
+        channels = ["b", "g", "r"]
+        data = block.create_data_array("first_video_frame", "nix.image", data=data_manager.experiment_setup_img)
+        height_dim = data.append_sampled_dimension(1)
+        height_dim.label = "height"
+        width_dim = data.append_sampled_dimension(1)
+        width_dim.label = "width"
+        color_dim = data.append_set_dimension()
+        color_dim.labels = channels
+
+    @staticmethod
     def write_nix(file_name, times, data_manager, roi_manager, meta_manager, parameters):
         name = file_name.split('/')[-1].split('.')[0]
         nix_file = nix.File.open(file_name, nix.FileMode.Overwrite)
@@ -101,6 +113,9 @@ class DataWriter(object):
                 continue
             section = nix_file.create_section(entry.name, "metadata")
             DataWriter.save_subsections(section, meta_odml, "metadata")
+
+        # save overview image
+        DataWriter.save_first_frame(block, data_manager)
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
