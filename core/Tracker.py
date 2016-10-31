@@ -382,7 +382,7 @@ class Tracker(object):
             print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
                   "in the tools folder."
-            raise Exception("ERROR: times file missing - data saving abortet")
+            raise Exception("ERROR: times file missing - data saving aborted")
         
         with open(file_name, 'r') as f:
             times = map(lambda x: x.strip(), f)
@@ -391,6 +391,12 @@ class Tracker(object):
     def run(self):
         # self.set_video_file()
         self.check_if_necessary_files_exist()
+        file_name, file_directory = self.extract_video_file_name_and_path()
+        times = self.load_frame_times(file_directory + '_'.join(file_name.split('_')[:-1]) + "_times.dat")
+        output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
+        if file_name == "":
+            return
+        
         self.set_video_capture()
 
         self.extract_data()
@@ -407,9 +413,9 @@ class Tracker(object):
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
             return
-
-        times = self.load_frame_times(file_directory + file_name + "_times.dat")
-        output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
+        
+        # times = self.load_frame_times(file_directory + file_name + "_times.dat")
+        # output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
 
         # TODO add video size
         params = {}
@@ -424,7 +430,7 @@ class Tracker(object):
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
-
+       
         DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
         cv2.imwrite(output_file_name + "_OV_path.png", self.im.overview_output)
 
