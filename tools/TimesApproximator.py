@@ -14,13 +14,15 @@ import sys
 import copy
 import os
 import argparse
-
+from IPython import embed
 
 class TimesApproximator(object):
     def __init__(self, path):
         self.cap = None
-        self.info_file = path.split('.')[0][:-9] + "_info.dat"
-        self.times_file = path.split('.')[0] + "_times.dat"
+        path_stub = os.path.sep.join(path.split(os.path.sep)[:-1])
+        info_temp = '_'.join(path.split(os.path.sep)[-1].split('.')[0].split('_')[:2]) + "_info.dat"    
+        self.info_file = os.path.sep.join([path_stub, info_temp])
+        self.times_file = os.path.sep.join([path_stub, '_'.join(path.split(os.path.sep)[-1].split('.')[0].split('_')[:2]) + "_times.dat" ])
 
         self.start_time = None
         self.end_time = None
