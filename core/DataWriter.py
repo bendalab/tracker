@@ -1,6 +1,6 @@
 import collections
 import numpy as np
-import nix
+import nixio as nix
 import odml
 import cv2
 

@@ -19,7 +19,7 @@ from MetaManager import MetaManager
 from IPython import embed
 
 try:
-    import nix
+    import nixio as nix
 except ImportError as e:
     print e
     print 'Unfortunately your system misses the NIX packages.'
