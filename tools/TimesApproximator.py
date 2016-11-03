@@ -12,10 +12,10 @@ class TimesApproximator(object):
     def __init__(self, path):
         self.cap = None
         path_stub = os.path.sep.join(path.split(os.path.sep)[:-1])
-        info_temp = '_'.join(path.split(os.path.sep)[-1].split('.')[0].split('_')[:2]) + "_info.dat"    
-        self.info_file = os.path.sep.join([path_stub, info_temp])
-        self.times_file = os.path.sep.join([path_stub, '_'.join(path.split(os.path.sep)[-1].split('.')[0].split('_')[:2]) + "_times.dat" ])
-
+        info_temp = '_'.join(path.split(os.path.sep)[-1].split('.')[0].split('_')[:2]) + "_info.dat"
+        times_temp = '_'.join(path.split(os.path.sep)[-1].split('.')[0].split('_')[:2]) + "_times.dat"
+        self.info_file = info_temp if len(path_stub) == 0 else os.path.sep.join([path_stub, info_temp])
+        self.times_file = times_temp if len(path_stub) == 0 else os.path.sep.join([path_stub, times_temp])
         self.start_time = None
         self.end_time = None
         self.time_diff_mus = None
