@@ -1,20 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-"""
-For starters coded for files created by videoRecorder
-"""
-
-import numpy as np
 from datetime import datetime
 from datetime import timedelta
 import cv2
-import math
-import sys
-import copy
 import os
 import argparse
 from IPython import embed
+
 
 class TimesApproximator(object):
     def __init__(self, path):
@@ -32,7 +24,7 @@ class TimesApproximator(object):
         self.frame_count = 0
 
     def run(self, path):
-        print "Frame times approximation started for " + str(path)
+        print("Frame times approximation started for %s" % str(path))
 
         if self._check_if_times_file_exists():
             return
@@ -41,10 +33,13 @@ class TimesApproximator(object):
 
         try:
             with open(self.info_file, 'r') as tf:
-                self.start_time = datetime.strptime(tf.readline()[12:].rstrip(), '%Y-%m-%d  %H:%M:%S:%f')
-                self.end_time = datetime.strptime(tf.readline()[11:].rstrip(), '%Y-%m-%d %H:%M:%S:%f')
+                self.start_time = datetime.strptime(tf.readline()[12:].rstrip(),
+                                                    '%Y-%m-%d  %H:%M:%S:%f')
+                self.end_time = datetime.strptime(tf.readline()[11:].rstrip(),
+                                                  '%Y-%m-%d %H:%M:%S:%f')
         except:
-            print "info file missing or badly formatted - can not approximate without start and end time"
+            print("info file missing or badly formatted - " +
+                  "can not approximate without start and end time")
             return
 
         self._get_time_diff()
@@ -73,7 +68,6 @@ class TimesApproximator(object):
     def _write_times_file(self):
         printtime = datetime.strptime('00:00:00:000000', '%H:%M:%S:%f')
         addtime = timedelta(0, 0, self.frame_time_diff_mus)
-
         with open(self.times_file, 'a') as tf:
             for i in range(self.frame_count + 1):
                 tf.write(str(printtime)[11:] + "\n")
@@ -81,14 +75,16 @@ class TimesApproximator(object):
 
     def _check_if_times_file_exists(self):
         if os.path.exists(self.times_file):
-            print "Times File already exists! If you want to create a new Times File please delete the old one.\nApproximation aborted"
+            print("Times File already exists! If you want to create a new times file " +
+                  "please delete the old one.\nApproximation aborted")
             return True
         return False
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='approximate frametimes for VideoRecorder')
-    parser.add_argument('path', type=str, nargs="*", help="absolute file path to VideoRecorder video including file name and file extension")
-    
+    parser.add_argument('path', type=str, nargs="*",
+                        help="absolute file path to VideoRecorder video including file name " +
+                        "and file extension")
     args = parser.parse_args()
 
     for path in args.path:
