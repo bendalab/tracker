@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 import odml
 
 try:
@@ -8,18 +8,18 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
 
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 
 # maybe enough to inherit from QTreeView
 #class TabMetaEntry(QtGui.QScrollArea):
-class TabMetaEntry(QtGui.QWidget):
+class TabMetaEntry(QtWidgets.QWidget):
     def __init__(self, path, name, controller):
         super(TabMetaEntry, self).__init__()
         self.controller = controller
@@ -27,14 +27,14 @@ class TabMetaEntry(QtGui.QWidget):
         self.name = name
         self.delete_me = False
 
-        self.vert_LO = QtGui.QVBoxLayout(self)
-        self.btn_delete_self = QtGui.QPushButton()
+        self.vert_LO = QtWidgets.QVBoxLayout(self)
+        self.btn_delete_self = QtWidgets.QPushButton()
         self.btn_delete_self.setObjectName("btn_delete_self")
         self.btn_delete_self.setText(_translate(self.name, "Delete This", None))
         self.btn_delete_self.clicked.connect(self.delete_self_clicked)
         self.vert_LO.addWidget(self.btn_delete_self)
 
-        self.tree_widget = QtGui.QTreeWidget()
+        self.tree_widget = QtWidgets.QTreeWidget()
         self.vert_LO.addWidget(self.tree_widget)
 
         self.parents = []
@@ -49,7 +49,7 @@ class TabMetaEntry(QtGui.QWidget):
     def extract_odml_data(self, path):
         odml_data = odml.tools.xmlparser.load(path)
         for s in odml_data.sections:
-            tree_item = QtGui.QTreeWidgetItem()
+            tree_item = QtWidgets.QTreeWidgetItem()
             tree_item.setText(0, s.name)
             self.add_subsections_to_entry(tree_item, s)
             self.parents.append(tree_item)
@@ -58,7 +58,7 @@ class TabMetaEntry(QtGui.QWidget):
         if section.sections is not None and len(section.sections) > 0:
             for s in section.sections:
                 # add subsections recursiveley
-                sub_item = QtGui.QTreeWidgetItem()
+                sub_item = QtWidgets.QTreeWidgetItem()
                 sub_item.setText(0, s.name)
                 self.add_subsections_to_entry(sub_item, s)
                 tree_item.addChild(sub_item)
@@ -66,7 +66,7 @@ class TabMetaEntry(QtGui.QWidget):
             # add values of section
         if section.properties is not None and len(section.properties) > 0:
             for p in section.properties:
-                prop_item = QtGui.QTreeWidgetItem()
+                prop_item = QtWidgets.QTreeWidgetItem()
                 prop_item.setText(0, p.name)
                 prop_item.setData(1, 0, QtCore.QVariant(QtCore.QString(str(p.value))))
                 tree_item.addChild(prop_item)

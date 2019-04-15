@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from MyQLine import MyQLine
 from RoiInputBox import RoiInputBox
 
@@ -9,16 +9,16 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
 
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 
-class TabRoi(QtGui.QWidget):
+class TabRoi(QtWidgets.QWidget):
     def __init__(self):
         super(TabRoi, self).__init__()
 
@@ -29,54 +29,56 @@ class TabRoi(QtGui.QWidget):
         self.roi_input_boxes = []
 
         # horizontal layout preview  + layout config
-        self.hoLO_tab_roi = QtGui.QHBoxLayout(self)
+        self.hoLO_tab_roi = QtWidgets.QHBoxLayout(self)
 
         # left side widget
-        self.roi_preview_widget = QtGui.QWidget()
-        self.vertLO_roi_preview = QtGui.QVBoxLayout(self.roi_preview_widget)
+        self.roi_preview_widget = QtWidgets.QWidget()
+        self.vertLO_roi_preview = QtWidgets.QVBoxLayout(self.roi_preview_widget)
         # spaccer
-        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.vertLO_roi_preview.addItem(spacerItem2)
         # line
         self.line_3 = MyQLine(self, "line_3")
         self.vertLO_roi_preview.addWidget(self.line_3)
         # label region of interest
-        self.lbl_roi = QtGui.QLabel(self)
+        self.lbl_roi = QtWidgets.QLabel(self)
         self.lbl_roi.setObjectName(_fromUtf8("lbl_roi"))
         self.vertLO_roi_preview.addWidget(self.lbl_roi)
         # add roi preview output
-        self.lbl_roi_preview_label = QtGui.QLabel(self)
+        self.lbl_roi_preview_label = QtWidgets.QLabel(self)
         self.lbl_roi_preview_label.setObjectName(_fromUtf8("lbl_roi_preview_label"))
         self.lbl_roi_preview_label.setAlignment(QtCore.Qt.AlignCenter)
         self.vertLO_roi_preview.addWidget(self.lbl_roi_preview_label)
         self.line_4 = MyQLine(self, "line_4")
         self.vertLO_roi_preview.addWidget(self.line_4)
         # spacer
-        spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                            QtWidgets.QSizePolicy.Expanding)
         self.vertLO_roi_preview.addItem(spacerItem3)
 
         # right side widget
-        self.roi_config_scroll_area = QtGui.QScrollArea()
-        self.roi_config_widget = QtGui.QWidget()
+        self.roi_config_scroll_area = QtWidgets.QScrollArea()
+        self.roi_config_widget = QtWidgets.QWidget()
         self.roi_config_widget.setMinimumHeight(600)
         self.roi_config_widget.setMinimumWidth(280)
         # vertical layout roi config
-        self.vertLO_roi_config = QtGui.QVBoxLayout(self.roi_config_widget)
+        self.vertLO_roi_config = QtWidgets.QVBoxLayout(self.roi_config_widget)
         self.vertLO_roi_config.setObjectName(_fromUtf8("vertLO_tab_roi"))
         # label for new roi name
-        self.lbl_new_roi_name = QtGui.QLabel(self)
+        self.lbl_new_roi_name = QtWidgets.QLabel(self)
         self.lbl_new_roi_name.setObjectName(_fromUtf8("lbl_new_roi_name"))
         self.vertLO_roi_config.addWidget(self.lbl_new_roi_name)
         # line edit for new roi name
-        self.lnEdit_new_roi_name = QtGui.QLineEdit(self)
+        self.lnEdit_new_roi_name = QtWidgets.QLineEdit(self)
         self.lnEdit_new_roi_name.setObjectName(_fromUtf8("new_roi_name"))
         self.vertLO_roi_config.addWidget(self.lnEdit_new_roi_name)
         # button for roi creation
-        self.btn_create_roi = QtGui.QPushButton()
+        self.btn_create_roi = QtWidgets.QPushButton()
         self.btn_create_roi.setObjectName(_fromUtf8("btn_create_roi"))
         self.vertLO_roi_config.addWidget(self.btn_create_roi)
         # button for roi deletion
-        self.btn_delete_roi = QtGui.QPushButton()
+        self.btn_delete_roi = QtWidgets.QPushButton()
         self.btn_delete_roi.setObjectName(_fromUtf8("btn_delete_roi"))
         self.vertLO_roi_config.addWidget(self.btn_delete_roi)
 
@@ -118,6 +120,7 @@ class TabRoi(QtGui.QWidget):
         return
 
     def connect_widgets(self, controller):
+        # FIXME Signal are no longer supported
         for box in self.roi_input_boxes:
             box.connect_widgets(controller)
         self.btn_create_roi.clicked.connect(self.controller.add_new_roi_clicked)

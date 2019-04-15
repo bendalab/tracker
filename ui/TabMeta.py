@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from MyQLine import MyQLine
 from core.MetaEntry import MetaEntry
 from TabMetaEntry import TabMetaEntry
@@ -10,16 +10,16 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
 
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 
-class TabMeta(QtGui.QTabWidget):
+class TabMeta(QtWidgets.QTabWidget):
     def __init__(self):
         super(TabMeta, self).__init__()
 
@@ -29,27 +29,30 @@ class TabMeta(QtGui.QTabWidget):
 
         self.name = "tab_meta"
 
-        self.browse_tab = QtGui.QWidget()
+        self.browse_tab = QtWidgets.QWidget()
 
-        self.vert_LO_browse_tab = QtGui.QVBoxLayout(self.browse_tab)
-        self.vert_LO_browse_tab.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-        self.ln_edit_browse_template = QtGui.QLineEdit()
+        self.vert_LO_browse_tab = QtWidgets.QVBoxLayout(self.browse_tab)
+        self.vert_LO_browse_tab.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                                              QtWidgets.QSizePolicy.Expanding))
+        self.ln_edit_browse_template = QtWidgets.QLineEdit()
         self.vert_LO_browse_tab.addWidget(self.ln_edit_browse_template)
-        self.ho_LO_buttons = QtGui.QHBoxLayout()
+        self.ho_LO_buttons = QtWidgets.QHBoxLayout()
         self.vert_LO_browse_tab.addLayout(self.ho_LO_buttons)
-        self.btn_template_browse = QtGui.QPushButton()
+        self.btn_template_browse = QtWidgets.QPushButton()
         self.btn_template_browse.setObjectName("btn_template_browse")
         self.ho_LO_buttons.addWidget(self.btn_template_browse)
-        self.btn_template_add = QtGui.QPushButton()
+        self.btn_template_add = QtWidgets.QPushButton()
         self.btn_template_add.setObjectName("btn_template_add")
         self.ho_LO_buttons.addWidget(self.btn_template_add)
-        self.vert_LO_browse_tab.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-        self.ln_edit_remove_template = QtGui.QLineEdit()
+        self.vert_LO_browse_tab.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                                              QtWidgets.QSizePolicy.Expanding))
+        self.ln_edit_remove_template = QtWidgets.QLineEdit()
         self.vert_LO_browse_tab.addWidget(self.ln_edit_remove_template)
-        self.btn_template_remove = QtGui.QPushButton()
+        self.btn_template_remove = QtWidgets.QPushButton()
         self.btn_template_remove.setObjectName("btn_template_remove")
         self.vert_LO_browse_tab.addWidget(self.btn_template_remove)
-        self.vert_LO_browse_tab.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        self.vert_LO_browse_tab.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                                              QtWidgets.QSizePolicy.Expanding))
 
         self.addTab(self.browse_tab, "templates")
 
@@ -57,11 +60,12 @@ class TabMeta(QtGui.QTabWidget):
         self.setObjectName(_fromUtf8("tab_meta"))
 
         # vertLO meta tab
-        self.vert_LO_tab_meta = QtGui.QVBoxLayout(self)
+        self.vert_LO_tab_meta = QtWidgets.QVBoxLayout(self)
         self.vert_LO_tab_meta.setObjectName(_fromUtf8("vert_LO_tab_meta"))
 
         # spacer
-        self.vert_LO_tab_meta.addItem(QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        self.vert_LO_tab_meta.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
+                                                            QtWidgets.QSizePolicy.Expanding))
 
     def add_tab_meta_entry(self, meta_entry):
         new_tab = TabMetaEntry(meta_entry.path, meta_entry.name, self.controller)
@@ -84,6 +88,7 @@ class TabMeta(QtGui.QTabWidget):
         self.controller = controller
 
     def connect_widgets(self, controller):
+        # FIXME Signal and Slot replacement
         self.btn_template_browse.clicked.connect(controller.btn_template_browse_clicked)
         self.btn_template_add.clicked.connect(controller.btn_template_add_clicked)
         self.btn_template_remove.clicked.connect(controller.btn_template_remove_clicked)

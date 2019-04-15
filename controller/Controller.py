@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 import cv2
 import copy
 import ConfigParser
@@ -76,7 +76,7 @@ class Controller(object):
     def browse_file(self):
         self.roi_preview_displayed = False
 
-        self.track_file = QtGui.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_folder)
+        self.track_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_folder)
         if self.track_file == "":
             return
         self.ui.tab_file.lnEdit_file_path.setText(self.track_file)
@@ -88,8 +88,8 @@ class Controller(object):
     def btn_browse_directory_clicked(self):
         self.roi_preview_displayed = False
 
-        file_dialog = QtGui.QFileDialog()
-        file_dialog.setFileMode(QtGui.QFileDialog.Directory)
+        file_dialog = QtWidgets.QFileDialog()
+        file_dialog.setFileMode(QtWidgets.QFileDialog.Directory)
         if file_dialog.exec_():
             self.track_directory = str(file_dialog.selectedFiles()[0])
         if self.track_directory == "":
@@ -132,8 +132,8 @@ class Controller(object):
             roi_input_box = self.ui.tab_roi.get_roi_input_box(roi.name)
             cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), roi_input_box.color, 2)
         # convert numpy-array to qimage
-        output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
-        output_pixm = QtGui.QPixmap.fromImage(output_qimg)
+        output_qimg = QtWidgets.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtWidgets.QImage.Format_RGB888)
+        output_pixm = QtWidgets.QPixmap.fromImage(output_qimg)
         # fit picture to window size
         width = self.ui.tab_widget_options.geometry().width()*0.65
         height = int(width)
@@ -247,7 +247,7 @@ class Controller(object):
         return
 
     def btn_template_browse_clicked(self):
-        self.template_file = QtGui.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
+        self.template_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
         if self.template_file != "":
             self.last_selected_template_folder = "/".join(str(self.template_file).split("/")[:-1])
             # print self.last_selected_template_folder
@@ -307,9 +307,9 @@ class Controller(object):
         if self.output_is_input:
             self.ui.tab_file.lnEdit_output_path.setText("Output Directory same as Input-Folder!!")
             return
-        dial = QtGui.QFileDialog()
-        dial.setFileMode(QtGui.QFileDialog.Directory)
-        dial.setViewMode(QtGui.QFileDialog.List)
+        dial = QtWidgets.QFileDialog()
+        dial.setFileMode(QtWidgets.QFileDialog.Directory)
+        dial.setViewMode(QtWidgets.QFileDialog.List)
         if dial.exec_():
             self.output_directory = dial.selectedFiles()[0] + "/"
         self.ui.tab_file.lnEdit_output_path.setText(self.output_directory)
