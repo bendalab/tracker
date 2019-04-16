@@ -1,6 +1,7 @@
 import odml
 import os
-from MetaEntry import MetaEntry
+from .MetaEntry import MetaEntry
+
 
 class MetaManager(object):
     def __init__(self):

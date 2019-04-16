@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
-from MyQLine import MyQLine
+from .MyQLine import MyQLine
 from core.MetaEntry import MetaEntry
-from TabMetaEntry import TabMetaEntry
+from .TabMetaEntry import TabMetaEntry
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

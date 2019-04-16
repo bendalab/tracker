@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
-from MyQLine import MyQLine
-from RoiInputBox import RoiInputBox
+from .MyQLine import MyQLine
+from .RoiInputBox import RoiInputBox
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

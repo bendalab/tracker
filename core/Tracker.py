@@ -2,28 +2,18 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import cv2
-import math
 import sys
 import copy
 import os
 import argparse
-import ConfigParser
-from ROI import ROI
-from RelROI import RelROI
-from ROIManager import ROIManager
-from DataWriter import DataWriter
-from ContourManager import ContourManager
-from DataManager import DataManager
-from ImageManager import ImageManager
-from MetaManager import MetaManager
-from IPython import embed
+import configparser
 
-try:
-    import nixio as nix
-except ImportError as e:
-    print(e)
-    print('Unfortunately your system misses the NIX packages.')
-    quit()
+from .ROIManager import ROIManager
+from .DataWriter import DataWriter
+from .ContourManager import ContourManager
+from .DataManager import DataManager
+from .ImageManager import ImageManager
+from .MetaManager import MetaManager
 
 
 class Tracker(object):
@@ -57,7 +47,7 @@ class Tracker(object):
         self.read_cfg = None
         self.config_file_present = True
         self.init_read_cfg()
-        self.write_cfg = ConfigParser.SafeConfigParser()
+        self.write_cfg = configparser.SafeConfigParser()
 
         # image morphing data
         self._erosion_iterations = 1
@@ -99,7 +89,7 @@ class Tracker(object):
         self.import_config_values()
 
     def init_read_cfg(self):
-        self.read_cfg = ConfigParser.ConfigParser()
+        self.read_cfg = configparser.ConfigParser()
 
         if self.ui_mode_on:
             cfg_path = "tracker.cnf"
@@ -158,7 +148,7 @@ class Tracker(object):
         self.frame_waittime = self.read_cfg.getint('system', 'frame_waittime')
 
     def write_config_file(self):
-        cfg = ConfigParser.SafeConfigParser()
+        cfg = configparser.SafeConfigParser()
 
         self.mm.add_cfg_values(cfg)
 

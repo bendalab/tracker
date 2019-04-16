@@ -1,5 +1,5 @@
-from ROI import ROI
-import ConfigParser
+from .ROI import ROI
+import configparser
 
 
 class ROIManager(object):

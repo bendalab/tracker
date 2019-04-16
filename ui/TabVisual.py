@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
-from MyQLine import MyQLine
+from .MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

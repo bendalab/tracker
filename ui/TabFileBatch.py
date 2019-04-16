@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
-from MyQLine import MyQLine
+from .MyQLine import MyQLine
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -128,6 +128,6 @@ class TabFileBatch(QtWidgets.QWidget):
     def connect_widgets(self, controller):
         self.btn_to_single.clicked.connect(controller.btn_to_single_clicked)
         self.btn_browse_directory.clicked.connect(controller.btn_browse_directory_clicked)
+        self.btn_set_roi_preview.clicked.connect(controller.btn_set_roi_preview_clicked)
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
         self.cbx_output_is_input.stateChanged.connect(controller.change_output_is_input);
-        self.btn_set_roi_preview.clicked.connect(controller.btn_set_roi_preview_clicked)

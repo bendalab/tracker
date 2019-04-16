@@ -5,15 +5,15 @@
 # Created: Mon Dec  1 12:45:22 2014
 #      by: PyQt4 ui code generator 4.10.4
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
 from core.Tracker import Tracker
 from controller.Controller import Controller
 
-from TabFile import TabFile
-from TabRoi import TabRoi
-from TabAdv import TabAdv
-from TabVisual import TabVisual
-from TabMeta import TabMeta
+from .TabFile import TabFile
+from .TabRoi import TabRoi
+from .TabAdv import TabAdv
+from .TabVisual import TabVisual
+from .TabMeta import TabMeta
 
 
 try:
