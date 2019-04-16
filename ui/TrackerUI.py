@@ -40,8 +40,6 @@ class TrackerUserInterface(QtWidgets.QWidget):
 
         #main widget
         self.setObjectName(_fromUtf8("self"))
-        self.resize(1000, 835)
-        self.setMinimumSize(QtCore.QSize(450, 770))
 
         # main vertical layout
         self.vertLO_main = QtWidgets.QVBoxLayout(self)
@@ -130,6 +128,19 @@ class TrackerUserInterface(QtWidgets.QWidget):
         self.controller.preset_options()
         self.connect_widgets()
         self.set_shortcuts()
+
+    def center(self):
+        # geometry of the main window
+        qr = self.frameGeometry()
+
+        # center point of screen
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+
+        # move rectangle's center point to screen's center point
+        qr.moveCenter(cp)
+
+        # top left of rectangle becomes top left of window centering it
+        self.move(qr.topLeft())
 
     def connect_controller_to_tabs(self):
         self.tab_roi.connect_to_controller(self.controller)
