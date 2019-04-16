@@ -90,15 +90,13 @@ class TabFile(QtWidgets.QWidget):
         spacer_item_1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum,
                                               QtWidgets.QSizePolicy.Expanding)
         self.vertLO_tab_file.addItem(spacer_item_1)
-        # FIXME SIGNAL SLOT no longer supported in qt5
 
     def connect_widgets(self, controller):
         self.btn_to_batch.clicked.connect(controller.btn_to_batch_clicked)
         self.btn_browse_file.clicked.connect(controller.browse_file)
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
 
-        self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_output_is_input)
+        self.cbx_output_is_input.stateChanged.connect(controller.change_output_is_input)
 
     def retranslate_tab_file(self):
         self.btn_to_batch.setText(_translate(self.name, "Switch to Batch Tracking", None))

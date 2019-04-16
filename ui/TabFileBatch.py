@@ -129,8 +129,5 @@ class TabFileBatch(QtWidgets.QWidget):
         self.btn_to_single.clicked.connect(controller.btn_to_single_clicked)
         self.btn_browse_directory.clicked.connect(controller.btn_browse_directory_clicked)
         self.btn_browse_output.clicked.connect(controller.browse_output_directory)
-
-        self.connect(self.cbx_output_is_input, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_output_is_input)
-
+        self.cbx_output_is_input.stateChanged.connect(controller.change_output_is_input);
         self.btn_set_roi_preview.clicked.connect(controller.btn_set_roi_preview_clicked)

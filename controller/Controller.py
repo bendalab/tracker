@@ -8,6 +8,7 @@ from ui.TabFileBatch import TabFileBatch
 from ui.TabFile import TabFile
 import traceback
 
+
 class Controller(object):
     def __init__(self, ui):
         self._ui = ui
@@ -76,7 +77,8 @@ class Controller(object):
     def browse_file(self):
         self.roi_preview_displayed = False
 
-        self.track_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_folder)
+        self.track_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file',
+                                                                self.last_selected_folder)
         if self.track_file == "":
             return
         self.ui.tab_file.lnEdit_file_path.setText(self.track_file)

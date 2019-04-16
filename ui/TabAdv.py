@@ -168,26 +168,15 @@ class TabAdv(QtWidgets.QWidget):
         self.vertLO_tab_adv.addItem(spacerItem10)
 
     def connect_widgets(self, controller):
-        # FIXME SIGNAL SLOT no longer supported in qt5
-        self.connect(self.spinBox_erosion, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_erosion_factor)
-        self.connect(self.spinBox_dilation, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_dilation_factor)
+        self.spinBox_erosion.valueChanged.connect(controller.change_erosion_factor)
+        self.spinBox_dilation.valueChanged.connect(controller.change_dilation_factor)
 
-        self.connect(self.spinBox_erosion_matrix, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_erosion_matrix)
-        self.connect(self.spinBox_dilation_matrix, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_dilation_matrix)
-
-        self.connect(self.spinBox_frame_waittime, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_frame_waittime)
-
-        self.connect(self.spinBox_fish_threshold, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_min_fish_threshold)
-        self.connect(self.spinBox_fish_max_threshold, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_max_fish_threshold)
-        self.connect(self.cbx_enable_max_size_thresh, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_enable_max_size_threshold)
+        self.spinBox_erosion_matrix.valueChanged.connect(controller.change_erosion_matrix)
+        self.spinBox_dilation_matrix.valueChanged.connect(controller.change_dilation_matrix)
+        self.spinBox_frame_waittime.valueChanged.connect(controller.change_frame_waittime)
+        self.spinBox_fish_threshold.valueChanged.connect(controller.change_min_fish_threshold)
+        self.spinBox_fish_max_threshold.valueChanged.connect(controller.change_max_fish_threshold)
+        self.cbx_enable_max_size_thresh.stateChanged.connect(controller.change_enable_max_size_threshold)
         return
 
     def retranslate_tab_adv(self):

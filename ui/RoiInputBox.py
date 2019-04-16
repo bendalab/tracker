@@ -1,4 +1,4 @@
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 import random
 
 try:
@@ -14,7 +14,8 @@ try:
         return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return  QtWidgets.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
+
 
 class RoiInputBox(QtWidgets.QWidget):
     def __init__(self, roi, controller):
@@ -36,7 +37,8 @@ class RoiInputBox(QtWidgets.QWidget):
         self.lbl_name = QtWidgets.QLabel(self)
         self.lbl_name.setObjectName(_fromUtf8("lbl_name"))
         self.lbl_name.setAutoFillBackground(True)
-        color_string = "rgb({0:s},{1:s},{2:s})".format(str(self.color[0]), str(self.color[1]), str(self.color[2]))
+        color_string = "rgb({0:s},{1:s},{2:s})".format(str(self.color[0]), str(self.color[1]),
+                                                       str(self.color[2]))
         self.lbl_name.setStyleSheet("QLabel {{color: {0:s}; }}".format(color_string))
         self.vertLO_input_box.addWidget(self.lbl_name)
 
@@ -87,12 +89,12 @@ class RoiInputBox(QtWidgets.QWidget):
         x2 = self.spinBox_roi_x2.value()
         y2 = self.spinBox_roi_y2.value()
         return x1, y1, x2, y2
-    # FIXME! signal slot no longer supported!
+
     def connect_widgets(self, controller):
-        self.connect(self.spinBox_roi_x1, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_x1)
-        self.connect(self.spinBox_roi_x2, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_x2)
-        self.connect(self.spinBox_roi_y1, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_y1)
-        self.connect(self.spinBox_roi_y2, QtCore.SIGNAL("valueChanged(int)"), self.send_value_change_y2)
+        self.spinBox_roi_x1.valueChanged.connect(self.send_value_change_x1)
+        self.spinBox_roi_x2.valueChanged.connect(self.send_value_change_x2)
+        self.spinBox_roi_y1.valueChanged.connect(self.send_value_change_y1)
+        self.spinBox_roi_y2.valueChanged.connect(self.send_value_change_y2)
         return
 
     def send_value_change_x1(self):

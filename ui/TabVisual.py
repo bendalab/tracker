@@ -111,21 +111,14 @@ class TabVisual(QtWidgets.QWidget):
 
     def connect_widgets(self, controller):
         # FIXME Signal and slots
-        self.connect(self.cbx_show_bgsub_img, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_show_bg_sub_img)
-        self.connect(self.cbx_show_morph_img, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_show_morphed_img)
-        self.connect(self.cbx_show_contour, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_draw_contour)
-        self.connect(self.cbx_show_ellipse, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_draw_ellipse)
-        self.connect(self.cbx_show_orientation, QtCore.SIGNAL("stateChanged(int)"),
-                     controller.change_show_orientation)
+        self.cbx_show_bgsub_img.stateChanged.connect(controller.change_show_bg_sub_img)
+        self.cbx_show_morph_img.stateChanged.connect(controller.change_show_morphed_img)
+        self.cbx_show_contour.stateChanged.connect(controller.change_draw_contour)
+        self.cbx_show_ellipse.stateChanged.connect(controller.change_draw_ellipse)
+        self.cbx_show_orientation.stateChanged.connect(controller.change_show_orientation)
 
-        self.connect(self.spinBox_lineend_offset, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_lineend_offset)
-        self.connect(self.spinBox_circle_size, QtCore.SIGNAL("valueChanged(int)"),
-                     controller.change_circle_size)
+        self.spinBox_lineend_offset.valueChanged.connect(controller.change_lineend_offset)
+        self.spinBox_circle_size.valueChanged.connect(controller.change_circle_size)
         return
 
     def retranslate_tab_visual(self):

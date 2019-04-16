@@ -132,7 +132,6 @@ class TrackerUserInterface(QtWidgets.QWidget):
         self.set_shortcuts()
 
     def connect_controller_to_tabs(self):
-        # FIXME singal and slots
         self.tab_roi.connect_to_controller(self.controller)
         self.tab_meta.connect_to_controller(self.controller)
         # TODO connect to other tabs
@@ -187,7 +186,6 @@ class TrackerUserInterface(QtWidgets.QWidget):
         return
 
     def connect_widgets(self):
-        # FIXME singal and slots
         self.tab_file.connect_widgets(self.controller)
         self.tab_roi.connect_widgets(self.controller)
         self.tab_adv.connect_widgets(self.controller)
