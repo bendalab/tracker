@@ -108,8 +108,8 @@ class DataWriter(object):
             try:
                 meta_odml = odml.tools.xmlparser.load(entry.path)
             except Exception as e:
-                print e
-                print "could not read meta file {0:s} from {1:s}".format(entry.name, entry.path)
+                print(e)
+                print("could not read meta file {0:s} from {1:s}".format(entry.name, entry.path))
                 continue
             section = nix_file.create_section(entry.name, "metadata")
             DataWriter.save_subsections(section, meta_odml, "metadata")
@@ -119,16 +119,33 @@ class DataWriter(object):
 
         # save data
         time_stamps = np.asarray(DataWriter.time_to_seconds(times))
-        DataWriter.save_trace(time_stamps, data_manager.all_pos_original, block, 'positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
-        DataWriter.save_trace(time_stamps, data_manager.estimated_pos_original, block, 'estimated positions', 'nix.irregular_sampled.coordinates', data_label='position', set_labels=['x', 'y'])
-        DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
-        DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block, 'estimated_orientations', 'nix.irregular_sampled', data_label='orientation', set_labels=['degree'])
-        DataWriter.save_trace(time_stamps, data_manager.all_oris_ratio, block, 'orientation_ratios', 'nix.irregular_sampled', data_label='orientaion_ratio', set_labels=['front_to_back_ratio'])
-        DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block, 'object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
-        DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame, block, 'fish object count', 'nix.irregular_sampled', data_label='count', set_labels=['amount'])
+        DataWriter.save_trace(time_stamps, data_manager.all_pos_original, block, 'positions',
+                              'nix.irregular_sampled.coordinates', data_label='position',
+                              set_labels=['x', 'y'])
+        DataWriter.save_trace(time_stamps, data_manager.estimated_pos_original, block,
+                              'estimated positions', 'nix.irregular_sampled.coordinates',
+                              data_label='position', set_labels=['x', 'y'])
+        DataWriter.save_trace(time_stamps, data_manager.all_oris, block, 'orientations',
+                              'nix.irregular_sampled', data_label='orientation',
+                              set_labels=['degree'])
+        DataWriter.save_trace(time_stamps, data_manager.estimated_oris, block,
+                              'estimated_orientations', 'nix.irregular_sampled',
+                              data_label='orientation', set_labels=['degree'])
+        DataWriter.save_trace(time_stamps, data_manager.all_oris_ratio, block,
+                              'orientation_ratios', 'nix.irregular_sampled',
+                              data_label='orientaion_ratio', set_labels=['front_to_back_ratio'])
+        DataWriter.save_trace(time_stamps, data_manager.number_contours_per_frame, block,
+                              'object count', 'nix.irregular_sampled', data_label='count',
+                              set_labels=['amount'])
+        DataWriter.save_trace(time_stamps, data_manager.number_relevant_contours_per_frame,
+                              block, 'fish object count', 'nix.irregular_sampled',
+                              data_label='count', set_labels=['amount'])
 
         for roi in roi_manager.roi_list:
-            DataWriter.save_trace(time_stamps, roi.frame_data["{0:s}_mean_colors".format(roi.name)], block, 'ROI {0:s} mean colors'.format(roi.name), 'nix.irregular_sampled', data_label='count', set_labels=['r', 'g', 'b'])
+            DataWriter.save_trace(time_stamps, roi.frame_data["{0:s}_mean_colors".format(roi.name)],
+                                  block, 'ROI {0:s} mean colors'.format(roi.name),
+                                  'nix.irregular_sampled', data_label='count',
+                                  set_labels=['r', 'g', 'b'])
 
         nix_file.close()
 

@@ -30,7 +30,7 @@ class ROI(object):
             self.y1 = cfg.getint(section, "y1")
             self.y2 = cfg.getint(section, "y2")
         except:
-            print "New roi: {0:s}; no values in config.".format(self.name)
+            print("New roi: {0:s}; no values in config.".format(self.name))
             return
 
     def check_and_adjust_values(self, cap):
@@ -103,7 +103,7 @@ class ROI(object):
     def y2(self, value):
         self._y_2 = value
 
-#debug main
+
 if __name__ == "__main__":
     import cv2
     img = cv2.imread("/home/madai/Pictures/two_color.png")
@@ -115,5 +115,5 @@ if __name__ == "__main__":
     roi1.calc_all_data(img)
     roi2.calc_all_data(img)
 
-    print roi1.frame_data
-    print roi2.frame_data
+    print(roi1.frame_data)
+    print(roi2.frame_data)

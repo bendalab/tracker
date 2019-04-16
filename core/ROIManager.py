@@ -1,6 +1,7 @@
 from ROI import ROI
 import ConfigParser
 
+
 class ROIManager(object):
     def __init__(self):
         self._roi_list = []
@@ -19,13 +20,13 @@ class ROIManager(object):
 
     def remove_roi(self, name, controller=None):
         if name == "tracking_area" or name == "starting_area":
-            print "can't remove tracking area or starting area!"
+            print("can't remove tracking area or starting area!")
             return
-        
+
         for i in range(len(self._roi_list)):
             if self._roi_list[i].name == name:
                 self._roi_list.pop(i)
-                print "removed roi from tracker"
+                print("removed roi from tracker")
                 if controller is not None:
                     controller.roi_removed_from_tracker(name)
                 break

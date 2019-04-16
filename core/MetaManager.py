@@ -13,7 +13,7 @@ class MetaManager(object):
             if controller is not None:
                 controller.metadata_entry_added(new_meta_entry)
         else:
-            print "name of meta entry must be unique! name already exists!"
+            print("name of meta entry must be unique! name already exists!")
 
     def remove_meta_entry(self, name, controller=None):
         for i in range(len(self._meta_entries)):
@@ -33,7 +33,7 @@ class MetaManager(object):
         try:
             cfg_entries = cfg.items('metadata')
         except Exception as e:
-            print e
+            print(e)
             return
         for entry in cfg_entries:
             self.add_meta_entry(entry[0], entry[1], controller)

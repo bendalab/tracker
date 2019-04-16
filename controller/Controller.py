@@ -79,7 +79,8 @@ class Controller(object):
 
         self.track_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file',
                                                                 self.last_selected_folder)
-        if self.track_file == "":
+        print(type(self.track_file))
+        if self.track_file[0] == "":
             return
         self.ui.tab_file.lnEdit_file_path.setText(self.track_file)
 
@@ -261,7 +262,7 @@ class Controller(object):
         try:
             odml.tools.xmlparser.load(path)
         except Exception as e:
-            print "odml error: {0:s}".format(str(e))
+            print("odml error: %s" % (str(e)))
             self.ui.tab_meta.ln_edit_browse_template.setText("{0:s} <-- not valid".format(str(self.ui.tab_meta.ln_edit_browse_template.text())))
             return
         self.tracker.mm.add_meta_entry(name, path, self)
@@ -302,8 +303,8 @@ class Controller(object):
             try:
                 self.tracker.mm.add_meta_entry(f.split("/")[-1], f, self)
             except Exception as e:
-                print "ODML ERROR while importing from file {0:s}".format(f)
-                print "ERROR MESSAGE: {0:s}".format(e)
+                print("ODML ERROR while importing from file %s" % f)
+                print("ERROR MESSAGE: %s" % str(e))
 
     def browse_output_directory(self):
         if self.output_is_input:
@@ -463,9 +464,9 @@ class Controller(object):
         try:
             self.ui.tracker.run()
         except Exception as e:
-            print "ERROR WHILE TRACKING in file: {0:s}".format(self.track_file)
-            print "ERROR MESSAGE: {0:s}".format(e)
-            print "DETAILS:"
+            print("ERROR WHILE TRACKING in file: %s" % self.track_file)
+            print("ERROR MESSAGE: %s" % e)
+            print("DETAILS:")
             print(traceback.format_exc())
         self.ui.set_new_tracker(self)
         self.ui.controller.preset_options()
@@ -536,9 +537,9 @@ class Controller(object):
             try:
                 self.ui.tracker.run()
             except Exception as e:
-                print "ERROR WHILE TRACKING in file: {0:s}".format(track_path)
-                print "ERROR MESSAGE: {0:s}".format(e)
-                print "DETAILS:"
+                print("ERROR WHILE TRACKING in file: %s" % track_path)
+                print("ERROR MESSAGE: %s" % e)
+                print("DETAILS:")
                 print(traceback.format_exc())
             self.ui.set_new_tracker(self)
             self.remove_all_meta_entries()

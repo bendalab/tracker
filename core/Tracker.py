@@ -21,9 +21,10 @@ from IPython import embed
 try:
     import nixio as nix
 except ImportError as e:
-    print e
-    print 'Unfortunately your system misses the NIX packages.'
+    print(e)
+    print('Unfortunately your system misses the NIX packages.')
     quit()
+
 
 class Tracker(object):
     def __init__(self, path=None, wait_time=50, controller=None, batch_mode_on=False):
@@ -31,13 +32,13 @@ class Tracker(object):
         self.ui_mode_on = False
         self.batch_mode_on = batch_mode_on
         self.ui_abort_button_pressed = False
-        
+
         if path is not None:
             self.video_file = path
 
         self.output_directory = ""
         self.output_path_isset = False
-        
+
         self.cap = None
 
         self.save_frames = False
@@ -106,9 +107,9 @@ class Tracker(object):
             cfg_path = "../tracker.cnf"
 
         if not os.path.exists(cfg_path):
-            print "Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking."
+            print("Couldn't import config data from file - file doesn't exist. Config file will be created at first Tracking.")
             self.config_file_present = False
-            print "set to false"
+            print("set to false")
             return
 
         if self.ui_mode_on:
@@ -148,7 +149,7 @@ class Tracker(object):
             self._erosion_matrix_value = self.read_cfg.getint('image_morphing', 'erosion_matrix_value')
             self._dilation_matrix_value = self.read_cfg.getint('image_morphing', 'dilation_matrix_value')
         except:
-            print "no entry for erosion or dilation matrix value. will be created at next tracking"
+            print("no entry for erosion or dilation matrix value. will be created at next tracking")
 
         self._fish_size_threshold = self.read_cfg.getint('detection_values', 'min_area_threshold')
         self._fish_max_size_threshold = self.read_cfg.getint('detection_values', 'max_area_threshold')
@@ -220,7 +221,7 @@ class Tracker(object):
 
     # captures video defined by path stored in video file
     def set_video_capture(self):
-        print self.video_file
+        print(self.video_file)
         self.cap = cv2.VideoCapture(self.video_file)
         self.dm.video_resolution = (self.cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH), self.cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
 
@@ -379,11 +380,11 @@ class Tracker(object):
 
     def load_frame_times(self, file_name):
         if not os.path.exists(file_name):
-            print "It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
+            print("It seems that your times file is missing. It should be named [video_file_name]_times.dat.\n" \
                   "If you dont have such a file, you can approximate your frame times with the TimesApproximator.py\n" \
-                  "in the tools folder."
+                  "in the tools folder.")
             raise Exception("ERROR: times file missing - data saving aborted")
-        
+
         with open(file_name, 'r') as f:
             times = map(lambda x: x.strip(), f)
         return times
@@ -396,7 +397,7 @@ class Tracker(object):
         output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
         if file_name == "":
             return
-        
+
         self.set_video_capture()
 
         self.extract_data()
@@ -413,7 +414,7 @@ class Tracker(object):
         file_name, file_directory = self.extract_video_file_name_and_path()
         if file_name == "":
             return
-        
+
         # times = self.load_frame_times(file_directory + file_name + "_times.dat")
         # output_file_name, out_dir = self.get_output_file_and_dir(file_name, file_directory)
 
@@ -430,7 +431,7 @@ class Tracker(object):
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
-       
+
         DataWriter.write_nix(output_file_name + ".h5", times, self.dm, self.roim, self.mm, params)
         cv2.imwrite(output_file_name + "_OV_path.png", self.im.overview_output)
 

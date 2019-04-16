@@ -254,20 +254,24 @@ class DataManager(object):
                 self.estimated_oris[i] = self.all_oris[i]
 
     def print_data(self):
-        print "positions region of interest: " + str(self.all_pos_roi)
-        print "estimated positions roi:      " + str(self.estimated_pos_roi)
-        print "positions original recording: " + str(self.all_pos_original)
-        print "estimated positions original: " + str(self.estimated_pos_original)
-        print "all orientations:             " + str(self.all_oris)
-        print "estimated orientations:       " + str(self.estimated_oris)
-        print "number of contours in frames: " + str(self.number_contours_per_frame)
-        print "number of fish-size contours: " + str(self.number_relevant_contours_per_frame)
+        print("positions region of interest: " + str(self.all_pos_roi))
+        print("estimated positions roi:      " + str(self.estimated_pos_roi))
+        print("positions original recording: " + str(self.all_pos_original))
+        print("estimated positions original: " + str(self.estimated_pos_original))
+        print("all orientations:             " + str(self.all_oris))
+        print("estimated orientations:       " + str(self.estimated_oris))
+        print("number of contours in frames: " + str(self.number_contours_per_frame))
+        print("number of fish-size contours: " + str(self.number_relevant_contours_per_frame))
 
     def check_data_integrity(self):
-        if not len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == self.frame_counter:
-            print "WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!"
+        if not len(self.all_pos_roi) == len(self.all_pos_original) == \
+           len(self.all_oris) == self.frame_counter:
+            print("WARNING: Something went wrong. Length of Lists saving fish data not consistent with frame count!")
 
-        print "All lists consistent with frame count: " + str(len(self.all_pos_roi) == len(self.all_pos_original) == len(self.all_oris) == len(self.number_contours_per_frame) == len(self.number_relevant_contours_per_frame) == self.frame_counter)
+        print("All lists consistent with frame count: " +
+              str(len(self.all_pos_roi) == len(self.all_pos_original) ==
+                  len(self.all_oris) == len(self.number_contours_per_frame) ==
+                  len(self.number_relevant_contours_per_frame) == self.frame_counter))
 
     def check_frames_missing_fish(self, fish_not_detected_threshold):
         start_pos = 0
