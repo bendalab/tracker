@@ -34,8 +34,8 @@ class ROI(object):
             return
 
     def check_and_adjust_values(self, cap):
-        width = cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
-        height = cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         if self._x_1 < 0:
             self._x_1 = 0
         if self._x_1 > width:

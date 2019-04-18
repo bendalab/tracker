@@ -1,7 +1,6 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 import cv2
 import copy
-import ConfigParser
 import os
 import odml
 from ui.TabFileBatch import TabFileBatch
@@ -77,10 +76,9 @@ class Controller(object):
     def browse_file(self):
         self.roi_preview_displayed = False
 
-        self.track_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file',
-                                                                self.last_selected_folder)
-        print(type(self.track_file))
-        if self.track_file[0] == "":
+        self.track_file, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file',
+                                                                   self.last_selected_folder)
+        if not self.track_file or self.track_file == "":
             return
         self.ui.tab_file.lnEdit_file_path.setText(self.track_file)
 
@@ -133,10 +131,12 @@ class Controller(object):
         self.roi_preview_draw_numpy = copy.copy(self.first_frame_numpy)
         for roi in self.tracker.roim.roi_list:
             roi_input_box = self.ui.tab_roi.get_roi_input_box(roi.name)
-            cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1), (roi.x2, roi.y2), roi_input_box.color, 2)
+            cv2.rectangle(self.roi_preview_draw_numpy, (roi.x1, roi.y1),
+                          (roi.x2, roi.y2), roi_input_box.color, 2)
         # convert numpy-array to qimage
-        output_qimg = QtWidgets.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1], self.first_frame_numpy.shape[0], QtWidgets.QImage.Format_RGB888)
-        output_pixm = QtWidgets.QPixmap.fromImage(output_qimg)
+        output_qimg = QtGui.QImage(self.roi_preview_draw_numpy, self.first_frame_numpy.shape[1],
+                                   self.first_frame_numpy.shape[0], QtGui.QImage.Format_RGB888)
+        output_pixm = QtGui.QPixmap.fromImage(output_qimg)
         # fit picture to window size
         width = self.ui.tab_widget_options.geometry().width()*0.65
         height = int(width)
@@ -148,7 +148,7 @@ class Controller(object):
         self.ui.tab_roi.adjust_all_sizes()
 
     def update_progress(self, cap, frame_counter):
-        max_frames = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
+        max_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
         progress = "{0:s} %".format(str(frame_counter/max_frames*100)[0:6])
         self.ui.lbl_progress.setText("Progress: {0:s}".format(progress))
 
@@ -250,7 +250,8 @@ class Controller(object):
         return
 
     def btn_template_browse_clicked(self):
-        self.template_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', self.last_selected_template_folder)
+        self.template_file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file',
+                                                                   self.last_selected_template_folder)
         if self.template_file != "":
             self.last_selected_template_folder = "/".join(str(self.template_file).split("/")[:-1])
             # print self.last_selected_template_folder

@@ -213,7 +213,8 @@ class Tracker(object):
     def set_video_capture(self):
         print(self.video_file)
         self.cap = cv2.VideoCapture(self.video_file)
-        self.dm.video_resolution = (self.cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH), self.cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+        self.dm.video_resolution = (self.cap.get(cv2.CAP_PROP_FRAME_WIDTH),
+                                    self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # # morph given img by erosion/dilation
     def morph_img(self, img):
