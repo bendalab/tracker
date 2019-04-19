@@ -257,30 +257,21 @@ class Tracker(object):
     def extract_data(self):
         # create BG subtractor
         # bg_sub = cv2.BackgroundSubtractorMOG(100, 5, 0.5, 0)
-        bg_sub = cv2.BackgroundSubtractorMOG()
-
+        bg_sub = cv2.bgsegm.createBackgroundSubtractorMOG()
         self.roim.check_and_adjust_rois(self.cap, self.controller)
-
         roi = self.roim.get_roi("tracking_area")
 
         # main loop
         while self.cap.isOpened():
             ret, frame = self.cap.read()
-
             if frame is None:
                 break
 
             self.im.current_frame = frame
-
             self.dm.frame_counter += 1
-
-            # # TODO REMOVE AFTER TESTING
-            # if self.dm.frame_counter < 400:
-            #     continue
 
             # set region of interest ROI
             roi_img = copy.copy(frame[roi.y1:roi.y2, roi.x1:roi.x2])
-
             if self.dm.frame_counter == 1:
                 self.im.overview_output = copy.copy(frame)
                 self.dm.experiment_setup_img = copy.copy(frame)
@@ -292,7 +283,9 @@ class Tracker(object):
             ret, self.im.current_morphed = self.morph_img(self.im.current_bg_sub)
 
             # getting contours (of the morphed img)
-            self.cm.contour_list, hierarchy = cv2.findContours(copy.copy(self.im.current_morphed), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            self.cm.contour_list, hierarchy = cv2.findContours(copy.copy(self.im.current_morphed),
+                                                               cv2.RETR_EXTERNAL,
+                                                               cv2.CHAIN_APPROX_NONE)
 
             # save amount of contours
             self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_contours_per_frame)
@@ -305,7 +298,8 @@ class Tracker(object):
                 self.cm.del_oversized_contours(self.fish_max_size_threshold)
 
             # save number of remaining contours
-            self.dm.save_number_of_contours(self.cm.contour_list, self.dm.number_relevant_contours_per_frame)
+            self.dm.save_number_of_contours(self.cm.contour_list,
+                                            self.dm.number_relevant_contours_per_frame)
 
             # check if fish started
             if not self.fish_started:
@@ -318,7 +312,8 @@ class Tracker(object):
             # keep only biggest contours
             self.cm.keep_biggest_contours()
 
-            # if two or more contours (of same size) in list delete which is farthest away from last point
+            # if two or more contours (of same size) in list delete which is farthest
+            # away from last point
             if self.fish_started and self.cm.contour_list is not None and len(self.cm.contour_list) > 1:
                 self.cm.keep_nearest_contour(self.dm.last_pos, self.roim.get_roi("tracking_area"))
 
@@ -349,7 +344,8 @@ class Tracker(object):
             self.roim.calc_roi_data(frame)
 
             # draw current preview
-            self.im.draw_preview_img(self.ellipse, self.dm, self.fish_started, self.cm.contour_list, self.roim.get_roi("tracking_area"))
+            self.im.draw_preview_img(self.ellipse, self.dm, self.fish_started, self.cm.contour_list,
+                                     self.roim.get_roi("tracking_area"))
 
             # show all imgs
             self.im.show_imgs()
@@ -381,6 +377,7 @@ class Tracker(object):
         return times
 
     def run(self):
+        print("Tracker.run!!!")
         # self.set_video_file()
         self.check_if_necessary_files_exist()
         file_name, file_directory = self.extract_video_file_name_and_path()
